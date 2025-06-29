@@ -1,4 +1,4 @@
-package org.example.inventario.model.entity.organization;
+package org.example.inventario.model.entity.security;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,10 +16,12 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Role extends Base {
-    private String name;
-    private String description;
+public class User extends Base {
+    private String username;
+    private String password;
+    private String email;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Permit> permits;
+    private List<Role> roles;
+
 }

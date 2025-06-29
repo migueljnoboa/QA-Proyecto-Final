@@ -19,6 +19,8 @@ public class MyException extends RuntimeException {
     public static final int ERROR_USER_TOKEN_DISABLED = 4006;
     public static final int ERROR_USER_NO_PERMISSIONS = 4009;
 
+    public static final int ERROR_NOT_FOUND = 4040;
+
 
     public static final int ERROR_SERVER = 5000;
 
@@ -42,7 +44,7 @@ public class MyException extends RuntimeException {
                  MyException.ERROR_JWT_EXPIRED,
                  MyException.ERROR_USER_NO_PERMISSIONS,
                  MyException.ERROR_USER_TOKEN_DISABLED -> HttpStatus.FORBIDDEN;
-
+            case MyException.ERROR_NOT_FOUND -> HttpStatus.NOT_FOUND;
             case MyException.ERROR_SERVER -> HttpStatus.INTERNAL_SERVER_ERROR;
 
             default -> HttpStatus.BAD_REQUEST;

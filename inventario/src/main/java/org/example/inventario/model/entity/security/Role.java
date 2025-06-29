@@ -1,9 +1,8 @@
-package org.example.inventario.model.entity.organization;
+package org.example.inventario.model.entity.security;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +16,10 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class User extends Base {
-    private String username;
-    private String password;
-    private String email;
+public class Role extends Base {
+    private String name;
+    private String description;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Role> roles;
-
+    private List<Permit> permits;
 }

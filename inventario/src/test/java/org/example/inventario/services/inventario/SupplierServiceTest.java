@@ -126,18 +126,23 @@ public class SupplierServiceTest {
 
         supplier1.setName("");
         assertThrows(MyException.class, () -> supplierService.updateSupplier(supplier1.getId(), supplier1));
+        supplier1.setName(supplier2.getName());
 
         supplier1.setContactInfo("");
         assertThrows(MyException.class, () -> supplierService.updateSupplier(supplier1.getId(), supplier1));
+        supplier1.setContactInfo(supplier2.getContactInfo());
 
         supplier1.setAddress("");
         assertThrows(MyException.class, () -> supplierService.updateSupplier(supplier1.getId(), supplier1));
+        supplier1.setAddress(supplier2.getAddress());
 
         supplier1.setEmail("");
         assertThrows(MyException.class, () -> supplierService.updateSupplier(supplier1.getId(), supplier1));
+        supplier1.setEmail(supplier2.getEmail());
 
         supplier1.setPhoneNumber("");
         assertThrows(MyException.class, () -> supplierService.updateSupplier(supplier1.getId(), supplier1));
+
 
     }
 

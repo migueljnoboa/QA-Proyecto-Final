@@ -15,20 +15,20 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Product extends Base {
-    String name;
+    private String name;
     @Lob
-    String description;
+    private String description;
 
     @Enumerated(EnumType.STRING)
-    Category category;
+    private Category category;
 
-    BigDecimal price;
+    private BigDecimal price;
 
-    Integer stock;
+    private Integer stock;
 
-    Integer minStock;
+    private Integer minStock;
     @Lob
-    String image;
+    private String image;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Supplier supplier;

@@ -1,9 +1,8 @@
-package org.example.inventario.services;
+package org.example.inventario.services.inventario;
 
 import org.example.inventario.model.entity.inventory.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class ProductServiceTest {
 

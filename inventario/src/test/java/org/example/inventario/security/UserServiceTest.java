@@ -1,7 +1,6 @@
-package org.example.inventario.services;
+package org.example.inventario.security;
 
-import org.example.inventario.model.entity.inventory.Supplier;
-import org.example.inventario.model.entity.organization.User;
+import org.example.inventario.model.entity.security.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

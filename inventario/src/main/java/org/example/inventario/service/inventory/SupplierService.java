@@ -21,24 +21,9 @@ public class SupplierService {
 
 
     public Supplier createSupplier(Supplier supplier){
-        if(supplier == null) {
-            throw new MyException(400,"Supplier cannot be null");
-        }
-        if(StringUtils.isBlank(supplier.getName())) {
-            throw  new MyException(400,"Supplier name cannot be null or empty");
-        }
-        if(StringUtils.isBlank(supplier.getContactInfo())) {
-            throw new MyException(400,"Supplier contact info cannot be null or empty");
-        }
-        if(StringUtils.isBlank(supplier.getAddress())) {
-            throw new MyException(400,"Supplier address cannot be null or empty");
-        }
-        if(StringUtils.isBlank(supplier.getEmail())) {
-            throw new MyException(400,"Supplier email cannot be null or empty");
-        }
-        if(StringUtils.isBlank(supplier.getPhoneNumber())) {
-            throw new MyException(400,"Supplier phone number cannot be null or empty");
-        }
+
+        checkVariables(supplier);
+
         return supplierRepository.save(supplier);
     }
 
@@ -63,9 +48,25 @@ public class SupplierService {
 
     }
     public Supplier updateSupplier(Long id,  Supplier supplier) {
-        if (supplier == null ||  !supplierRepository.existsById(id)) {
-            throw new MyException(400,"Supplier or Supplier ID cannot be null");
+
+        if(id == null) {
+            throw  new MyException(400, "Id cannot be null");
         }
+
+        Supplier oldSupplier = getSupplierById(id);
+
+        if(supplier == null || oldSupplier == null) {
+            throw  new MyException(400, "Supplier not found or null");
+        }
+
+        checkVariables(supplier);
+
+        oldSupplier.setName(supplier.getName());
+        oldSupplier.setContactInfo(supplier.getContactInfo());
+        oldSupplier.setAddress(supplier.getAddress());
+        oldSupplier.setEmail(supplier.getEmail());
+        oldSupplier.setPhoneNumber(supplier.getPhoneNumber());
+
         return supplierRepository.save(supplier);
     }
 
@@ -74,9 +75,32 @@ public class SupplierService {
             throw new MyException(400,"Supplier ID cannot be null");
         }
         Supplier supplier = getSupplierById(id);
+
+        if (supplier == null) {
+            throw  new MyException(400, "Supplier not found or null");
+        }
         supplier.setEnabled(false);
         return supplierRepository.save(supplier);
     }
 
-
+    private void checkVariables(Supplier supplier) {
+        if(supplier == null) {
+            throw new MyException(400,"Supplier cannot be null");
+        }
+        if(StringUtils.isBlank(supplier.getName())) {
+            throw  new MyException(400,"Supplier name cannot be null or empty");
+        }
+        if(StringUtils.isBlank(supplier.getContactInfo())) {
+            throw new MyException(400,"Supplier contact info cannot be null or empty");
+        }
+        if(StringUtils.isBlank(supplier.getAddress())) {
+            throw new MyException(400,"Supplier address cannot be null or empty");
+        }
+        if(StringUtils.isBlank(supplier.getEmail())) {
+            throw new MyException(400,"Supplier email cannot be null or empty");
+        }
+        if(StringUtils.isBlank(supplier.getPhoneNumber())) {
+            throw new MyException(400, "Supplier phone number cannot be null or empty");
+        }
+    }
 }

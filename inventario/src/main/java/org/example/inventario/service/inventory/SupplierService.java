@@ -63,10 +63,12 @@ public class SupplierService {
 
     }
     public Supplier updateSupplier(Long id,  Supplier supplier) {
-        if (supplier == null ||  !supplierRepository.existsById(id)) {
+        Supplier supplierFound = getSupplierById(id);
+        if (supplier == null ||  supplierFound == null) {
             throw new MyException(400,"Supplier or Supplier ID cannot be null");
         }
-        return supplierRepository.save(supplier);
+        supplierFound.setName(supplier.getName());
+        return supplierRepository.save(supplierFound);
     }
 
     public Supplier deleteSupplier(Long id) {

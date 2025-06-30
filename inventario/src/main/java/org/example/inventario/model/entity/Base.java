@@ -19,9 +19,9 @@ public class Base implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
     @CreatedDate
-    private Date createdAt;
+    private Date createdAt = new Date();;
     @LastModifiedDate
-    protected Date updateAt;
+    protected Date updateAt = new Date();;
     @Version
     protected Long version;
     protected boolean enabled = true;

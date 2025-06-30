@@ -2,17 +2,22 @@ package org.example.inventario.model.entity.security;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.inventario.model.entity.Base;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "permits")
 public class Permit extends Base {
     public static final String DASHBOARD_MENU = "DASHBOARD_MENU";
     public static final String PRODUCTS_MENU = "PRODUCTS_MENU";
@@ -32,5 +37,8 @@ public class Permit extends Base {
 
     @Column(unique = true)
     String name;
+
+    @ManyToMany(mappedBy = "permits")
+    List<Role> roles;
 
 }

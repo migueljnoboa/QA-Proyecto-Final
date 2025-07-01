@@ -21,3 +21,17 @@ The [Getting Started](https://vaadin.com/docs/latest/getting-started) guide will
 Qa Proyecto Final implementation. You'll learn how to set up your development environment, understand the project 
 structure, and find resources to help you add muscles to your skeleton — transforming it into a fully-featured 
 application.
+
+## Risk Assesment
+
+1. Security issues involving API access.
+  - Fix: create tests on API calls to make sure the appropriate users are able to make calls and prevent unverified ones.
+
+2. Issues integrating Spring Boot Backend with React Front End
+   - Fix: Investigate appropriate implementation of Spring API, document and create a standard API call procedure / structure. Test for stable communication
+
+3. Conflicts from working in a team.
+   - Fix: Always make sure to be working on a separete branch and double check updates on the project before pushing code to the repository.
+  
+4. Unneseary testing
+   - Fix: Focus testing efforts on points of confliction / weakness as well as the requierments and rules the project needs to follow. Then keep going with coverage testing, but to use time more efficiently focus on the main classes, services and UI. Use flyway for ease and consistency of tests.

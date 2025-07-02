@@ -1,5 +1,6 @@
 package org.example.inventario.model.entity.security;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
@@ -39,6 +40,7 @@ public class Permit extends Base {
     String name;
 
     @ManyToMany(mappedBy = "permits")
+    @JsonIgnore
     List<Role> roles;
 
 }

@@ -1,72 +1,104 @@
--- USER
-CREATE TABLE users (
-                       id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                       created_at DATETIME,
-                       updated_at DATETIME,
-                       username VARCHAR(255) NOT NULL UNIQUE,
-                       password VARCHAR(255) NOT NULL,
-                       email VARCHAR(255)
-);
+-- inventariodb.roles definition
+CREATE TABLE `roles`
+(
+    `id`          bigint NOT NULL AUTO_INCREMENT,
+    `name`        varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `created_at`  datetime(6) DEFAULT NULL,
+    `enabled`     bit(1) NOT NULL,
+    `update_at`   datetime(6) DEFAULT NULL,
+    `version`     bigint                                  DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ROLE
-CREATE TABLE roles (
-                       id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                       created_at DATETIME,
-                       updated_at DATETIME,
-                       name VARCHAR(255),
-                       description VARCHAR(255)
-);
 
--- Table: permits
-CREATE TABLE permits (
-                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                         created_at DATETIME,
-                         updated_at DATETIME,
-                         name VARCHAR(255) UNIQUE
-);
+-- inventariodb.permits definition
+CREATE TABLE `permits`
+(
+    `id`         bigint NOT NULL AUTO_INCREMENT,
+    `created_at` datetime(6) DEFAULT NULL,
+    `enabled`    bit(1) NOT NULL,
+    `update_at`  datetime(6) DEFAULT NULL,
+    `version`    bigint                                  DEFAULT NULL,
+    `name`       varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `UKjkqq0lo5gti77y8qrrsp0ak3q` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table: user_roles (join table)
-CREATE TABLE user_roles (
-                            user_id BIGINT NOT NULL,
-                            roles_id BIGINT NOT NULL,
-                            PRIMARY KEY (user_id, roles_id),
-                            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-                            FOREIGN KEY (roles_id) REFERENCES roles(id) ON DELETE CASCADE
-);
 
--- Table: role_permits (join table)
-CREATE TABLE role_permits (
-                              role_id BIGINT NOT NULL,
-                              permits_id BIGINT NOT NULL,
-                              PRIMARY KEY (role_id, permits_id),
-                              FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
-                              FOREIGN KEY (permits_id) REFERENCES permits(id) ON DELETE CASCADE
-);
+-- inventariodb.roles_permits definition
+CREATE TABLE `roles_permits`
+(
+    `roles_id`   bigint NOT NULL,
+    `permits_id` bigint NOT NULL,
+    KEY          `FKbr5xd3omh6bkhyxcn2j6wbcdc` (`permits_id`),
+    KEY          `FK362qj8xl57wes9pocllv1q7v8` (`roles_id`),
+    CONSTRAINT `FK362qj8xl57wes9pocllv1q7v8` FOREIGN KEY (`roles_id`) REFERENCES `roles` (`id`),
+    CONSTRAINT `FKbr5xd3omh6bkhyxcn2j6wbcdc` FOREIGN KEY (`permits_id`) REFERENCES `permits` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table: supplier
-CREATE TABLE supplier (
-                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                          created_at DATETIME,
-                          updated_at DATETIME,
-                          name VARCHAR(255),
-                          contact_info VARCHAR(255),
-                          address VARCHAR(255),
-                          email VARCHAR(255),
-                          phone_number VARCHAR(255)
-);
 
--- Table: product
-CREATE TABLE product (
-                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                         created_at DATETIME,
-                         updated_at DATETIME,
-                         name VARCHAR(255),
-                         description TEXT,
-                         category VARCHAR(255),
-                         price DECIMAL(19,2),
-                         stock INT,
-                         min_stock INT,
-                         image TEXT,
-                         supplier_id BIGINT,
-                         FOREIGN KEY (supplier_id) REFERENCES supplier(id)
-);
+-- inventariodb.users definition
+CREATE TABLE `users`
+(
+    `id`         bigint NOT NULL AUTO_INCREMENT,
+    `created_at` datetime(6) DEFAULT NULL,
+    `enabled`    bit(1) NOT NULL,
+    `update_at`  datetime(6) DEFAULT NULL,
+    `version`    bigint                                  DEFAULT NULL,
+    `email`      varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `password`   varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `username`   varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- inventariodb.users_roles definition
+CREATE TABLE `users_roles`
+(
+    `users_id` bigint NOT NULL,
+    `roles_id` bigint NOT NULL,
+    KEY        `FKa62j07k5mhgifpp955h37ponj` (`roles_id`),
+    KEY        `FKml90kef4w2jy7oxyqv742tsfc` (`users_id`),
+    CONSTRAINT `FKa62j07k5mhgifpp955h37ponj` FOREIGN KEY (`roles_id`) REFERENCES `roles` (`id`),
+    CONSTRAINT `FKml90kef4w2jy7oxyqv742tsfc` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- inventariodb.supplier definition
+CREATE TABLE `supplier`
+(
+    `id`           bigint NOT NULL AUTO_INCREMENT,
+    `created_at`   datetime(6) DEFAULT NULL,
+    `enabled`      bit(1) NOT NULL,
+    `update_at`    datetime(6) DEFAULT NULL,
+    `version`      bigint                                  DEFAULT NULL,
+    `address`      varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `contact_info` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `email`        varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `name`         varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `phone_number` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- inventariodb.product definition
+CREATE TABLE `product`
+(
+    `id`          bigint NOT NULL AUTO_INCREMENT,
+    `created_at`  datetime(6) DEFAULT NULL,
+    `enabled`     bit(1) NOT NULL,
+    `update_at`   datetime(6) DEFAULT NULL,
+    `version`     bigint                                  DEFAULT NULL,
+    `category`    varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `description` longtext COLLATE utf8mb4_unicode_ci,
+    `image`       longtext COLLATE utf8mb4_unicode_ci,
+    `min_stock`   int                                     DEFAULT NULL,
+    `name`        varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `price`       decimal(38, 2)                          DEFAULT NULL,
+    `stock`       int                                     DEFAULT NULL,
+    `supplier_id` bigint                                  DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY           `FK2kxvbr72tmtscjvyp9yqb12by` (`supplier_id`),
+    CONSTRAINT `FK2kxvbr72tmtscjvyp9yqb12by` FOREIGN KEY (`supplier_id`) REFERENCES `supplier` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -3,7 +3,13 @@ package org.example.inventario.security;
 import org.example.inventario.model.entity.security.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 
+@SpringBootTest
+@TestPropertySource("classpath:application-dev.properties")
+@Transactional
 public class UserServiceTest {
 
     //@Autowired

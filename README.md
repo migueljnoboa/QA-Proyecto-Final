@@ -52,9 +52,12 @@ application.
 
 After the project has been tested with unit tests, integration tests, end to end tests and converage testing ect it should be ready for release / production. The basic idea is to monitor how the users respond to the program and make any fixes if necessary or when bugs are found.
 
+
 For upgrades or adding new versions of the dependencies we follow the documentation and any possible conflics between versions and make changes and addresss them in a testing enviroment. We retest with the tests that have been done in the past and add any new ones we need and fix any that have been broken or obselete. 
 
+
 Any new additions to the database will be addressed with a new version of the database using flyway.
+
 
 Slow rollouts to the more dedicated users as well as sustaining good comunication and feedback with them is essential before full deployment.
    

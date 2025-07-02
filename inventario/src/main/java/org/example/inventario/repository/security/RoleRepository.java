@@ -2,6 +2,8 @@ package org.example.inventario.repository.security;
 
 import org.example.inventario.model.entity.security.Role;
 import org.example.inventario.model.entity.security.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,6 +13,8 @@ import java.util.List;
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
     List<Role> findAllByUsersAndEnabledIsTrue(User user);
+
+    Page<Role> findAllByEnabledIsTrue(Pageable pageable);
 
     boolean existsByName(String name);
 

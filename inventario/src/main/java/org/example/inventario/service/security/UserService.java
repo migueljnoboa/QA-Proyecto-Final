@@ -30,7 +30,7 @@ public class UserService {
         if(StringUtils.isBlank(user.getPassword())) {
             throw new MyException(MyException.ERROR_VALIDATION, "Password cannot be empty");
         }
-        if(userRepository.findByUsername(user.getUsername()) != null) {
+        if(userRepository.findByUsernameAndEnabledIsTrue(user.getUsername()) != null) {
             throw new MyException(MyException.ERROR_VALIDATION, "User with this username already exists");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -48,7 +48,7 @@ public class UserService {
         if(StringUtils.isBlank(username)) {
             throw new MyException(MyException.ERROR_VALIDATION, "Username cannot be empty");
         }
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsernameAndEnabledIsTrue(username);
         if(user == null) {
             throw new MyException(MyException.ERROR_NOT_FOUND, "User not found with username: " + username);
         }
@@ -68,7 +68,7 @@ public class UserService {
         User actualUser = userRepository.findById(id)
                 .orElseThrow(() -> new MyException(MyException.ERROR_NOT_FOUND, "User not found with ID: " + id));
 
-        if(!actualUser.getUsername().equals(user.getUsername()) && userRepository.findByUsername(user.getUsername()) != null) {
+        if(!actualUser.getUsername().equals(user.getUsername()) && userRepository.findByUsernameAndEnabledIsTrue(user.getUsername()) != null) {
             throw new MyException(MyException.ERROR_VALIDATION, "User with this username already exists");
         }
         actualUser.setUsername(user.getUsername());
@@ -98,7 +98,7 @@ public class UserService {
     }
 
     public void createDefaultUserIfNotExists() {
-        User user = userRepository.findByUsername("admin");
+        User user = userRepository.findByUsernameAndEnabledIsTrue("admin");
         if(user == null) {
             user = new User();
             user.setUsername("admin");

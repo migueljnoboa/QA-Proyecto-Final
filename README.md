@@ -15,6 +15,13 @@ To build the application in production mode, run:
 ./mvnw -Pproduction package
 ```
 
+## test playwrite
+```bash
+npm install -D @playwright/test --legacy-peer-deps
+
+npx playwright test
+```
+
 ## Getting Started
 
 The [Getting Started](https://vaadin.com/docs/latest/getting-started) guide will quickly familiarize you with your new

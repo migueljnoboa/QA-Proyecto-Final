@@ -109,4 +109,27 @@ public class UserService {
         }
     }
 
+
+    public void createTestUser(){
+        User user = userRepository.findByUsernameAndEnabledIsTrue("miguel");
+        if(user == null) {
+            user = new User();
+            user.setUsername("miguel");
+            user.setPassword(passwordEncoder.encode("admin"));
+            user.setEmail("miguel@gmail.com");
+            user.setRoles(List.of(roleService.findByName(Role.USER_ROLE)));
+            userRepository.save(user);
+        }
+
+        user = userRepository.findByUsernameAndEnabledIsTrue("carlos");
+        if(user == null) {
+            user = new User();
+            user.setUsername("carlos");
+            user.setPassword(passwordEncoder.encode("admin"));
+            user.setEmail("carlos@gmail.com");
+            user.setRoles(List.of(roleService.findByName(Role.USER_ROLE)));
+            userRepository.save(user);
+        }
+    }
+
 }

@@ -102,3 +102,6 @@ CREATE TABLE `product`
     KEY           `FK2kxvbr72tmtscjvyp9yqb12by` (`supplier_id`),
     CONSTRAINT `FK2kxvbr72tmtscjvyp9yqb12by` FOREIGN KEY (`supplier_id`) REFERENCES `supplier` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+

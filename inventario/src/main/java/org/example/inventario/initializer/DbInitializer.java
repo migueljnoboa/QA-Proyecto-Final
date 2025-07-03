@@ -27,6 +27,9 @@ public  class DbInitializer implements ApplicationRunner {
         roleService.createDefaultRolesIfNotExists();
         userService.createDefaultUserIfNotExists();
 
+        //TODO: REMOVE BEFORE DEPLOYMENT
+        userService.createTestUser();
+
     }
 }
 

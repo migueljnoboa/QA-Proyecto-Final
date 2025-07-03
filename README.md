@@ -22,6 +22,30 @@ Qa Proyecto Final implementation. You'll learn how to set up your development en
 structure, and find resources to help you add muscles to your skeleton — transforming it into a fully-featured 
 application.
 
+## Project Plan
+
+The project is focused on an inventory management system with high levels of Quality Assurance.
+It must implement methods that let the user add, update, view and delete products from its catalog as well as be notified when the stock is low to know what to products to restock.
+Behind this system there must be users that can access specific parts of the app and are prevented from others. Some examples of posible users are Admins with access to all the system and user data and a product viewer that can see the full catalog but not interact with it.
+DTOs will be used for communicating with react to keep higher levels of security and discretion.
+
+This projects foundation is set on a Spring Boot backend with a react frontend and a rest API connecting them both.
+Junit will be used for unit tests
+Cucumber will be used for integration testing.
+Playwright for end to end testing
+Flyway for database version management
+Docker for containerization.
+The database will be MySQL
+
+The key components / requierments of the program are the following.
+- Management of Product (Create, update, view, delete)
+- Management of Supplier (Create, update, view, delete)
+- User Management (Create, update, view, delete)
+- Role Management (Create, update, view, delete)
+- Permit Management (View)
+
+
+
 ## Risk Assesment
 
 1. Security issues involving API access.

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.inventario.model.dto.api.ProductApi;
 import org.example.inventario.model.entity.Base;
 
 import java.math.BigDecimal;
@@ -33,5 +34,22 @@ public class Product extends Base {
     @ManyToOne(fetch = FetchType.EAGER)
     private Supplier supplier;
 
+
+    public static Product from(ProductApi product) {
+        if (product == null) {
+            return null;
+        }
+        Product newProduct = new Product();
+        newProduct.setId(product.getId());
+        newProduct.setName(product.getName());
+        newProduct.setDescription(product.getDescription());
+        newProduct.setCategory(product.getCategory());
+        newProduct.setPrice(product.getPrice());
+        newProduct.setStock(product.getStock());
+        newProduct.setMinStock(product.getMinStock());
+        newProduct.setImage(product.getImage());
+        newProduct.setSupplier(product.getSupplier());
+        return newProduct;
+    }
 
 }

@@ -28,13 +28,25 @@ public class ProductApiController {
     }
 
     @PostMapping("")
-    public ProductApi createProduct(@RequestBody ProductApi productApi) {
-        if (productApi == null) {
+    public ProductApi createProduct(@RequestBody Product product) {
+        if (product == null) {
             throw new IllegalArgumentException("Product cannot be null");
         }
-
-        return productApiService.createProduct(productApi);
+        return productApiService.createProduct(product);
     }
 
+    @PutMapping("{id}")
+    public ProductApi updateProduct(@PathVariable(name = "id") @Parameter(description = "Product ID.", example = "1") Long id, @RequestBody Product product) {
+        if (product == null) {
+            throw new IllegalArgumentException("Product cannot be null");
+        }
+        return productApiService.updateProduct(id, product);
+    }
 
+    @DeleteMapping("{id}")
+    public ProductApi deleteProduct(@PathVariable(name = "id") @Parameter(description = "Product ID.", example = "1") Long id) {
+        return productApiService.deleteProduct(id);
+    }
+
+    
 }

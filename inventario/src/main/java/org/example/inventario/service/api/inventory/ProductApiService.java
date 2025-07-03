@@ -44,7 +44,7 @@ public class ProductApiService {
     }
 
 
-    public ProductApi createProduct(ProductApi product) {
+    public ProductApi createProduct(Product product) {
 
         if (product == null) {
             throw new MyException(400, "Product is null");
@@ -58,7 +58,55 @@ public class ProductApiService {
         return productApi;
     }
 
-    private void checkVariables(ProductApi product) {
+    public ProductApi getProductById(Long id) {
+        if (id == null) {
+            throw new MyException(MyException.ERROR_NOT_FOUND, "Product ID cannot be null");
+        }
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new MyException(MyException.ERROR_NOT_FOUND, "Product not found with ID: " + id));
+        ProductApi productApi;
+        productApi = ProductApi.from(product);
+        return productApi;
+    }
+
+    public ProductApi updateProduct(Long id, Product product) {
+        if(id == null) {
+            throw new MyException(MyException.ERROR_NOT_FOUND, "Product ID cannot be null");
+        }
+        checkVariables(product);
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new MyException(MyException.ERROR_NOT_FOUND, "Product not found with ID: " + id));
+
+        existingProduct.setName(product.getName());
+        existingProduct.setDescription(product.getDescription());
+        existingProduct.setCategory(product.getCategory());
+        existingProduct.setPrice(product.getPrice());
+        existingProduct.setStock(product.getStock());
+        existingProduct.setMinStock(product.getMinStock());
+        existingProduct.setImage(product.getImage());
+        existingProduct.setSupplier(product.getSupplier());
+        Product updatedProduct = productRepository.save(existingProduct);
+        ProductApi productApi = ProductApi.from(updatedProduct);
+        return productApi;
+
+    }
+
+    public ProductApi deleteProduct(Long id) {
+        if(id == null) {
+            throw new MyException(MyException.ERROR_NOT_FOUND, "Product ID cannot be null");
+        }
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new MyException(MyException.ERROR_NOT_FOUND, "Product not found with ID: " + id));
+
+        product.setEnabled(false);
+        Product deletedProduct = productRepository.save(product);
+        ProductApi productApi = ProductApi.from(deletedProduct);
+        return productApi;
+    }
+
+
+
+    private void checkVariables(Product product) {
 
         if(product == null) {
             throw new MyException(400,"Supplier cannot be null");
@@ -87,16 +135,8 @@ public class ProductApiService {
             throw new MyException(400,"Supplier not found");
         }
 
+
+
     }
 
-    public ProductApi getProductById(Long id) {
-        if (id == null) {
-            throw new MyException(MyException.ERROR_NOT_FOUND, "Product ID cannot be null");
-        }
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new MyException(MyException.ERROR_NOT_FOUND, "Product not found with ID: " + id));
-        ProductApi productApi;
-        productApi = ProductApi.from(product);
-        return productApi;
-    }
 }

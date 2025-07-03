@@ -4,6 +4,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.apache.commons.lang3.StringUtils;
+import org.example.inventario.model.entity.Base;
+import org.example.inventario.model.entity.security.Permit;
+import org.example.inventario.model.entity.security.Role;
 import org.example.inventario.model.entity.security.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +32,11 @@ public class JWTService {
                 .claim("userID", user.getId())
                 .claim("email", user.getEmail())
                 .claim("name", user.getUsername())
+                .claim("permit", StringUtils.join(user.getRoles().stream()
+                        .filter(Base::isEnabled)
+                        .flatMap(role -> role.getPermits().stream())
+                        .map(Permit::getName)
+                        .toList(), ","))
                 .signWith(getJwtSecret())
                 .compact();
     }

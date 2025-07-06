@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b43ce6c1-9d89-40ae-b063-04028606ee6d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradlew.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/inventario/InventarioApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/inventario/exception/MyException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/inventario/exception/ResponseMessage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/inventario/exception/RestResponseEntityExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/inventario/initializer/DbInitializer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/inventario/model/entity/Base.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/inventario/model/entity/inventory/Category.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/inventario/model/entity/inventory/Product.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/inventario/model/entity/inventory/Supplier.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/inventario/model/entity/organization/Permit.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/inventario/model/entity/organization/Role.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/inventario/model/entity/organization/User.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/example/inventario/InventarioApplicationTests.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "EleazarPe"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/migueljnoboa/QA-Proyecto-Final.git",
+    "accountId": "26b0cc81-9a7a-42cb-832a-c437f1c35079"
+  }
+}]]></component>
+  <component name="GoLibraries">
+    <option name="indexEntireGoPath" value="true" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 8
+}]]></component>
+  <component name="ProjectId" id="2z4weSpu96np5Il07PIdZM27zFa" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "android.gradle.sync.needed": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "cpeterson",
+    "go.import.settings.migrated": "true",
+    "last_opened_file_path": "/home/eleazar/Documents",
+    "nodejs_package_manager_path": "npm",
+    "org.rust.first.attach.projects": "true",
+    "settings.editor.selected.configurable": "vcs.Git",
+    "show.migrate.to.gradle.popup": "false",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RustProjectSettings">
+    <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.26094.121" />
+        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-IU-251.26094.121" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b43ce6c1-9d89-40ae-b063-04028606ee6d" name="Changes" comment="" />
+      <created>1751003748178</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1751003748178</updated>
+      <workItem from="1751003749810" duration="13000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VgoProject">
+    <integration-enabled>false</integration-enabled>
+    <settings-migrated>true</settings-migrated>
+  </component>
+</project>

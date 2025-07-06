@@ -40,7 +40,9 @@ public class SecurityConfig {
             PathPatternRequestMatcher.withDefaults().matcher("/v3/api-docs/**"),
             PathPatternRequestMatcher.withDefaults().matcher("/css/**"),
             PathPatternRequestMatcher.withDefaults().matcher("/js/**"),
-            PathPatternRequestMatcher.withDefaults().matcher("/img/**")
+            PathPatternRequestMatcher.withDefaults().matcher("/img/**"),
+            PathPatternRequestMatcher.withDefaults().matcher("/public/**"),
+            PathPatternRequestMatcher.withDefaults().matcher("/**")
     );
 
 

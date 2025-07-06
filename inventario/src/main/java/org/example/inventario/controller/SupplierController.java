@@ -8,7 +8,7 @@ import org.example.inventario.service.inventory.SupplierService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/supplier")
+@RequestMapping("api/supplier")
 @RequiredArgsConstructor
 public class SupplierController {
     private final SupplierService supplierService;

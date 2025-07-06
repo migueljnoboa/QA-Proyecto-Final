@@ -8,7 +8,7 @@ import org.example.inventario.service.inventory.ProductService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/product")
+@RequestMapping("api/product")
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;

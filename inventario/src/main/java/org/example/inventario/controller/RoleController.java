@@ -8,7 +8,7 @@ import org.example.inventario.service.security.RoleService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/role")
+@RequestMapping("api/role")
 @RequiredArgsConstructor
 public class RoleController {
     private final RoleService roleService;

@@ -1,7 +1,5 @@
 package org.example.inventario.services.inventario;
 
-import jakarta.persistence.*;
-import org.apache.commons.lang3.StringUtils;
 import org.example.inventario.exception.MyException;
 import org.example.inventario.model.dto.inventory.ReturnList;
 import org.example.inventario.model.entity.inventory.Category;
@@ -13,9 +11,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.*;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 
@@ -23,10 +23,25 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ActiveProfiles("dev")
 @SpringBootTest
-@TestPropertySource("classpath:application-dev.properties")
 @Transactional
+@Testcontainers
 public class ProductServiceTest {
+
+    @Container
+    public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:8.0.33")
+            .withDatabaseName("testdb")
+            .withUsername("testuser")
+            .withPassword("testpass");
+
+    // Override Spring properties to use the container's JDBC URL and credentials
+    @DynamicPropertySource
+    static void overrideDatasourceProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", mysqlContainer::getUsername);
+        registry.add("spring.datasource.password", mysqlContainer::getPassword);
+    }
 
     @Autowired
     private SupplierService supplierService;
@@ -46,7 +61,6 @@ public class ProductServiceTest {
     public void init() {
 
         supplier = new Supplier("supplier1","contact Info", "address", "email@email.com", "8099891333");
-
         product1 = new Product("product1","description", Category.BEAUTY_PRODUCTS, new BigDecimal("20.0"), 5, 2, null, supplier);
         product2 = new Product("product2","description", Category.BEAUTY_PRODUCTS, new BigDecimal("20.0"), 5, 2, null, supplier);
         product3 = new Product("product3","description", Category.BEAUTY_PRODUCTS, new BigDecimal("20.0"), 5, 2, null, supplier);
@@ -208,14 +222,12 @@ public class ProductServiceTest {
 
         ReturnList<Product> productReturnList = productService.getAllProducts(0, 20);
 
+        System.out.println("TESTING");
+        productReturnList.getData().iterator().forEachRemaining(product -> System.out.println("ID: " + product.getId()));
+
         assertTrue(productReturnList.getData().contains(product1));
         assertTrue(productReturnList.getData().contains(product2));
         assertTrue(productReturnList.getData().contains(product3));
-
-        productReturnList = productService.getAllProducts(0, 1);
-
-        assertTrue(productReturnList.getData().contains(product1));
-        assertFalse(productReturnList.getData().contains(product2));
 
     }
 

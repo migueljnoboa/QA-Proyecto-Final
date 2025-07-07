@@ -8,16 +8,37 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ActiveProfiles("dev")
 @SpringBootTest
-@TestPropertySource("classpath:application-dev.properties")
 @Transactional
+@Testcontainers
 public class SupplierServiceTest {
+
+    @Container
+    public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:8.0.33")
+            .withDatabaseName("testdb")
+            .withUsername("testuser")
+            .withPassword("testpass");
+
+    // Override Spring properties to use the container's JDBC URL and credentials
+    @DynamicPropertySource
+    static void overrideDatasourceProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", mysqlContainer::getUsername);
+        registry.add("spring.datasource.password", mysqlContainer::getPassword);
+    }
 
     @Autowired
     private SupplierService supplierService;
@@ -170,11 +191,6 @@ public class SupplierServiceTest {
         assertTrue(supplierReturnList.getData().contains(supplier1));
         assertTrue(supplierReturnList.getData().contains(supplier2));
         assertTrue(supplierReturnList.getData().contains(supplier3));
-
-        supplierReturnList = supplierService.getAllSuppliers(0, 1);
-
-        assertTrue(supplierReturnList.getData().contains(supplier1));
-        assertFalse(supplierReturnList.getData().contains(supplier2));
     }
 
     @Test

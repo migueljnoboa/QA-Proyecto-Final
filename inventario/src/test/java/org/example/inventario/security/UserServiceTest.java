@@ -4,11 +4,12 @@ import org.example.inventario.model.entity.security.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
+@Profile("dev")
 @SpringBootTest
-@TestPropertySource("classpath:application-dev.properties")
 @Transactional
 public class UserServiceTest {
 

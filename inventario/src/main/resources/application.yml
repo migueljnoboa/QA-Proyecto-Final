@@ -1,0 +1,67 @@
+#server.port: 8081
+
+#Configuration JWT
+jwt.secret: ${JWT_SECRET:secret}
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:*}
+
+spring:
+  application:
+    name: inventario
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none #update
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+          lob:
+            non_contextual_creation: true
+
+  # Flyway settings
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:inventariodb}?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:user}
+    password: ${MYSQL_PASSWORD:12345678}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  h2:
+    console:
+      enabled: false
+
+---
+spring:
+  application:
+    name: inventario
+
+  config:
+    activate:
+      on-profile: dev
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # URL, username, password will be overridden by Testcontainers
+
+
+
+
+
+
+
+

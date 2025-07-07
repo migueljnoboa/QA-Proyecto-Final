@@ -19,16 +19,16 @@ VALUES (NOW(), b'1', NOW(), 1, '654 Birch Ln', 'Luis Gomez', 'supplier5@example.
 -- Create test Products
 
 INSERT INTO product (created_at, enabled, update_at, version, category, description, image, min_stock, name, price, stock, supplier_id)
-VALUES (NOW(), b'1', NOW(), 1, 'Electronics', 'High-performance graphics card', NULL, 10, 'NVIDIA RTX 4080', 1199.99, 25, 1);
+VALUES (NOW(), b'1', NOW(), 1, 'ELECTRONICS', 'High-performance graphics card', NULL, 10, 'NVIDIA RTX 4080', 1199.99, 25, 1);
 
 INSERT INTO product (created_at, enabled, update_at, version, category, description, image, min_stock, name, price, stock, supplier_id)
-VALUES (NOW(), b'1', NOW(), 1, 'Hardware', 'Heavy-duty industrial drill', NULL, 5, 'Bosch PowerDrill X200', 349.50, 12, 2);
+VALUES (NOW(), b'1', NOW(), 1, 'FURNITURE', 'Heavy-duty industrial drill', NULL, 5, 'Bosch PowerDrill X200', 349.50, 12, 2);
 
 INSERT INTO product (created_at, enabled, update_at, version, category, description, image, min_stock, name, price, stock, supplier_id)
-VALUES (NOW(), b'1', NOW(), 1, 'Peripherals', 'Ergonomic wireless keyboard', NULL, 15, 'Logitech Ergo K860', 99.95, 40, 3);
+VALUES (NOW(), b'1', NOW(), 1, 'CLOTHING', 'Ergonomic wireless keyboard', NULL, 15, 'Logitech Ergo K860', 99.95, 40, 3);
 
 INSERT INTO product (created_at, enabled, update_at, version, category, description, image, min_stock, name, price, stock, supplier_id)
-VALUES (NOW(), b'1', NOW(), 1, 'Components', '500GB NVMe SSD drive', NULL, 20, 'Samsung 980 PRO', 129.99, 60, 4);
+VALUES (NOW(), b'1', NOW(), 1, 'FOOD', '500GB NVMe SSD drive', NULL, 20, 'Samsung 980 PRO', 129.99, 60, 4);
 
 INSERT INTO product (created_at, enabled, update_at, version, category, description, image, min_stock, name, price, stock, supplier_id)
-VALUES (NOW(), b'1', NOW(), 1, 'Networking', 'Wi-Fi 6 router with mesh support', NULL, 8, 'TP-Link AX3000', 89.00, 18, 5);
+VALUES (NOW(), b'1', NOW(), 1, 'BOOKS', 'Wi-Fi 6 router with mesh support', NULL, 8, 'TP-Link AX3000', 89.00, 18, 5);

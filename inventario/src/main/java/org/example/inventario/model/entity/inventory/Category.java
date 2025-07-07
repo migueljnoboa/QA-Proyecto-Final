@@ -1,5 +1,8 @@
 package org.example.inventario.model.entity.inventory;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+
 public enum Category {
     ELECTRONICS,
     FURNITURE,

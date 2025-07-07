@@ -116,7 +116,7 @@ public class UserService {
         if(user == null) {
             user = new User();
             user.setUsername("miguel");
-            user.setPassword(passwordEncoder.encode("admin"));
+            user.setPassword(passwordEncoder.passwordEncoder().encode("admin"));
             user.setEmail("miguel@gmail.com");
             user.setRoles(List.of(roleService.findByName(Role.USER_ROLE)));
             userRepository.save(user);
@@ -126,7 +126,7 @@ public class UserService {
         if(user == null) {
             user = new User();
             user.setUsername("carlos");
-            user.setPassword(passwordEncoder.encode("admin"));
+            user.setPassword(passwordEncoder.passwordEncoder().encode("admin"));
             user.setEmail("carlos@gmail.com");
             user.setRoles(List.of(roleService.findByName(Role.USER_ROLE)));
             userRepository.save(user);

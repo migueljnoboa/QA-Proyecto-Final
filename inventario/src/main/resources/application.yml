@@ -36,6 +36,13 @@ spring:
     console:
       enabled: false
 
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      username: ${REDIS_USERNAME:}
+      password: ${REDIS_PASSWORD:}
+
 ---
 spring:
   application:
@@ -53,6 +60,13 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      username: ${REDIS_USERNAME:}
+      password: ${REDIS_PASSWORD:}
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

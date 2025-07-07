@@ -19,10 +19,14 @@ import org.springframework.web.util.pattern.PathPatternParser;
 
 import java.util.List;
 
-@RequiredArgsConstructor
-public class VaadinSecurityConfiguration extends VaadinWebSecurity {
-    private final UserDetailsService userDetailsService;
 
+@RequiredArgsConstructor
+@Configuration
+@Order(2)
+public class VaadinSecurityConfiguration extends VaadinWebSecurity {
+
+    private final ValidateUserService userDetailsService;
+    private final PasswordEncodingConfig passwordEncodingConfig;
 
     public static final List<PathPatternRequestMatcher> EXCLUDE_ROUTES = List.of(
             PathPatternRequestMatcher.withDefaults().matcher("/images/*"),
@@ -33,25 +37,27 @@ public class VaadinSecurityConfiguration extends VaadinWebSecurity {
             PathPatternRequestMatcher.withDefaults().matcher("/js/**"),
             PathPatternRequestMatcher.withDefaults().matcher("/font-awesome/**"),
             PathPatternRequestMatcher.withDefaults().matcher("/img/**"),
-            PathPatternRequestMatcher.withDefaults().matcher("/fonts/**"),
-            PathPatternRequestMatcher.withDefaults().matcher("/login")
+            PathPatternRequestMatcher.withDefaults().matcher("/fonts/**")
     );
 
     @Override
-    @Order(2)
     protected void configure(HttpSecurity http) throws Exception {
+        http.authenticationProvider(authenticationProvider());
+
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(EXCLUDE_ROUTES.toArray(new PathPatternRequestMatcher[0])).permitAll()
-                .anyRequest().authenticated()
-        )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        super.configure(http);
-        setLoginView(http, Login.class);
+                .requestMatchers("/login").permitAll()
+        );
 
+        super.configure(http);
+
+        setLoginView(http, Login.class);
     }
-    public UserDetailsService userDetailsService() {
-        return new ValidateUserService();
+
+    @Bean("authProvider")
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncodingConfig.passwordEncoder());
+        return authProvider;
     }
 }
-
-

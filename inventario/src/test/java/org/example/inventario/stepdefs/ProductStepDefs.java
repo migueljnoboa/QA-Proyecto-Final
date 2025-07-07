@@ -64,4 +64,36 @@ public class ProductStepDefs {
         Assertions.assertNotNull(responseProduct);
         Assertions.assertEquals(expectedName, responseProduct.getName());
     }
+
+    @When("I update the product name to {string}")
+    public void iUpdateTheProductNameTo(String arg0) {
+
+        product.setName(arg0);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Product> request = new HttpEntity<>(product, headers);
+
+        responseEntity = restTemplate.exchange(
+                "/api/product/" + lastProductId,
+                HttpMethod.PUT,
+                request,
+                Product.class
+        );
+
+        responseProduct = responseEntity.getBody();
+    }
+
+    @When("I delete the product")
+    public void i_delete_the_product() {
+        restTemplate.delete("/api/product/" + lastProductId);
+        responseProduct = productService.getProductById(lastProductId); // should be disabled
+    }
+
+    @Then("the product should be marked as disabled")
+    public void the_product_should_be_marked_as_disabled() {
+        Assertions.assertFalse(responseProduct.isEnabled());
+    }
+
+
 }

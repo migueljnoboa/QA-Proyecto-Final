@@ -22,7 +22,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
 
 @Layout
-@PermitAll // When security is enabled, allow all authenticated users
+@PermitAll
 public final class MainLayout extends AppLayout {
 
     /*private final CurrentUser currentUser;*/

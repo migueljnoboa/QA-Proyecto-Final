@@ -22,20 +22,19 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-
     private final JWTAuthFilter jwtAuthFilter;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     public static final List<PathPatternRequestMatcher> EXCLUDE_ROUTES = List.of(
-            PathPatternRequestMatcher.withDefaults().matcher("/api/security/authenticate"),
-            PathPatternRequestMatcher.withDefaults().matcher("/**")
+            PathPatternRequestMatcher.withDefaults().matcher("/api/security/authenticate")
     );
-
 
     @Bean
     @Order(1)
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         http
+
+                .securityMatcher("/api/**")
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -57,6 +56,4 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-
 }
-

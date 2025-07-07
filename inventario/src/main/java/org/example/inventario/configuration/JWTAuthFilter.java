@@ -34,7 +34,8 @@ public class JWTAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return SecurityConfig.EXCLUDE_ROUTES.stream().anyMatch(matcher -> matcher.matches(request));
+        return !request.getRequestURI().startsWith("/api/") ||
+                SecurityConfig.EXCLUDE_ROUTES.stream().anyMatch(matcher -> matcher.matches(request));
     }
 
     @Override

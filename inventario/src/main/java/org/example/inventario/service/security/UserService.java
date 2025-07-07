@@ -2,6 +2,7 @@ package org.example.inventario.service.security;
 
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
+import org.example.inventario.configuration.PasswordEncodingConfig;
 import org.example.inventario.exception.MyException;
 import org.example.inventario.model.entity.security.Role;
 import org.example.inventario.model.entity.security.User;
@@ -16,7 +17,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
 
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncodingConfig passwordEncoder;
     private final RoleService roleService;
 
 
@@ -33,7 +34,7 @@ public class UserService {
         if(userRepository.findByUsernameAndEnabledIsTrue(user.getUsername()) != null) {
             throw new MyException(MyException.ERROR_VALIDATION, "User with this username already exists");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.passwordEncoder().encode(user.getPassword()));
 
         return userRepository.save(user);
     }
@@ -72,7 +73,7 @@ public class UserService {
             throw new MyException(MyException.ERROR_VALIDATION, "User with this username already exists");
         }
         actualUser.setUsername(user.getUsername());
-        actualUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        actualUser.setPassword(passwordEncoder.passwordEncoder().encode(user.getPassword()));
         actualUser.setEnabled(user.isEnabled());
         actualUser.setRoles(user.getRoles());
         return userRepository.save(actualUser);
@@ -102,7 +103,7 @@ public class UserService {
         if(user == null) {
             user = new User();
             user.setUsername("admin");
-            user.setPassword(passwordEncoder.encode("admin"));
+            user.setPassword(passwordEncoder.passwordEncoder().encode("admin"));
             user.setEmail("admin@gmail.com");
             user.setRoles(List.of( roleService.findByName(Role.ADMIN_ROLE)));
             userRepository.save(user);

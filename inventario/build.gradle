@@ -26,7 +26,7 @@ repositories {
 }
 
 vaadin {
-    productionMode = false
+    productionMode = true
 }
 
 ext {

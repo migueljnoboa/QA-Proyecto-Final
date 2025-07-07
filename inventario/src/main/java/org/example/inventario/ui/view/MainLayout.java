@@ -20,19 +20,20 @@ import com.vaadin.flow.server.menu.MenuEntry;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
+import org.example.inventario.model.entity.security.User;
+import org.example.inventario.service.security.SecurityService;
 
 @Layout
 @PermitAll
 public final class MainLayout extends AppLayout {
 
-    /*private final CurrentUser currentUser;*/
-    private final AuthenticationContext authenticationContext;
+    private final SecurityService service;
 
-    MainLayout(/*CurrentUser currentUser, */AuthenticationContext authenticationContext) {
-        /*this.currentUser = currentUser;*/
-        this.authenticationContext = authenticationContext;
+
+    MainLayout(SecurityService service) {
+        this.service = service;
         setPrimarySection(Section.DRAWER);
-        addToDrawer(createHeader(), new Scroller(createSideNav())/*, createUserMenu()*/);
+        addToDrawer(createHeader(), new Scroller(createSideNav()), createUserMenu());
     }
 
     private Div createHeader() {
@@ -62,27 +63,35 @@ public final class MainLayout extends AppLayout {
         }
     }
 
-//    private Component createUserMenu() {
-//        var user = currentUser.require();
-//
-//        var avatar = new Avatar(user.getFullName(), user.getPictureUrl());
-//        avatar.addThemeVariants(AvatarVariant.LUMO_XSMALL);
-//        avatar.addClassNames(LumoUtility.Margin.Right.SMALL);
-//        avatar.setColorIndex(5);
-//
-//        var userMenu = new MenuBar();
-//        userMenu.addThemeVariants(MenuBarVariant.LUMO_TERTIARY_INLINE);
-//        userMenu.addClassNames(LumoUtility.Margin.MEDIUM);
-//
-//        var userMenuItem = userMenu.addItem(avatar);
-//        userMenuItem.add(user.getFullName());
-//        if (user.getProfileUrl() != null) {
-//            userMenuItem.getSubMenu().addItem("View Profile",
-//                    event -> UI.getCurrent().getPage().open(user.getProfileUrl()));
-//        }
-//        userMenuItem.getSubMenu().addItem("Logout", event -> authenticationContext.logout());
-//
-//        return userMenu;
-//    }
+    private Component createUserMenu() {
+        User user = null;
+        var authenticatedUser = service.getAuthenticatedUser();
+        if (authenticatedUser != null) {
+            user = authenticatedUser.getUsuario();
+        }
+
+        var userMenu = new MenuBar();
+        userMenu.addThemeVariants(MenuBarVariant.LUMO_TERTIARY_INLINE);
+        userMenu.addClassNames(LumoUtility.Margin.MEDIUM);
+
+        if (user != null) {
+            var avatar = new Avatar(user.getUsername());
+            avatar.addThemeVariants(AvatarVariant.LUMO_XSMALL);
+            avatar.addClassNames(LumoUtility.Margin.Right.SMALL);
+            avatar.setColorIndex(5);
+
+            var userMenuItem = userMenu.addItem(avatar);
+            userMenuItem.add(user.getUsername());
+            //        if (user.getProfileUrl() != null) {
+            //            userMenuItem.getSubMenu().addItem("View Profile",
+            //                    event -> UI.getCurrent().getPage().open(user.getProfileUrl()));
+            //        }
+            userMenuItem.getSubMenu().addItem("Logout", event -> service.logout());
+        } else {
+            userMenu.addItem("Login", event -> UI.getCurrent().navigate("login"));
+        }
+
+        return userMenu;
+    }
 
 }

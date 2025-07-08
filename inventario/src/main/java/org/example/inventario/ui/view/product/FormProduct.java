@@ -22,12 +22,14 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.server.streams.InMemoryUploadHandler;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.Supplier;
 import org.example.inventario.ui.component.ConfirmWindow;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
@@ -54,7 +56,7 @@ public class FormProduct extends Dialog {
 
     private ComboBox<Supplier> supplier;
 
-    private UploadHandler image;
+    private byte[] image;
     
     private Button btnSave, btnExit;
 
@@ -105,7 +107,7 @@ public class FormProduct extends Dialog {
         btnExit.addThemeVariants(ButtonVariant.LUMO_SMALL);
         btnExit.addClickListener(event -> {
             if (!view) {
-                ConfirmWindow confirmWindow = new ConfirmWindow("Action Confirmation", "Are you sure to continue?", this::close);
+                ConfirmWindow confirmWindow = new ConfirmWindow("Action Confirmation", "Are you sure you want to continue?", this::close);
                 confirmWindow.open();
             } else {
                 close();
@@ -159,13 +161,8 @@ public class FormProduct extends Dialog {
         description.setMaxLength(500);
         description.setValueChangeMode(ValueChangeMode.EAGER);
 
-//        UploadHandler uploadHandler = new UploadHandler();
-//        Upload uploadImage = new Upload(uploadHandler);
-//        uploadImage.setAcceptedFileTypes("image/jpeg", "image/jpg", "image/png", "image/gif");
-//        uploadImage.setMaxFiles(1);
-//        uploadImage.setMaxFileSize(5 * 1024 * 1024); // 5MB
-//        uploadImage.setUploadButton(new Button("Choose File"));
-//        uploadImage.setDropLabel(new NativeLabel("Arrastra aquí tu imagen o haz clic para seleccionar"));
+        Upload upload = getUpload();
+        upload.setDropAllowed(true);
 
         // Crear layout para mostrar la imagen preview
         VerticalLayout imagePreviewLayout = new VerticalLayout();
@@ -239,7 +236,7 @@ public class FormProduct extends Dialog {
         imageSection.setPadding(false);
         NativeLabel imageLabel = new NativeLabel("Product Image");
         imageLabel.getStyle().set("font-weight", "bold");
-        imageSection.add(imageLabel/*, uploadImage*/, imagePreviewLayout);
+        imageSection.add(imageLabel, upload, imagePreviewLayout);
 
         // Layout principal del tab
         VerticalLayout mainLayout = new VerticalLayout();
@@ -249,6 +246,19 @@ public class FormProduct extends Dialog {
         mainLayout.add(row1, row2, row3, imageSection, description);
 
         return mainLayout;
+    }
+
+    @NotNull
+    private Upload getUpload() {
+        InMemoryUploadHandler inMemoryHandler = UploadHandler.inMemory(
+                (metadata, data) -> {
+                    String fileName = metadata.fileName();
+                    String mimeType = metadata.contentType();
+                    long contentLength = metadata.contentLength();
+                    image = data;
+                });
+        Upload upload = new Upload(inMemoryHandler);
+        return upload;
     }
 
 

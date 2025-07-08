@@ -87,11 +87,31 @@ public class FormProduct extends Dialog {
 
         add(buildWindow());
     }
+    public FormProduct(Product product, boolean view) {
+        this.saveProduct = product;
+        setHeaderTitle("Editar Producto: " + saveProduct.getName());
+        setId("FORM-PRODUCTO");
+        setModal(false);
+        setDraggable(true);
+        addThemeVariants(DialogVariant.LUMO_NO_PADDING);
+        add(buildWindow());
+        if (view) {
+            this.setHeaderTitle("Visualizar Caja Chica");
+            this.setId("FORM-CAJA-CHICA-VISUALIZAR");
+            disableFields();
+        } else {
+            this.setHeaderTitle("Editar Caja Chica");
+            this.setId("FORM-CAJA-CHICA-EDITAR");
+        }
+    }
 
     @Autowired
     public void setServices(ProductService productService, SupplierService supplierService) {
         this.productService = productService;
         this.supplierService = supplierService;
+        if (saveProduct.getId() != null && saveProduct.getId() > 0L) {
+            fillFields();
+        }
     }
 
     private Component buildWindow() {
@@ -374,6 +394,37 @@ public class FormProduct extends Dialog {
             saveProduct.setImage(null);
         }
         
+    }
+
+    private void fillFields(){
+        tfName.setValue(saveProduct.getName());
+        taDescription.setValue(saveProduct.getDescription());
+        cbCategory.setValue(saveProduct.getCategory());
+        bdFPrice.setValue(saveProduct.getPrice());
+        ifStock.setValue(saveProduct.getStock());
+        ifminStock.setValue(saveProduct.getMinStock());
+        cbSupplier.setValue(saveProduct.getSupplier());
+
+        if (saveProduct.getImage() != null) {
+            try {
+                image = saveProduct.getImage().getBytes();
+            } catch (Exception e) {
+                image = null;
+            }
+        } else {
+            image = null;
+        }
+    }
+
+    private void disableFields(){
+        tfName.setReadOnly(true);
+        taDescription.setReadOnly(true);
+        cbCategory.setReadOnly(true);
+        bdFPrice.setReadOnly(true);
+        ifStock.setReadOnly(true);
+        ifminStock.setReadOnly(true);
+        cbSupplier.setReadOnly(true);
+        btnSave.setVisible(false);
     }
 
 

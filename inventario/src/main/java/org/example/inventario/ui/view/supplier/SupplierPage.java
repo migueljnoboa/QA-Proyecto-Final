@@ -1,35 +1,24 @@
 package org.example.inventario.ui.view.supplier;
 
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.textfield.BigDecimalField;
-import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
-import org.example.inventario.model.entity.inventory.Category;
-import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.Supplier;
 import org.example.inventario.model.entity.security.Permit;
-import org.example.inventario.service.inventory.ProductService;
 import org.example.inventario.service.inventory.SupplierService;
 import org.example.inventario.service.security.SecurityService;
-import org.example.inventario.ui.component.ControlPanel;
-import org.example.inventario.ui.component.SearchFilter;
+import org.example.inventario.ui.component.*;
 import org.example.inventario.ui.view.MainLayout;
-import org.example.inventario.ui.view.product.FormProduct;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-
 @Route(value ="/supplier", layout = MainLayout.class)
 @PageTitle("Supplier")
-@RolesAllowed({"PRODUCTS_MENU"})
+@RolesAllowed({"SUPPLIERS_MENU"})
 @Menu(order = 2, icon = "vaadin:user-card", title = "Supplier")
 public class SupplierPage extends ControlPanel<Supplier> {
 
@@ -105,15 +94,26 @@ public class SupplierPage extends ControlPanel<Supplier> {
             form.open();
         });
         btnCancel.addClickListener(event -> {
-            if (selectedItem != null && selectedItem.getId() != null) {
-                supplierService.deleteSupplier(selectedItem.getId());
-            }
-            fillGrid();
+            deleteRow();
         });
     }
 
     @Override
     protected void deleteRow() {
+        ConfirmWindow ventanaConfirmacion = new ConfirmWindow("Confirm Action", "Are you sure you want to delete this supplier: " + selectedItem.getName() + "?", () -> {
+            try {
+                supplierService.deleteSupplier(selectedItem.getId());
+                String mensaje = "Supplier " + selectedItem.getName() + " deleted successfully.";
+                MySuccessNotification miSuccessNotification = new MySuccessNotification(mensaje);
+                miSuccessNotification.open();
+
+                fillGrid();
+            } catch (Exception e) {
+                MyErrorNotification miErrorNotification = new MyErrorNotification(e.getMessage());
+                miErrorNotification.open();
+            }
+        });
+        ventanaConfirmacion.open();
 
     }
 }

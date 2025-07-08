@@ -59,6 +59,7 @@ public class SupplierPage extends ControlPanel<Supplier> {
         btnNew.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+ Permit.SUPPLIER_CREATE)));
         btnEdit.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.SUPPLIER_EDIT)));
         btnView.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.SUPPLIER_VIEW)));
+        btnCancel.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.SUPPLIER_DELETE)));
     }
 
     @Override

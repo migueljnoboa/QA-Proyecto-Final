@@ -14,11 +14,14 @@ import jakarta.annotation.security.RolesAllowed;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.Supplier;
+import org.example.inventario.model.entity.security.Permit;
 import org.example.inventario.service.inventory.ProductService;
 import org.example.inventario.service.inventory.SupplierService;
+import org.example.inventario.service.security.SecurityService;
 import org.example.inventario.ui.component.ControlPanel;
 import org.example.inventario.ui.component.SearchFilter;
 import org.example.inventario.ui.view.MainLayout;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
@@ -34,10 +37,15 @@ public class ProductPage extends ControlPanel<Product> {
     private ProductService productService;
     private SupplierService supplierService;
 
+    private SecurityService securityService;
+    ApplicationContext applicationContext;
 
-    public ProductPage(ProductService productService, SupplierService supplierService) {
+
+    public ProductPage(ApplicationContext applicationContext,ProductService productService, SecurityService securityService, SupplierService supplierService) {
         super();
+        this.applicationContext = applicationContext;
         this.productService = productService;
+        this.securityService = securityService;
         this.supplierService = supplierService;
         setConfig();
     }
@@ -55,6 +63,9 @@ public class ProductPage extends ControlPanel<Product> {
 
     @Override
     protected void addSecurity() {
+        btnNew.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.PRODUCT_CREATE)));
+        btnEdit.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.PRODUCT_EDIT)));
+        btnView.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.PRODUCT_VIEW)));
 
     }
 
@@ -87,7 +98,11 @@ public class ProductPage extends ControlPanel<Product> {
 
     @Override
     protected void configButtons() {
-
+        btnNew.addClickListener(event -> {
+            FormProduct form = applicationContext.getBean(FormProduct.class);
+            form.addDialogCloseActionListener(event1 -> fillGrid());
+            form.open();
+        });
     }
 
     @Override

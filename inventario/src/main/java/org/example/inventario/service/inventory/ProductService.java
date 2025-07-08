@@ -8,11 +8,14 @@ import org.example.inventario.model.dto.inventory.ReturnList;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.Supplier;
+import org.example.inventario.model.specification.ProductSpecification;
 import org.example.inventario.repository.inventory.ProductRepository;
 import org.example.inventario.repository.inventory.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -119,6 +122,17 @@ public class ProductService {
             throw new MyException(400,"Supplier not found");
         }
 
+    }
+
+    public Page<Product> searchProducts(String name, Category category, BigDecimal price, Integer minStock,Integer stock , Pageable pageable) {
+        Specification<Product> spec = Specification.not((Specification<Product>) null);
+        spec = spec.and(ProductSpecification.hasName(name));
+        spec = spec.and(ProductSpecification.hasCategory(category));
+        spec = spec.and(ProductSpecification.hasPrice(price));
+        spec = spec.and(ProductSpecification.hasMinStockThreshold(minStock));
+        spec = spec.and(ProductSpecification.hasStock(stock));
+
+        return productRepository.findAll(spec, pageable);
     }
 
 }

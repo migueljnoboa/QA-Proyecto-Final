@@ -21,40 +21,54 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.server.streams.InMemoryUploadHandler;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import org.apache.commons.lang3.StringUtils;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.Supplier;
+import org.example.inventario.service.inventory.ProductService;
+import org.example.inventario.service.inventory.SupplierService;
 import org.example.inventario.ui.component.ConfirmWindow;
+import org.example.inventario.ui.component.MyErrorNotification;
+import org.example.inventario.ui.component.MySuccessNotification;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class FormProduct extends Dialog {
 
+    private ProductService productService;
+    private SupplierService supplierService;
+
     private Product saveProduct;
 
-    private TextField name;
+    private TextField tfName;
 
-    private TextArea description;
+    private TextArea taDescription;
 
-    private ComboBox<Category> category;
+    private ComboBox<Category> cbCategory;
 
-    private BigDecimalField price;
+    private BigDecimalField bdFPrice;
 
-    private IntegerField stock, minStock;
+    private IntegerField ifStock, ifminStock;
 
-    private ComboBox<Supplier> supplier;
+    private ComboBox<Supplier> cbSupplier;
 
     private byte[] image;
     
@@ -72,6 +86,12 @@ public class FormProduct extends Dialog {
         addThemeVariants(DialogVariant.LUMO_NO_PADDING);
 
         add(buildWindow());
+    }
+
+    @Autowired
+    public void setServices(ProductService productService, SupplierService supplierService) {
+        this.productService = productService;
+        this.supplierService = supplierService;
     }
 
     private Component buildWindow() {
@@ -99,7 +119,8 @@ public class FormProduct extends Dialog {
         btnSave.addClickShortcut(Key.F10);
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
         btnSave.addClickListener(event -> {
-//            guardarCambios();
+            saveChanges();
+
         });
 
         btnExit = new Button("Exit (ESC)");
@@ -119,47 +140,63 @@ public class FormProduct extends Dialog {
     }
 
     private Component buildTabNewProduct() {
-        name = new TextField("Product Name");
-        name.setRequired(true);
-        name.setRequiredIndicatorVisible(true);
-        name.setWidthFull();
+        tfName = new TextField("Product Name");
+        tfName.setRequired(true);
+        tfName.setRequiredIndicatorVisible(true);
+        tfName.setWidthFull();
 
-        category = new ComboBox<>("Category");
-        category.setRequired(true);
-        category.setRequiredIndicatorVisible(true);
-        category.setWidthFull();
-        category.setItems(Category.values());
-        category.setItemLabelGenerator(Category::toString);
+        cbCategory = new ComboBox<>("Category");
+        cbCategory.setRequired(true);
+        cbCategory.setRequiredIndicatorVisible(true);
+        cbCategory.setWidthFull();
+        cbCategory.setItems(Category.values());
+        cbCategory.setItemLabelGenerator(Category::toString);
 
-        price = new BigDecimalField("Price ($)");
-        price.setRequired(true);
-        price.setRequiredIndicatorVisible(true);
-        price.setPrefixComponent(new Span("$"));
+        bdFPrice = new BigDecimalField("Price ($)");
+        bdFPrice.setRequired(true);
+        bdFPrice.setRequiredIndicatorVisible(true);
+        bdFPrice.setPrefixComponent(new Span("$"));
 
-        stock = new IntegerField("Stock");
-        stock.setRequired(true);
-        stock.setRequiredIndicatorVisible(true);
-        stock.setMin(0);
-        stock.setStepButtonsVisible(true);
+        ifStock = new IntegerField("Stock");
+        ifStock.setRequired(true);
+        ifStock.setRequiredIndicatorVisible(true);
+        ifStock.setMin(0);
+        ifStock.setStepButtonsVisible(true);
 
-        minStock = new IntegerField("Min Stock");
-        minStock.setRequired(true);
-        minStock.setRequiredIndicatorVisible(true);
-        minStock.setMin(0);
-        minStock.setStepButtonsVisible(true);
+        ifminStock = new IntegerField("Min Stock");
+        ifminStock.setRequired(true);
+        ifminStock.setRequiredIndicatorVisible(true);
+        ifminStock.setMin(0);
+        ifminStock.setStepButtonsVisible(true);
 
-        supplier = new ComboBox<>("Supplier");
-        supplier.setRequired(true);
-        supplier.setRequiredIndicatorVisible(true);
-        supplier.setWidthFull();
-        // Configurar el ComboBox para mostrar el nombre del proveedor
-        supplier.setItemLabelGenerator(Supplier::getName);
+        cbSupplier = new ComboBox<>("Supplier");
+        cbSupplier.setRequired(true);
+        cbSupplier.setRequiredIndicatorVisible(true);
+        cbSupplier.setWidthFull();
+        cbSupplier.setItemLabelGenerator(Supplier::getName);
+        DataProvider<Supplier, String> dataProvider = DataProvider.fromFilteringCallbacks(
+                query -> {
+                    Pageable pageable = PageRequest.of(
+                            query.getOffset() / query.getLimit(),
+                            query.getLimit()
+                    );
 
-        description = new TextArea("Description");
-        description.setWidthFull();
-        description.setHeight("100px");
-        description.setMaxLength(500);
-        description.setValueChangeMode(ValueChangeMode.EAGER);
+                    Page<Supplier> page = supplierService.getAllSuppliers(pageable);
+
+                    return page.getContent().stream();
+                },
+                query -> {
+                    Pageable pageable = PageRequest.of(0, 1);
+                    return (int) supplierService.getAllSuppliers(pageable).getTotalElements();
+                }
+        );
+        cbSupplier.setItems(dataProvider);
+
+        taDescription = new TextArea("Description");
+        taDescription.setWidthFull();
+        taDescription.setHeight("100px");
+        taDescription.setMaxLength(500);
+        taDescription.setValueChangeMode(ValueChangeMode.EAGER);
 
         Upload upload = getUpload();
         upload.setDropAllowed(true);
@@ -215,20 +252,20 @@ public class FormProduct extends Dialog {
         // Crear los layouts para organizar los campos
         HorizontalLayout row1 = new HorizontalLayout();
         row1.setWidthFull();
-        row1.add(name, category);
-        row1.setFlexGrow(2, name);
-        row1.setFlexGrow(1, category);
+        row1.add(tfName, cbCategory);
+        row1.setFlexGrow(2, tfName);
+        row1.setFlexGrow(1, cbCategory);
 
         HorizontalLayout row2 = new HorizontalLayout();
         row2.setWidthFull();
-        row2.add(price, stock, minStock);
-        row2.setFlexGrow(1, price);
-        row2.setFlexGrow(1, stock);
-        row2.setFlexGrow(1, minStock);
+        row2.add(bdFPrice, ifStock, ifminStock);
+        row2.setFlexGrow(1, bdFPrice);
+        row2.setFlexGrow(1, ifStock);
+        row2.setFlexGrow(1, ifminStock);
 
         HorizontalLayout row3 = new HorizontalLayout();
         row3.setWidthFull();
-        row3.add(supplier);
+        row3.add(cbSupplier);
 
         // Layout para la sección de imagen
         VerticalLayout imageSection = new VerticalLayout();
@@ -243,7 +280,7 @@ public class FormProduct extends Dialog {
         mainLayout.setSpacing(true);
         mainLayout.setPadding(true);
         mainLayout.setWidthFull();
-        mainLayout.add(row1, row2, row3, imageSection, description);
+        mainLayout.add(row1, row2, row3, imageSection, taDescription);
 
         return mainLayout;
     }
@@ -257,8 +294,86 @@ public class FormProduct extends Dialog {
                     long contentLength = metadata.contentLength();
                     image = data;
                 });
-        Upload upload = new Upload(inMemoryHandler);
-        return upload;
+        return new Upload(inMemoryHandler);
+    }
+    private void saveChanges() {
+        if (!validate()) {
+            return;
+        }
+        try {
+            loadComponents();
+
+            productService.createProduct(saveProduct);
+
+
+            MySuccessNotification mySuccessNotification = new MySuccessNotification("Product saved successfully: " + saveProduct.getName());
+            mySuccessNotification.open();
+
+            close();
+        } catch (Exception e) {
+            MyErrorNotification miErrorNotification = new MyErrorNotification(e.getMessage());
+            miErrorNotification.open();
+        }
+    }
+
+
+    private boolean validate() {
+        boolean ok = true;
+
+        if (tfName.isRequired() && StringUtils.isBlank(tfName.getValue())) {
+            ok = false;
+            tfName.setInvalid(true);
+        } else {
+            tfName.setInvalid(false);
+        }
+        if (cbCategory.isRequired() && cbCategory.getValue() == null) {
+            ok = false;
+            cbCategory.setInvalid(true);
+        } else {
+            cbCategory.setInvalid(false);
+        }
+        if (bdFPrice.isRequired() && bdFPrice.getValue() == null) {
+            ok = false;
+            bdFPrice.setInvalid(true);
+        } else {
+            bdFPrice.setInvalid(false);
+        }
+        if (ifStock.isRequired() && ifStock.getValue() == null) {
+            ok = false;
+            ifStock.setInvalid(true);
+        } else {
+            ifStock.setInvalid(false);
+        }
+        if (ifminStock.isRequired() && ifminStock.getValue() == null) {
+            ok = false;
+            ifminStock.setInvalid(true);
+        } else {
+            ifminStock.setInvalid(false);
+        }
+
+        if (taDescription.isRequired() && StringUtils.isBlank(taDescription.getValue())) {
+            ok = false;
+            taDescription.setInvalid(true);
+        } else {
+            taDescription.setInvalid(false);
+        }
+        return ok;
+    }
+    private void loadComponents() {
+        saveProduct.setName(tfName.getValue());
+        saveProduct.setDescription(taDescription.getValue());
+        saveProduct.setCategory(cbCategory.getValue());
+        saveProduct.setPrice(bdFPrice.getValue());
+        saveProduct.setStock(ifStock.getValue());
+        saveProduct.setMinStock(ifminStock.getValue());
+        saveProduct.setSupplier(cbSupplier.getValue());
+
+        if (image != null && image.length > 0) {
+            saveProduct.setImage(Arrays.toString(image));
+        } else {
+            saveProduct.setImage(null);
+        }
+        
     }
 
 

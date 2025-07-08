@@ -100,7 +100,7 @@ public class ProductPage extends ControlPanel<Product> {
     protected void configButtons() {
         btnNew.addClickListener(event -> {
             FormProduct form = applicationContext.getBean(FormProduct.class);
-            form.addDialogCloseActionListener(event1 -> fillGrid());
+            form.addDetachListener(event1 -> fillGrid());
             form.open();
         });
     }

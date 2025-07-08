@@ -26,7 +26,7 @@ import java.util.Arrays;
 @Route(value ="/supplier", layout = MainLayout.class)
 @PageTitle("Supplier")
 @RolesAllowed({"PRODUCTS_MENU"})
-@Menu(order = 1, icon = "vaadin:user-card", title = "Supplier")
+@Menu(order = 2, icon = "vaadin:user-card", title = "Supplier")
 public class SupplierPage extends ControlPanel<Supplier> {
     private SupplierService supplierService;
 

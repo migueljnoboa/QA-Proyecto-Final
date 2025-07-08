@@ -43,4 +43,9 @@ public class Permit extends Base {
     @JsonIgnore
     List<Role> roles;
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
 }

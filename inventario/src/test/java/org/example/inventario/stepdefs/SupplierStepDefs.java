@@ -1,8 +1,11 @@
 package org.example.inventario.stepdefs;
 
 import io.cucumber.java.en.*;
+import org.example.inventario.model.entity.inventory.Category;
+import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.Supplier;
 import org.example.inventario.model.dto.inventory.ReturnList;
+import org.example.inventario.service.inventory.SupplierService;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,72 +13,106 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.test.context.TestPropertySource;
 
+import java.math.BigDecimal;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource("classpath:application-dev.properties")
 public class SupplierStepDefs {
+
+    private Supplier supplier;
 
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private Supplier supplier;
+    @Autowired
+    private SupplierService supplierService;
+
     private Supplier responseSupplier;
     private Long lastSupplierId;
     private ResponseEntity<Supplier> responseEntity;
-    private ResponseEntity<String> errorResponse;
 
-    @Given("a new supplier with name {string}, contactInfo {string}, address {string}, email {string}, phoneNumber {string}")
-    public void a_new_supplier(String name, String contactInfo, String address, String email, String phoneNumber) {
+
+    @Given("a supplier with name {string}, contact info {string}, address {string}, email {string}, and phone {string}")
+    public void aSupplierWithNameContactInfoAddressEmailAndPhone(String name, String contactInfo, String address, String email, String phone) {
+
         supplier = new Supplier();
         supplier.setName(name);
-        supplier.setContactInfo(contactInfo);
-        supplier.setAddress(address);
-        supplier.setEmail(email);
-        supplier.setPhoneNumber(phoneNumber);
+        supplier.setName(contactInfo);
+        supplier.setName(address);
+        supplier.setName(email);
+        supplier.setName(phone);
         supplier.setEnabled(true);
     }
 
-    @When("I send a create supplier request")
-    public void i_send_create_supplier_request() {
-        responseEntity = restTemplate.postForEntity("/supplier/", supplier, Supplier.class);
-        responseSupplier = responseEntity.getBody();
-        if (responseSupplier != null) lastSupplierId = responseSupplier.getId();
+    @When("the supplier is created")
+    public void createSupplier() {
+        responseEntity = restTemplate.postForEntity("/api/supplier/", supplier, Supplier.class);
     }
 
-    @Then("the response supplier should have name {string}")
-    public void the_response_supplier_should_have_name(String expectedName) {
-        Assertions.assertNotNull(responseSupplier);
-        Assertions.assertEquals(expectedName, responseSupplier.getName());
+    @Then("the supplier should be saved and returned with name {string}")
+    public void assertSupplierCreated(String expectedName) {
+        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Assertions.assertNotNull(responseEntity.getBody());
+        Assertions.assertEquals(expectedName, responseEntity.getBody().getName());
     }
 
-    @Then("the supplier ID should not be null")
-    public void the_supplier_id_should_not_be_null() {
-        Assertions.assertNotNull(lastSupplierId);
+    @Given("suppliers exist in the database")
+    public void suppliersExist() {
+        Supplier supplier = new Supplier();
+        supplier.setName("Test");
+        supplier.setContactInfo("Contact");
+        supplier.setAddress("Address");
+        supplier.setEmail("test@example.com");
+        supplier.setPhoneNumber("00000000");
+        supplier.setEnabled(true);
+        supplierService.createSupplier(supplier);
     }
 
-    @Given("a supplier exists with name {string}, contactInfo {string}, address {string}, email {string}, phoneNumber {string}")
-    public void a_supplier_exists(String name, String contactInfo, String address, String email, String phoneNumber) {
-        a_new_supplier(name, contactInfo, address, email, phoneNumber);
-        i_send_create_supplier_request();
+    @When("I request all suppliers")
+    public void getAllSuppliers() {
+        restTemplate.getForEntity("/api/supplier", String.class); // just calls it, no need to store now
     }
 
-    @When("I get the supplier by ID")
-    public void i_get_supplier_by_id() {
-        responseEntity = restTemplate.getForEntity("/supplier/" + lastSupplierId, Supplier.class);
-        responseSupplier = responseEntity.getBody();
+    @Then("I should receive a list of suppliers")
+    public void assertSupplierListReturned() {
+        ResponseEntity<String> response = restTemplate.getForEntity("/api/supplier", String.class);
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertTrue(response.getBody().contains("data"));
     }
 
-    @When("I delete the supplier by ID")
-    public void i_delete_supplier_by_id() {
-        restTemplate.delete("/supplier/" + lastSupplierId);
+    @Given("a supplier with ID {int} exists")
+    public void supplierWithIdExists(int id) {
+        Supplier supplier = new Supplier();
+        supplier.setName("Supplier " + id);
+        supplier.setContactInfo("Contact " + id);
+        supplier.setAddress("Address " + id);
+        supplier.setEmail("email" + id + "@example.com");
+        supplier.setPhoneNumber("123456789");
+        supplier.setEnabled(true);
+        supplierService.createSupplier(supplier);
+
+        lastSupplierId = supplier.getId();
     }
 
-    @Then("getting the supplier by ID should return an error {string}")
-    public void getting_supplier_by_id_should_return_error(String expectedMessage) {
-        try {
-            restTemplate.getForEntity("/supplier/" + lastSupplierId, Supplier.class);
-            Assertions.fail("Expected error but got success");
-        } catch (Exception e) {
-            Assertions.assertTrue(e.getMessage().contains(expectedMessage));
-        }
+    @When("I request the supplier by ID {int}")
+    public void getSupplierById(int id) {
+        responseEntity = restTemplate.getForEntity("/api/supplier/" + id, Supplier.class);
+    }
+
+    @Then("I should get the supplier with ID {int}")
+    public void assertSupplierByIdReturned(int id) {
+        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Assertions.assertEquals(id, responseEntity.getBody().getId());
+    }
+
+    @When("I delete the supplier with ID {int}")
+    public void deleteSupplierById(int id) {
+        restTemplate.delete("/api/supplier/" + id);
+    }
+
+    @Then("the supplier should be marked as disabled")
+    public void assertSupplierIsDisabled() {
+        Supplier supplier = supplierService.getSupplierById(lastSupplierId);
+        Assertions.assertNotNull(supplier);
+        Assertions.assertFalse(supplier.isEnabled());
     }
 }

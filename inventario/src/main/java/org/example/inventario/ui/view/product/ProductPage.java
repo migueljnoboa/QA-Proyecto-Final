@@ -66,6 +66,7 @@ public class ProductPage extends ControlPanel<Product> {
         btnNew.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.PRODUCT_CREATE)));
         btnEdit.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.PRODUCT_EDIT)));
         btnView.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.PRODUCT_VIEW)));
+        btnCancel.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.PRODUCT_DELETE)));
 
     }
 
@@ -100,6 +101,16 @@ public class ProductPage extends ControlPanel<Product> {
     protected void configButtons() {
         btnNew.addClickListener(event -> {
             FormProduct form = applicationContext.getBean(FormProduct.class);
+            form.addDetachListener(event1 -> fillGrid());
+            form.open();
+        });
+        btnView.addClickListener(event -> {
+            FormProduct form = applicationContext.getBean(FormProduct.class, selectedItem, true);
+            form.addDetachListener(event1 -> fillGrid());
+            form.open();
+        });
+        btnEdit.addClickListener(event -> {
+            FormProduct form = applicationContext.getBean(FormProduct.class, selectedItem, false);
             form.addDetachListener(event1 -> fillGrid());
             form.open();
         });

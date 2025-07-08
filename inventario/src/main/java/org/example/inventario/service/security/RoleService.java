@@ -8,12 +8,17 @@ import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.security.Permit;
 import org.example.inventario.model.entity.security.Role;
 import org.example.inventario.model.entity.security.User;
+import org.example.inventario.model.specification.product.ProductSpecification;
+import org.example.inventario.model.specification.role.RoleSpecification;
 import org.example.inventario.repository.security.RoleRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -128,5 +133,18 @@ public class RoleService {
         }
         role.setEnabled(false);
         return roleRepository.save(role);
+    }
+
+    public Page<Role> searchRole(String name, Permit permit, Pageable pageable) {
+        Specification<Role> spec = Specification.not(null);
+        spec = spec.and(RoleSpecification.hasName(name));
+
+
+        spec = spec.and(RoleSpecification.hasPermit(permit));
+
+
+        spec = spec.and(RoleSpecification.isEnabled());
+
+        return roleRepository.findAll(spec, pageable);
     }
 }

@@ -125,12 +125,13 @@ public class ProductService {
     }
 
     public Page<Product> searchProducts(String name, Category category, BigDecimal price, Integer minStock,Integer stock , Pageable pageable) {
-        Specification<Product> spec = Specification.not((Specification<Product>) null);
+        Specification<Product> spec = Specification.not(null);
         spec = spec.and(ProductSpecification.hasName(name));
         spec = spec.and(ProductSpecification.hasCategory(category));
         spec = spec.and(ProductSpecification.hasPrice(price));
         spec = spec.and(ProductSpecification.hasMinStockThreshold(minStock));
         spec = spec.and(ProductSpecification.hasStock(stock));
+        spec = spec.and(ProductSpecification.isEnabled());
 
         return productRepository.findAll(spec, pageable);
     }

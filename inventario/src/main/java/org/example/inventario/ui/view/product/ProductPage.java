@@ -114,6 +114,12 @@ public class ProductPage extends ControlPanel<Product> {
             form.addDetachListener(event1 -> fillGrid());
             form.open();
         });
+        btnCancel.addClickListener(event -> {
+            if (selectedItem != null && selectedItem.getId() != null) {
+                productService.deleteProduct(selectedItem.getId());
+            }
+            fillGrid();
+        });
     }
 
     @Override

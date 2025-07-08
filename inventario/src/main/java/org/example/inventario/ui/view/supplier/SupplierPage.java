@@ -104,6 +104,12 @@ public class SupplierPage extends ControlPanel<Supplier> {
             form.addDetachListener(event1 -> fillGrid());
             form.open();
         });
+        btnCancel.addClickListener(event -> {
+            if (selectedItem != null && selectedItem.getId() != null) {
+                supplierService.deleteSupplier(selectedItem.getId());
+            }
+            fillGrid();
+        });
     }
 
     @Override

@@ -18,8 +18,7 @@ import org.example.inventario.model.entity.security.Permit;
 import org.example.inventario.service.inventory.ProductService;
 import org.example.inventario.service.inventory.SupplierService;
 import org.example.inventario.service.security.SecurityService;
-import org.example.inventario.ui.component.ControlPanel;
-import org.example.inventario.ui.component.SearchFilter;
+import org.example.inventario.ui.component.*;
 import org.example.inventario.ui.view.MainLayout;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
@@ -114,10 +113,27 @@ public class ProductPage extends ControlPanel<Product> {
             form.addDetachListener(event1 -> fillGrid());
             form.open();
         });
+        btnCancel.addClickListener(event -> {
+            deleteRow();
+        });
     }
 
     @Override
     protected void deleteRow() {
+        ConfirmWindow ventanaConfirmacion = new ConfirmWindow("Confirm Action", "Are you sure you want to delete this producta: " + selectedItem.getDescription() + "?", () -> {
+            try {
+                productService.deleteProduct(selectedItem.getId());
+                String mensaje = "Product " + selectedItem.getName() + " deleted successfully.";
+                MySuccessNotification miSuccessNotification = new MySuccessNotification(mensaje);
+                miSuccessNotification.open();
+
+                fillGrid();
+            } catch (Exception e) {
+                MyErrorNotification miErrorNotification = new MyErrorNotification(e.getMessage());
+                miErrorNotification.open();
+            }
+        });
+        ventanaConfirmacion.open();
 
     }
 }

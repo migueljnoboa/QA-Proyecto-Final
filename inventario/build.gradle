@@ -78,6 +78,9 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter:1.19.0'
     testImplementation 'org.testcontainers:mysql:1.19.0'
 
+    testImplementation 'com.microsoft.playwright:playwright:1.52.0'
+    implementation 'com.microsoft.playwright:playwright:1.52.0'
+
 }
 dependencyManagement {
     imports {

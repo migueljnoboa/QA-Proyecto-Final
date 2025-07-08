@@ -1,6 +1,9 @@
 package org.example.inventario.stepdefs;
 
+import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
+import org.example.inventario.model.dto.scurity.ReturnAuthentication;
+import org.example.inventario.model.dto.scurity.UserAuthentication;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.service.inventory.ProductService;
@@ -17,6 +20,10 @@ import java.math.BigDecimal;
 public class ProductStepDefs {
 
     private Product product;
+    private Product responseProduct;
+    private Long lastProductId;
+    private ResponseEntity<Product> responseEntity;
+    private String jwtToken;
 
     @Autowired
     private ProductService productService;
@@ -27,11 +34,30 @@ public class ProductStepDefs {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private Product responseProduct;
-    private Long lastProductId;
-    private ResponseEntity<Product> responseEntity;
+    // 🔐 Authenticate before tests
+    @Before
+    public void authenticate() {
+        UserAuthentication credentials = new UserAuthentication("admin", "admin");
 
-    // Get product by Id
+        ResponseEntity<ReturnAuthentication> loginResponse = restTemplate.postForEntity(
+                "/api/security/authenticate",
+                credentials,
+                ReturnAuthentication.class
+        );
+
+        Assertions.assertEquals(HttpStatus.OK, loginResponse.getStatusCode(), "Login failed");
+        assert loginResponse.getBody() != null;
+        jwtToken = loginResponse.getBody().token(); // 🛑 Adjust if field is named differently
+        Assertions.assertNotNull(jwtToken, "JWT token must not be null");
+    }
+
+    // 🔧 Add Authorization header
+    private HttpHeaders getAuthHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(jwtToken);
+        return headers;
+    }
+
     @Given("a product exists with name {string}, description {string}, category {string}, price {double}, stock {int}, minStock {int}, supplier Id {int}")
     public void a_product_exists(String name, String description, String category, Double price, Integer stock, Integer minStock, Integer supplierId) {
 
@@ -45,14 +71,15 @@ public class ProductStepDefs {
         product.setSupplier(supplierService.getSupplierById(Long.valueOf(supplierId)));
 
         productService.createProduct(product);
-
         lastProductId = product.getId();
     }
 
     @When("I get the product by ID")
     public void i_get_product_by_id() {
         String url = "/api/product/" + lastProductId;
-        responseEntity = restTemplate.getForEntity(url, Product.class);
+        HttpEntity<Void> request = new HttpEntity<>(getAuthHeaders());
+
+        responseEntity = restTemplate.exchange(url, HttpMethod.GET, request, Product.class);
         responseProduct = responseEntity.getBody();
 
         System.out.println("[DEBUG] Response product: " + responseProduct);
@@ -66,12 +93,12 @@ public class ProductStepDefs {
     }
 
     @When("I update the product name to {string}")
-    public void iUpdateTheProductNameTo(String arg0) {
+    public void iUpdateTheProductNameTo(String newName) {
+        product.setName(newName);
 
-        product.setName(arg0);
-
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = getAuthHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+
         HttpEntity<Product> request = new HttpEntity<>(product, headers);
 
         responseEntity = restTemplate.exchange(
@@ -86,7 +113,15 @@ public class ProductStepDefs {
 
     @When("I delete the product")
     public void i_delete_the_product() {
-        restTemplate.delete("/api/product/" + lastProductId);
+        HttpEntity<Void> request = new HttpEntity<>(getAuthHeaders());
+
+        restTemplate.exchange(
+                "/api/product/" + lastProductId,
+                HttpMethod.DELETE,
+                request,
+                Void.class
+        );
+
         responseProduct = productService.getProductById(lastProductId); // should be disabled
     }
 
@@ -94,6 +129,5 @@ public class ProductStepDefs {
     public void the_product_should_be_marked_as_disabled() {
         Assertions.assertFalse(responseProduct.isEnabled());
     }
-
 
 }

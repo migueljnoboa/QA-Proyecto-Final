@@ -117,56 +117,55 @@ public class FormProduct extends Dialog {
     }
 
     private Component buildTabNewProduct() {
-        name = new TextField("Nombre del Producto");
+        name = new TextField("Product Name");
         name.setRequired(true);
         name.setRequiredIndicatorVisible(true);
         name.setWidthFull();
 
-        category = new ComboBox<>("Categoría");
+        category = new ComboBox<>("Category");
         category.setRequired(true);
         category.setRequiredIndicatorVisible(true);
         category.setWidthFull();
-        category.setItemLabelGenerator(Category.values());
+        category.setItems(Category.values());
+        category.setItemLabelGenerator(Category::toString);
 
-        price = new BigDecimalField("Precio ($)");
+        price = new BigDecimalField("Price ($)");
         price.setRequired(true);
         price.setRequiredIndicatorVisible(true);
         price.setPrefixComponent(new Span("$"));
-        price.setMin(BigDecimal.ZERO);
 
-        stock = new IntegerField("Stock Actual");
+        stock = new IntegerField("Stock");
         stock.setRequired(true);
         stock.setRequiredIndicatorVisible(true);
         stock.setMin(0);
         stock.setStepButtonsVisible(true);
 
-        minStock = new IntegerField("Stock Mínimo");
+        minStock = new IntegerField("Min Stock");
         minStock.setRequired(true);
         minStock.setRequiredIndicatorVisible(true);
         minStock.setMin(0);
         minStock.setStepButtonsVisible(true);
 
-        supplier = new ComboBox<>("Proveedor");
+        supplier = new ComboBox<>("Supplier");
         supplier.setRequired(true);
         supplier.setRequiredIndicatorVisible(true);
         supplier.setWidthFull();
         // Configurar el ComboBox para mostrar el nombre del proveedor
         supplier.setItemLabelGenerator(Supplier::getName);
 
-        description = new TextArea("Descripción");
+        description = new TextArea("Description");
         description.setWidthFull();
         description.setHeight("100px");
         description.setMaxLength(500);
         description.setValueChangeMode(ValueChangeMode.EAGER);
 
-        // Crear el componente de upload para la imagen
-        MemoryBuffer memoryBuffer = new MemoryBuffer();
-        Upload uploadImage = new Upload(memoryBuffer);
-        uploadImage.setAcceptedFileTypes("image/jpeg", "image/jpg", "image/png", "image/gif");
-        uploadImage.setMaxFiles(1);
-        uploadImage.setMaxFileSize(5 * 1024 * 1024); // 5MB
-        uploadImage.setUploadButton(new Button("Choose File"));
-        uploadImage.setDropLabel(new NativeLabel("Arrastra aquí tu imagen o haz clic para seleccionar"));
+//        UploadHandler uploadHandler = new UploadHandler();
+//        Upload uploadImage = new Upload(uploadHandler);
+//        uploadImage.setAcceptedFileTypes("image/jpeg", "image/jpg", "image/png", "image/gif");
+//        uploadImage.setMaxFiles(1);
+//        uploadImage.setMaxFileSize(5 * 1024 * 1024); // 5MB
+//        uploadImage.setUploadButton(new Button("Choose File"));
+//        uploadImage.setDropLabel(new NativeLabel("Arrastra aquí tu imagen o haz clic para seleccionar"));
 
         // Crear layout para mostrar la imagen preview
         VerticalLayout imagePreviewLayout = new VerticalLayout();
@@ -181,40 +180,40 @@ public class FormProduct extends Dialog {
         imagePreview.getStyle().set("border", "1px solid #ccc");
         imagePreview.getStyle().set("border-radius", "4px");
 
-        NativeLabel imageInfo = new NativeLabel("Formatos soportados: JPG, PNG, GIF. Tamaño máximo: 5MB");
+        NativeLabel imageInfo = new NativeLabel("Accepted formats: JPG, PNG, GIF. Max size: 5MB.");
         imageInfo.getStyle().set("font-size", "12px");
         imageInfo.getStyle().set("color", "var(--lumo-secondary-text-color)");
 
         imagePreviewLayout.add(imagePreview, imageInfo);
 
-        // Configurar el comportamiento del upload
-        uploadImage.addSucceededListener(event -> {
-            try {
-                InputStream inputStream = memoryBuffer.getInputStream();
-                byte[] imageBytes = inputStream.readAllBytes();
+//        // Configurar el comportamiento del upload
+//        uploadImage.addSucceededListener(event -> {
+//            try {
+//                InputStream inputStream = memoryBuffer.getInputStream();
+//                byte[] imageBytes = inputStream.readAllBytes();
+//
+//                // Crear URL para preview de la imagen
+//                StreamResource resource = new StreamResource(event.getFileName(),
+//                        () -> new ByteArrayInputStream(imageBytes));
+//                imagePreview.setSrc(resource);
+//                imagePreview.setVisible(true);
+//
+//                // Guardar la imagen en el producto (esto depende de tu implementación)
+//                // saveProduct.setImage(imageBytes);
+//                // saveProduct.setImageName(event.getFileName());
+//
+//            } catch (IOException e) {
+//                Notification.show("Error al cargar la imagen: " + e.getMessage(),
+//                                3000, Notification.Position.MIDDLE)
+//                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+//            }
+//        });
 
-                // Crear URL para preview de la imagen
-                StreamResource resource = new StreamResource(event.getFileName(),
-                        () -> new ByteArrayInputStream(imageBytes));
-                imagePreview.setSrc(resource);
-                imagePreview.setVisible(true);
-
-                // Guardar la imagen en el producto (esto depende de tu implementación)
-                // saveProduct.setImage(imageBytes);
-                // saveProduct.setImageName(event.getFileName());
-
-            } catch (IOException e) {
-                Notification.show("Error al cargar la imagen: " + e.getMessage(),
-                                3000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
-            }
-        });
-
-        uploadImage.addFileRejectedListener(event -> {
-            Notification.show("Archivo rechazado: " + event.getErrorMessage(),
-                            3000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
-        });
+//        uploadImage.addFileRejectedListener(event -> {
+//            Notification.show("Archivo rechazado: " + event.getErrorMessage(),
+//                            3000, Notification.Position.MIDDLE)
+//                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+//        });
 
         // Crear los layouts para organizar los campos
         HorizontalLayout row1 = new HorizontalLayout();
@@ -238,9 +237,9 @@ public class FormProduct extends Dialog {
         VerticalLayout imageSection = new VerticalLayout();
         imageSection.setSpacing(false);
         imageSection.setPadding(false);
-        NativeLabel imageLabel = new NativeLabel("Imagen del Producto");
+        NativeLabel imageLabel = new NativeLabel("Product Image");
         imageLabel.getStyle().set("font-weight", "bold");
-        imageSection.add(imageLabel, uploadImage, imagePreviewLayout);
+        imageSection.add(imageLabel/*, uploadImage*/, imagePreviewLayout);
 
         // Layout principal del tab
         VerticalLayout mainLayout = new VerticalLayout();

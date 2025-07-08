@@ -93,6 +93,16 @@ public class SupplierPage extends ControlPanel<Supplier> {
             form.addDetachListener(event1 -> fillGrid());
             form.open();
         });
+        btnView.addClickListener(event -> {
+            FormSupplier form = applicationContext.getBean(FormSupplier.class, selectedItem, true);
+            form.addDetachListener(event1 -> fillGrid());
+            form.open();
+        });
+        btnEdit.addClickListener(event -> {
+            FormSupplier form = applicationContext.getBean(FormSupplier.class, selectedItem, false);
+            form.addDetachListener(event1 -> fillGrid());
+            form.open();
+        });
     }
 
     @Override

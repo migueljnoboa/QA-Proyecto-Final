@@ -1,8 +1,7 @@
-package org.example.inventario.model.specification;
+package org.example.inventario.model.specification.product;
 
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
-import org.example.inventario.model.entity.inventory.Supplier;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;

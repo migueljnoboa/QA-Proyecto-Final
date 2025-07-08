@@ -2,10 +2,17 @@ package org.example.inventario.service.security;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.security.Permit;
+import org.example.inventario.model.specification.permit.PermitSpecification;
+import org.example.inventario.model.specification.product.ProductSpecification;
 import org.example.inventario.repository.security.PermitRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -49,5 +56,13 @@ public class PermitService {
             throw new IllegalArgumentException("Permit name cannot be null or empty.");
         }
         return permitRepository.findByName(name);
+    }
+
+    public Page<Permit> searchPermit(String name, PageRequest pageable) {
+        Specification<Permit> spec = Specification.not(null);
+        spec = spec.and(PermitSpecification.hasName(name));
+        spec = spec.and(PermitSpecification.isEnabled());
+        return permitRepository.findAll(spec, pageable);
+
     }
 }

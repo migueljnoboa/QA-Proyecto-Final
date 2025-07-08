@@ -1,16 +1,13 @@
 package org.example.inventario.service.inventory;
 
-import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.example.inventario.exception.MyException;
 import org.example.inventario.model.dto.inventory.ReturnList;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
-import org.example.inventario.model.entity.inventory.Supplier;
-import org.example.inventario.model.specification.ProductSpecification;
+import org.example.inventario.model.specification.product.ProductSpecification;
 import org.example.inventario.repository.inventory.ProductRepository;
-import org.example.inventario.repository.inventory.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

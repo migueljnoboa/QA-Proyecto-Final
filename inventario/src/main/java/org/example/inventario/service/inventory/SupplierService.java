@@ -4,19 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.example.inventario.exception.MyException;
 import org.example.inventario.model.dto.inventory.ReturnList;
-import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.Supplier;
-import org.example.inventario.model.specification.ProductSpecification;
 import org.example.inventario.model.specification.supplier.SupplierSpecification;
 import org.example.inventario.repository.inventory.SupplierRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

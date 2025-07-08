@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Base64;
 
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -70,7 +71,7 @@ public class FormProduct extends Dialog {
 
     private ComboBox<Supplier> cbSupplier;
 
-    private byte[] image;
+    private String image;
     
     private Button btnSave, btnExit;
 
@@ -79,8 +80,8 @@ public class FormProduct extends Dialog {
 
     public FormProduct() {
         this.saveProduct = new Product();
-        setHeaderTitle("Nueva Producto");
-        setId("FORM-PRODUCTO");
+        setHeaderTitle("New Product");
+        setId("FORM-PRODUCT");
         setModal(false);
         setDraggable(true);
         addThemeVariants(DialogVariant.LUMO_NO_PADDING);
@@ -89,19 +90,19 @@ public class FormProduct extends Dialog {
     }
     public FormProduct(Product product, boolean view) {
         this.saveProduct = product;
-        setHeaderTitle("Editar Producto: " + saveProduct.getName());
-        setId("FORM-PRODUCTO");
+        setHeaderTitle("Edit Product");
+        setId("FORM-PRODUCT");
         setModal(false);
         setDraggable(true);
         addThemeVariants(DialogVariant.LUMO_NO_PADDING);
         add(buildWindow());
         if (view) {
-            this.setHeaderTitle("Visualizar Caja Chica");
-            this.setId("FORM-CAJA-CHICA-VISUALIZAR");
+            this.setHeaderTitle("View Product");
+            this.setId("FORM-PRODUCT-VIEW");
             disableFields();
         } else {
-            this.setHeaderTitle("Editar Caja Chica");
-            this.setId("FORM-CAJA-CHICA-EDITAR");
+            this.setHeaderTitle("Edit Product");
+            this.setId("FORM-PRODUCT-EDIT");
         }
     }
 
@@ -240,36 +241,6 @@ public class FormProduct extends Dialog {
 
         imagePreviewLayout.add(imagePreview, imageInfo);
 
-//        // Configurar el comportamiento del upload
-//        uploadImage.addSucceededListener(event -> {
-//            try {
-//                InputStream inputStream = memoryBuffer.getInputStream();
-//                byte[] imageBytes = inputStream.readAllBytes();
-//
-//                // Crear URL para preview de la imagen
-//                StreamResource resource = new StreamResource(event.getFileName(),
-//                        () -> new ByteArrayInputStream(imageBytes));
-//                imagePreview.setSrc(resource);
-//                imagePreview.setVisible(true);
-//
-//                // Guardar la imagen en el producto (esto depende de tu implementación)
-//                // saveProduct.setImage(imageBytes);
-//                // saveProduct.setImageName(event.getFileName());
-//
-//            } catch (IOException e) {
-//                Notification.show("Error al cargar la imagen: " + e.getMessage(),
-//                                3000, Notification.Position.MIDDLE)
-//                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
-//            }
-//        });
-
-//        uploadImage.addFileRejectedListener(event -> {
-//            Notification.show("Archivo rechazado: " + event.getErrorMessage(),
-//                            3000, Notification.Position.MIDDLE)
-//                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
-//        });
-
-        // Crear los layouts para organizar los campos
         HorizontalLayout row1 = new HorizontalLayout();
         row1.setWidthFull();
         row1.add(tfName, cbCategory);
@@ -287,7 +258,6 @@ public class FormProduct extends Dialog {
         row3.setWidthFull();
         row3.add(cbSupplier);
 
-        // Layout para la sección de imagen
         VerticalLayout imageSection = new VerticalLayout();
         imageSection.setSpacing(false);
         imageSection.setPadding(false);
@@ -295,12 +265,21 @@ public class FormProduct extends Dialog {
         imageLabel.getStyle().set("font-weight", "bold");
         imageSection.add(imageLabel, upload, imagePreviewLayout);
 
-        // Layout principal del tab
         VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setSpacing(true);
         mainLayout.setPadding(true);
         mainLayout.setWidthFull();
-        mainLayout.add(row1, row2, row3, imageSection, taDescription);
+        if(saveProduct.getId() != null && saveProduct.getId() > 0L) {
+            String src = "data:image/png;base64," + saveProduct.getImage();
+            Image image = new Image(src, "imagen");
+            image.setWidth("200px");
+            image.setHeight("150px");
+            mainLayout.add(image);
+        }
+        if(!view ) {
+            mainLayout.add(imageSection);
+        }
+        mainLayout.add(row1, row2, row3, taDescription);
 
         return mainLayout;
     }
@@ -312,7 +291,8 @@ public class FormProduct extends Dialog {
                     String fileName = metadata.fileName();
                     String mimeType = metadata.contentType();
                     long contentLength = metadata.contentLength();
-                    image = data;
+
+                    image = Base64.getEncoder().encodeToString(data);
                 });
         return new Upload(inMemoryHandler);
     }
@@ -387,9 +367,8 @@ public class FormProduct extends Dialog {
         saveProduct.setStock(ifStock.getValue());
         saveProduct.setMinStock(ifminStock.getValue());
         saveProduct.setSupplier(cbSupplier.getValue());
-
-        if (image != null && image.length > 0) {
-            saveProduct.setImage(Arrays.toString(image));
+        if (StringUtils.isNotBlank(image)) {
+            saveProduct.setImage(image);
         } else {
             saveProduct.setImage(null);
         }
@@ -407,7 +386,7 @@ public class FormProduct extends Dialog {
 
         if (saveProduct.getImage() != null) {
             try {
-                image = saveProduct.getImage().getBytes();
+                image = saveProduct.getImage();
             } catch (Exception e) {
                 image = null;
             }

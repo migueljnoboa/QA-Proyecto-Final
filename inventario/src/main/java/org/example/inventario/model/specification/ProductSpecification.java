@@ -2,6 +2,7 @@ package org.example.inventario.model.specification;
 
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
+import org.example.inventario.model.entity.inventory.Supplier;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
@@ -102,5 +103,8 @@ public class ProductSpecification {
         return (root, query, criteriaBuilder) -> {
             return criteriaBuilder.lessThanOrEqualTo(root.get("stock"), root.get("minStock"));
         };
+    }
+    public static Specification<Product> isEnabled() {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.isTrue(root.get("enabled"));
     }
 }

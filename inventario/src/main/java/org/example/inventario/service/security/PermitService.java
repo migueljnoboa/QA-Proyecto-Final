@@ -23,15 +23,24 @@ public class PermitService {
     public void createDefaultPermitsIfNotExists() {
         String[] defaultPermits = {
                 Permit.DASHBOARD_MENU,
+
+                Permit.SUPPLIERS_MENU,
+                Permit.SUPPLIER_CREATE,
+                Permit.SUPPLIER_EDIT,
+                Permit.SUPPLIER_DELETE,
+                Permit.SUPPLIER_VIEW,
+
                 Permit.PRODUCTS_MENU,
                 Permit.PRODUCT_CREATE,
                 Permit.PRODUCT_EDIT,
                 Permit.PRODUCT_DELETE,
                 Permit.PRODUCT_VIEW,
+
                 Permit.USERS_MENU,
                 Permit.USER_CREATE,
                 Permit.USER_EDIT,
                 Permit.USER_DELETE,
+
                 Permit.ROLES_MENU,
                 Permit.ROLE_CREATE,
                 Permit.ROLE_EDIT,

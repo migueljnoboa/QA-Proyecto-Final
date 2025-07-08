@@ -21,9 +21,15 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import org.apache.commons.lang3.StringUtils;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Supplier;
+import org.example.inventario.service.inventory.ProductService;
+import org.example.inventario.service.inventory.SupplierService;
 import org.example.inventario.ui.component.ConfirmWindow;
+import org.example.inventario.ui.component.MyErrorNotification;
+import org.example.inventario.ui.component.MySuccessNotification;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
@@ -31,10 +37,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class FormSupplier extends Dialog {
+
+    private SupplierService supplierService;
 
     private Supplier saveSupplier;
 
@@ -64,6 +73,11 @@ public class FormSupplier extends Dialog {
         add(buildWindow());
     }
 
+    @Autowired
+    public void setServices(SupplierService supplierService) {
+        this.supplierService = supplierService;
+    }
+
     private Component buildWindow() {
         TabSheet tabSheet = new TabSheet();
         tabSheet.setSizeUndefined();
@@ -89,7 +103,7 @@ public class FormSupplier extends Dialog {
         btnSave.addClickShortcut(Key.F10);
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
         btnSave.addClickListener(event -> {
-//            guardarCambios();
+            saveChanges();
         });
 
         btnExit = new Button("Exit (ESC)");
@@ -156,6 +170,74 @@ public class FormSupplier extends Dialog {
         mainLayout.add(row1, row2);
 
         return mainLayout;
+    }
+
+    private void saveChanges() {
+        if (!validate()) {
+            return;
+        }
+        try {
+            loadComponents();
+
+            supplierService.createSupplier(saveSupplier);
+
+            MySuccessNotification mySuccessNotification = new MySuccessNotification("Supplier saved successfully: " + saveSupplier.getName());
+            mySuccessNotification.open();
+
+            close();
+        } catch (Exception e) {
+            MyErrorNotification miErrorNotification = new MyErrorNotification(e.getMessage());
+            miErrorNotification.open();
+        }
+    }
+
+    private boolean validate() {
+        boolean ok = true;
+
+        if (name.isRequired() && StringUtils.isBlank(name.getValue())) {
+            ok = false;
+            name.setInvalid(true);
+        } else {
+            name.setInvalid(false);
+        }
+
+        if (contactInfo.isRequired() && StringUtils.isBlank(contactInfo.getValue())) {
+            ok = false;
+            contactInfo.setInvalid(true);
+        } else {
+            contactInfo.setInvalid(false);
+        }
+
+        if (address.isRequired() && StringUtils.isBlank(address.getValue())) {
+            ok = false;
+            address.setInvalid(true);
+        } else {
+            address.setInvalid(false);
+        }
+
+        if (email.isRequired() && StringUtils.isBlank(email.getValue())) {
+            ok = false;
+            email.setInvalid(true);
+        } else {
+            email.setInvalid(false);
+        }
+
+        if (phoneNumber.isRequired() && StringUtils.isBlank(phoneNumber.getValue())) {
+            ok = false;
+            phoneNumber.setInvalid(true);
+        } else {
+            phoneNumber.setInvalid(false);
+        }
+
+        return ok;
+    }
+
+    private void loadComponents() {
+        saveSupplier.setName(name.getValue());
+        saveSupplier.setContactInfo(contactInfo.getValue());
+        saveSupplier.setAddress(address.getValue());
+        saveSupplier.setEmail(email.getValue());
+        saveSupplier.setPhoneNumber(phoneNumber.getValue());
     }
 
 

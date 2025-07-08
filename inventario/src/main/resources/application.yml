@@ -13,7 +13,7 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: none #update
+      ddl-auto: update #update
     properties:
       hibernate:
         jdbc:
@@ -23,7 +23,7 @@ spring:
 
   # Flyway settings
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:db/migration
 
   datasource:

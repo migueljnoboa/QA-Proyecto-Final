@@ -21,11 +21,19 @@ import java.util.List;
 @Table(name = "permits")
 public class Permit extends Base {
     public static final String DASHBOARD_MENU = "DASHBOARD_MENU";
+
+    public static final String SUPPLIERS_MENU = "SUPPLIERS_MENU";
+    public static final String SUPPLIER_CREATE = "SUPPLIER_CREATE";
+    public static final String SUPPLIER_EDIT = "SUPPLIER_EDIT";
+    public static final String SUPPLIER_DELETE = "SUPPLIER_DELETE";
+    public static final String SUPPLIER_VIEW = "SUPPLIER_VIEW";
+
     public static final String PRODUCTS_MENU = "PRODUCTS_MENU";
     public static final String PRODUCT_CREATE = "PRODUCT_CREATE";
     public static final String PRODUCT_EDIT = "PRODUCT_EDIT";
     public static final String PRODUCT_DELETE = "PRODUCT_DELETE";
     public static final String PRODUCT_VIEW = "PRODUCT_VIEW";
+
     public static final String USERS_MENU = "USERS_MENU";
     public static final String USER_CREATE = "USER_CREATE";
     public static final String USER_EDIT = "USER_EDIT";

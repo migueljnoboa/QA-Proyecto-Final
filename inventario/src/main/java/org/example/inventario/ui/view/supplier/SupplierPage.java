@@ -13,11 +13,15 @@ import jakarta.annotation.security.RolesAllowed;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.Supplier;
+import org.example.inventario.model.entity.security.Permit;
 import org.example.inventario.service.inventory.ProductService;
 import org.example.inventario.service.inventory.SupplierService;
+import org.example.inventario.service.security.SecurityService;
 import org.example.inventario.ui.component.ControlPanel;
 import org.example.inventario.ui.component.SearchFilter;
 import org.example.inventario.ui.view.MainLayout;
+import org.example.inventario.ui.view.product.FormProduct;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
@@ -28,11 +32,17 @@ import java.util.Arrays;
 @RolesAllowed({"PRODUCTS_MENU"})
 @Menu(order = 2, icon = "vaadin:user-card", title = "Supplier")
 public class SupplierPage extends ControlPanel<Supplier> {
+
     private SupplierService supplierService;
 
-    public SupplierPage(SupplierService supplierService) {
+    private SecurityService securityService;
+    private ApplicationContext applicationContext;
+
+    public SupplierPage(SupplierService supplierService,  SecurityService securityService, ApplicationContext applicationContext) {
         super();
         this.supplierService = supplierService;
+        this.securityService = securityService;
+        this.applicationContext = applicationContext;
         setConfig();
     }
     @Override
@@ -46,7 +56,9 @@ public class SupplierPage extends ControlPanel<Supplier> {
 
     @Override
     protected void addSecurity() {
-
+        btnNew.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+ Permit.SUPPLIER_CREATE)));
+        btnEdit.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.SUPPLIER_EDIT)));
+        btnView.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.SUPPLIER_VIEW)));
     }
 
     @Override
@@ -76,7 +88,11 @@ public class SupplierPage extends ControlPanel<Supplier> {
 
     @Override
     protected void configButtons() {
-
+        btnNew.addClickListener(event -> {
+            FormSupplier form = applicationContext.getBean(FormSupplier.class);
+            form.addDetachListener(event1 -> fillGrid());
+            form.open();
+        });
     }
 
     @Override

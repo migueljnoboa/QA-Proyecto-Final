@@ -1,3 +1,18 @@
+-- inventariodb.permits definition
+CREATE TABLE `permits`
+(
+    `id`         bigint NOT NULL AUTO_INCREMENT,
+    `name`       varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `created_at` datetime(6) DEFAULT NULL,
+    `enabled`    bit(1) NOT NULL,
+    `update_at`  datetime(6) DEFAULT NULL,
+    `version`    bigint                                  DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `UKjkqq0lo5gti77y8qrrsp0ak3q` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
 -- inventariodb.roles definition
 CREATE TABLE `roles`
 (
@@ -12,19 +27,6 @@ CREATE TABLE `roles`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- inventariodb.permits definition
-CREATE TABLE `permits`
-(
-    `id`         bigint NOT NULL AUTO_INCREMENT,
-    `created_at` datetime(6) DEFAULT NULL,
-    `enabled`    bit(1) NOT NULL,
-    `update_at`  datetime(6) DEFAULT NULL,
-    `version`    bigint                                  DEFAULT NULL,
-    `name`       varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `UKjkqq0lo5gti77y8qrrsp0ak3q` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 
 -- inventariodb.roles_permits definition
 CREATE TABLE `roles_permits`
@@ -36,6 +38,7 @@ CREATE TABLE `roles_permits`
     CONSTRAINT `FK362qj8xl57wes9pocllv1q7v8` FOREIGN KEY (`roles_id`) REFERENCES `roles` (`id`),
     CONSTRAINT `FKbr5xd3omh6bkhyxcn2j6wbcdc` FOREIGN KEY (`permits_id`) REFERENCES `permits` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 
 -- inventariodb.users definition
@@ -53,6 +56,7 @@ CREATE TABLE `users`
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+
 -- inventariodb.users_roles definition
 CREATE TABLE `users_roles`
 (
@@ -63,6 +67,7 @@ CREATE TABLE `users_roles`
     CONSTRAINT `FKa62j07k5mhgifpp955h37ponj` FOREIGN KEY (`roles_id`) REFERENCES `roles` (`id`),
     CONSTRAINT `FKml90kef4w2jy7oxyqv742tsfc` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 
 -- inventariodb.supplier definition
@@ -80,6 +85,7 @@ CREATE TABLE `supplier`
     `phone_number` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 
 -- inventariodb.product definition

@@ -9,6 +9,7 @@ import org.example.inventario.model.specification.supplier.SupplierSpecification
 import org.example.inventario.repository.inventory.SupplierRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,10 @@ public class SupplierService {
                 .orElseThrow(() -> new MyException(MyException.ERROR_NOT_FOUND,"Supplier not found with ID: " + id));
     }
 
+
+    public Page<Supplier> getAllSuppliers(Pageable pageable) {
+        return supplierRepository.findAllByEnabledIsTrue(pageable);
+    }
     public ReturnList<Supplier> getAllSuppliers(int page, int size) {
         PageRequest pageable = PageRequest.of(page, size);
         Page<Supplier> list =  supplierRepository.findAllByEnabledIsTrue(pageable);

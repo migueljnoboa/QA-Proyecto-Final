@@ -15,16 +15,23 @@ spring:
     hibernate:
       ddl-auto: none #default: none
     properties:
-      hibernate:
-        jdbc:
-          time_zone: UTC
-          lob:
-            non_contextual_creation: true
+      # Hibernate core
+      hibernate.jdbc.time_zone: UTC
+      hibernate.lob.non_contextual_creation: true
+      hibernate.format_sql: true
 
-      org:
-        hibernate:
-          envers:
-            global_with_modified_flag=true:
+      # Envers — match your lowercase tables/suffix
+      hibernate.envers.audit_table_suffix: _aud
+      hibernate.envers.revision_table_name: revinfo
+      hibernate.envers.revision_field_name: rev
+      hibernate.envers.revision_timestamp_field_name: revtstmp
+
+      # You created *_mod columns; enable modified flags
+      hibernate.envers.global_with_modified_flag: true
+      hibernate.envers.with_modified_flag_suffix: _mod
+
+      # Optional but handy: keep full row on delete
+      hibernate.envers.store_data_at_delete: true
 
   # Flyway settings
   flyway:
@@ -77,6 +84,17 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     # URL, username, password will be overridden by Testcontainers
 
+  logging:
+    level:
+      org.hibernate.SQL: DEBUG
+      org.hibernate.orm.jdbc.bind: TRACE
+      org.springframework.transaction: DEBUG
+
+  # avoid session deserialization headaches in dev
+  server:
+    servlet:
+      session:
+        persistent: false
 
 
 

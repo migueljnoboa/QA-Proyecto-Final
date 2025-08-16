@@ -83,7 +83,7 @@ public class ProductService {
         oldProduct.setImage(product.getImage());
         oldProduct.setSupplier(product.getSupplier());
 
-        return productRepository.save(product);
+        return productRepository.save(oldProduct);
     }
 
     @Transactional
@@ -125,8 +125,8 @@ public class ProductService {
             throw new MyException(400,"Product supplier cannot be null");
         }
 
-        supplierService.getSupplierById(product.getSupplier().getId());
-        if (supplierService.getSupplierById(product.getSupplier().getId()) == null){
+        var supplier = supplierService.getSupplierById(product.getSupplier().getId());
+        if (supplier == null){
             throw new MyException(400,"Supplier not found");
         }
 

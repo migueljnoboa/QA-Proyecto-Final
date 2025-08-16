@@ -1,4 +1,5 @@
 -- inventariodb.revinfo definition
+
 CREATE TABLE `revinfo`
 (
     `rev`      int NOT NULL AUTO_INCREMENT,
@@ -11,6 +12,7 @@ CREATE TABLE `revinfo`
 
 
 -- inventariodb.permits definition
+
 CREATE TABLE `permits`
 (
     `id`                 bigint NOT NULL AUTO_INCREMENT,
@@ -29,6 +31,7 @@ CREATE TABLE `permits`
   COLLATE = utf8mb4_unicode_ci;
 
 -- inventariodb.permits_aud definition
+
 CREATE TABLE `permits_aud`
 (
     `id`        bigint NOT NULL,
@@ -239,7 +242,7 @@ CREATE TABLE `product`
     `last_modified_by`   varchar(255) COLLATE utf8mb4_unicode_ci                                                                                                                                                                                                           DEFAULT NULL,
     `last_modified_date` datetime(6)                                                                                                                                                                                                                                       DEFAULT NULL,
     `version`            bigint                                                                                                                                                                                                                                            DEFAULT NULL,
-    `category`           varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `category`           enum ('AUTOMOTIVE','BEAUTY_PRODUCTS','BOOKS','CLOTHING','ELECTRONICS','FOOD','FURNITURE','GARDENING_SUPPLIES','HEALTHCARE','JEWELRY','MUSICAL_INSTRUMENTS','OFFICE_SUPPLIES','PET_SUPPLIES','SPORTS_EQUIPMENT','TOYS') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `description`        longtext COLLATE utf8mb4_unicode_ci,
     `image`              longtext COLLATE utf8mb4_unicode_ci,
     `min_stock`          int                                                                                                                                                                                                                                               DEFAULT NULL,
@@ -261,11 +264,11 @@ CREATE TABLE `product_aud`
     `id`              bigint NOT NULL,
     `rev`             int    NOT NULL,
     `revtype`         tinyint                                                                                                                                                                                                                                           DEFAULT NULL,
-    `category`        varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `category`        enum ('AUTOMOTIVE','BEAUTY_PRODUCTS','BOOKS','CLOTHING','ELECTRONICS','FOOD','FURNITURE','GARDENING_SUPPLIES','HEALTHCARE','JEWELRY','MUSICAL_INSTRUMENTS','OFFICE_SUPPLIES','PET_SUPPLIES','SPORTS_EQUIPMENT','TOYS') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `category_mod`    bit(1)                                                                                                                                                                                                                                            DEFAULT NULL,
-    `description`     varchar(255) COLLATE utf8mb4_unicode_ci                                                                                                                                                                                                           DEFAULT NULL,
+    `description`     longtext COLLATE utf8mb4_unicode_ci                                                                                                                                                                                                           DEFAULT NULL,
     `description_mod` bit(1)                                                                                                                                                                                                                                            DEFAULT NULL,
-    `image`           varchar(255) COLLATE utf8mb4_unicode_ci                                                                                                                                                                                                           DEFAULT NULL,
+    `image`           longtext COLLATE utf8mb4_unicode_ci                                                                                                                                                                                                           DEFAULT NULL,
     `image_mod`       bit(1)                                                                                                                                                                                                                                            DEFAULT NULL,
     `min_stock`       int                                                                                                                                                                                                                                               DEFAULT NULL,
     `min_stock_mod`   bit(1)                                                                                                                                                                                                                                            DEFAULT NULL,
@@ -282,5 +285,4 @@ CREATE TABLE `product_aud`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
-
 

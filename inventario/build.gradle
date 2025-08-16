@@ -81,12 +81,14 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
+    // Hibernate Envers
+    implementation 'org.hibernate.orm:hibernate-envers'
+
     testRuntimeOnly 'com.h2database:h2'
 
     testImplementation 'org.mockito:mockito-inline:5.2.0'
 
     implementation('com.vaadin:vaadin-spring-boot-starter')
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.testcontainers:junit-jupiter:1.19.0'

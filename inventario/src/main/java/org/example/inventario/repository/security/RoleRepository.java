@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
-    List<Role> findAllByUsersAndEnabledIsTrue(User user);
+    List<Role> findAllByUsersAndEnabledIsTrue(List<User> users);
 
     Page<Role> findAllByEnabledIsTrue(Pageable pageable);
 

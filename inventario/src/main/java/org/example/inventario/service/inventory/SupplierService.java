@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class SupplierService {
 
     private final SupplierRepository supplierRepository;
 
-
+    @Transactional
     public Supplier createSupplier(Supplier supplier){
 
         checkVariables(supplier);
@@ -27,6 +28,7 @@ public class SupplierService {
         return supplierRepository.save(supplier);
     }
 
+    @Transactional(readOnly = true)
     public Supplier getSupplierById(Long id) {
         if (id == null) {
             throw new MyException(400,"Supplier ID cannot be null");
@@ -35,10 +37,12 @@ public class SupplierService {
                 .orElseThrow(() -> new MyException(MyException.ERROR_NOT_FOUND,"Supplier not found with ID: " + id));
     }
 
-
+    @Transactional(readOnly = true)
     public Page<Supplier> getAllSuppliers(Pageable pageable) {
         return supplierRepository.findAllByEnabledIsTrue(pageable);
     }
+
+    @Transactional(readOnly = true)
     public ReturnList<Supplier> getAllSuppliers(int page, int size) {
         PageRequest pageable = PageRequest.of(page, size);
         Page<Supplier> list =  supplierRepository.findAllByEnabledIsTrue(pageable);
@@ -51,13 +55,15 @@ public class SupplierService {
         return result;
 
     }
+
+    @Transactional
     public Supplier updateSupplier(Long id,  Supplier supplier) {
 
         if(id == null) {
             throw  new MyException(400, "Id cannot be null");
         }
 
-        Supplier oldSupplier = getSupplierById(id);
+        Supplier oldSupplier = supplierRepository.findById(id).orElse(null);
 
         if(supplier == null || oldSupplier == null) {
             throw  new MyException(400, "Supplier not found or null");
@@ -74,11 +80,12 @@ public class SupplierService {
         return supplierRepository.save(supplier);
     }
 
+    @Transactional
     public Supplier deleteSupplier(Long id) {
         if (id == null) {
             throw new MyException(400,"Supplier ID cannot be null");
         }
-        Supplier supplier = getSupplierById(id);
+        Supplier supplier = supplierRepository.findById(id).orElse(null);
 
         if (supplier == null) {
             throw  new MyException(400, "Supplier not found or null");
@@ -108,6 +115,7 @@ public class SupplierService {
         }
     }
 
+    @Transactional(readOnly = true)
     public Page<Supplier>searchSuppliers(String name, String contactInfo, String address, String mail, String phone, PageRequest pageable) {
         Specification<Supplier> spec = Specification.not(null);
         spec = spec.and(SupplierSpecification.hasName(name));

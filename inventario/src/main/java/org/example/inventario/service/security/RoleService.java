@@ -51,7 +51,7 @@ public class RoleService {
         if(user == null){
             throw new MyException(MyException.ERROR_USER_NOT_FOUND, "The user cannot be null.");
         }
-        return roleRepository.findAllByUsersAndEnabledIsTrue(user);
+        return roleRepository.findAllByUsersAndEnabledIsTrue(List.of(user));
     }
     public void createDefaultRolesIfNotExists(){
         if (!roleRepository.existsByName(Role.ADMIN_ROLE)) {

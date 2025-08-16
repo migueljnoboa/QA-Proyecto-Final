@@ -27,7 +27,7 @@ spring:
     locations: classpath:db/migration
 
   datasource:
-    url: jdbc:mysql://www.testenv.online:3306/inventariodb?autoReconnect=true
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:inventariodb}
     username: ${MYSQL_USER:user}
     password: ${MYSQL_PASSWORD:12345678}
     driver-class-name: com.mysql.cj.jdbc.Driver

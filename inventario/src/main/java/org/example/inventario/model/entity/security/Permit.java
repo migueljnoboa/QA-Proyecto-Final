@@ -1,16 +1,15 @@
 package org.example.inventario.model.entity.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.inventario.model.entity.Base;
+import org.hibernate.envers.Audited;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
@@ -19,7 +18,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "permits")
-public class Permit extends Base {
+@Audited(withModifiedFlag = true)
+public class Permit extends Base implements Serializable {
     public static final String DASHBOARD_MENU = "DASHBOARD_MENU";
 
     public static final String SUPPLIERS_MENU = "SUPPLIERS_MENU";

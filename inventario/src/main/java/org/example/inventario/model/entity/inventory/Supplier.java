@@ -1,18 +1,22 @@
 package org.example.inventario.model.entity.inventory;
 
 import jakarta.persistence.Entity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.*;
 import org.example.inventario.model.entity.Base;
+import org.hibernate.envers.Audited;
+
+import java.io.Serializable;
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class Supplier extends Base {
+@AllArgsConstructor
+@Audited(withModifiedFlag = true)
+public class Supplier extends Base implements Serializable {
     private String name;
     private String contactInfo;
     private String address;

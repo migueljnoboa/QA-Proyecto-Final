@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.inventario.model.entity.Base;
+import org.hibernate.envers.Audited;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ import java.util.List;
         indexes = {
                 @Index(name = "idx_user_username", columnList = "username")
         })
+@Audited(withModifiedFlag = true)
 public class User extends Base {
     private String username;
     private String password;

@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.inventario.model.dto.api.ProductApi;
 import org.example.inventario.model.entity.Base;
+import org.hibernate.envers.Audited;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
@@ -15,7 +17,8 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Product extends Base {
+@Audited(withModifiedFlag = true)
+public class Product extends Base implements Serializable {
     private String name;
     @Lob
     private String description;
@@ -33,7 +36,5 @@ public class Product extends Base {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Supplier supplier;
-
-
 
 }

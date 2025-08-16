@@ -3,25 +3,35 @@ package org.example.inventario.model.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
 @Setter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class Base implements Serializable {
+public abstract class Base implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
+    @CreatedBy
+    @Column(updatable = false)
+    protected String createdBy;
     @CreatedDate
-    private Date createdAt = new Date();;
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
+    @LastModifiedBy
+    protected String lastModifiedBy;
     @LastModifiedDate
-    protected Date updateAt = new Date();;
+    protected LocalDateTime lastModifiedDate;
     @Version
     protected Long version;
     protected boolean enabled = true;

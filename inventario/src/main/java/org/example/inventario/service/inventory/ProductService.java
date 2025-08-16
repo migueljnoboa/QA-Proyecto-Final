@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -27,6 +28,7 @@ public class ProductService {
     private SupplierService supplierService;
 
 
+    @Transactional
     public Product createProduct(Product product) {
 
         if (product == null) {
@@ -38,11 +40,13 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    @Transactional(readOnly = true)
     public Product getProductById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new MyException(MyException.ERROR_NOT_FOUND, "Product not found with ID: " + id));
     }
 
+    @Transactional(readOnly = true)
     public ReturnList<Product> getAllProducts(int page, int size) {
         PageRequest pageable = PageRequest.of(page, size);
         Page<Product> list = productRepository.findAll(pageable);
@@ -55,13 +59,14 @@ public class ProductService {
         return result;
     }
 
+    @Transactional
     public Product updateProduct(Long id, Product product) {
 
         if(id == null) {
             throw new MyException(MyException.ERROR_NOT_FOUND, "Product not found with ID: " + id);
         }
 
-        Product oldProduct = getProductById(id);
+        Product oldProduct = productRepository.findById(id).orElse(null);
 
         if(product == null || oldProduct == null) {
             throw  new MyException(400, "Supplier not found or null");
@@ -81,13 +86,19 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    @Transactional
     public Product deleteProduct(Long id) {
         if (id == null || !productRepository.existsById(id)) {
             throw new MyException(MyException.ERROR_NOT_FOUND, "Product not found with ID: " + id);
         }
-        Product supplier = getProductById(id);
-        supplier.setEnabled(false);
-        return productRepository.save(supplier);
+        Product product = productRepository.findById(id).orElse(null);
+
+        if (product == null) {
+            throw  new MyException(400, "Supplier not found or null");
+        }
+
+        product.setEnabled(false);
+        return productRepository.save(product);
     }
 
     private void checkVariables(Product product) {
@@ -121,6 +132,7 @@ public class ProductService {
 
     }
 
+    @Transactional(readOnly = true)
     public Page<Product> searchProducts(String name, Category category, BigDecimal price, Integer minStock,Integer stock , Pageable pageable) {
         Specification<Product> spec = Specification.not(null);
         spec = spec.and(ProductSpecification.hasName(name));

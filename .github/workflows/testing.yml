@@ -1,0 +1,126 @@
+name: CI (JUnit + Cucumber + Playwright + JaCoCo)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    defaults:
+      run:
+        working-directory: inventario
+
+    env:
+      HEADLESS: true
+      CI: true
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/inventariodb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: 12345678
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      # Playwright CLI (recommended): installs OS deps + browsers
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright browsers & OS deps
+        run: npx playwright install --with-deps
+
+      # Bring up MySQL via the compose file under src/test/java
+      - name: Start MySQL (docker compose)
+        working-directory: inventario/src/test/java
+        run: docker compose up -d
+
+      - name: Wait for MySQL to be ready
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq mysql-client > /dev/null
+          for i in {1..60}; do
+            if mysqladmin ping -h 127.0.0.1 -u"${SPRING_DATASOURCE_USERNAME}" -p"${SPRING_DATASOURCE_PASSWORD}" --silent; then
+              echo "MySQL is up"; break
+            fi
+            echo "Waiting for MySQL... ($i)"
+            sleep 2
+          done
+
+      # ---- Run subsets for clarity/logs ---------------------------------
+
+      - name: JUnit subset (service/security)
+        run: |
+          ./gradlew --no-daemon test \
+            --tests "org.example.inventario.security.*" \
+            --tests "org.example.inventario.services.inventario.*"
+
+      - name: Cucumber subset
+        run: |
+          ./gradlew --no-daemon test \
+            --tests "org.example.inventario.CucumberTest"
+
+      - name: Playwright subset
+        run: |
+          ./gradlew --no-daemon test \
+            --tests "org.example.inventario.playwright.*"
+
+      # ---- One consolidated run for complete coverage -------------------
+
+      - name: Clean + all tests + JaCoCo
+        run: |
+          ./gradlew --no-daemon clean test jacocoTestReport
+
+      # ---- Artifacts ----------------------------------------------------
+
+      - name: Upload JUnit & Cucumber test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-cucumber-reports
+          path: |
+            inventario/build/reports/tests/test
+            inventario/target/cucumber-reports.html
+          if-no-files-found: warn
+
+      - name: Upload Playwright logs (if any)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-output
+          path: |
+            inventario/build/test-results/test
+            inventario/build/reports/tests/test
+          if-no-files-found: warn
+
+      - name: Upload JaCoCo HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-html
+          path: inventario/build/jacocoHtml
+          if-no-files-found: warn
+
+      # Stop compose (nice cleanup)
+      - name: Stop MySQL (docker compose)
+        if: always()
+        working-directory: inventario/src/test/java
+        run: docker compose down -v

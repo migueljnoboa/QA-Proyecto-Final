@@ -37,6 +37,8 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url 'https://maven.vaadin.com/vaadin-addons' }
+    maven { url 'https://jitpack.io' }
 }
 
 vaadin {
@@ -96,6 +98,9 @@ dependencies {
 
     testImplementation 'com.microsoft.playwright:playwright:1.52.0'
     implementation 'com.microsoft.playwright:playwright:1.52.0'
+
+//    implementation 'com.github.appreciated:apexcharts:24.0.1'
+    implementation 'com.vaadin:vaadin-charts-flow:24.0.0'
 
 }
 dependencyManagement {

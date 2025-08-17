@@ -1,32 +1,22 @@
 package org.example.inventario.ui.view;
 
-import com.github.appreciated.apexcharts.ApexCharts;
-import com.github.appreciated.apexcharts.ApexChartsBuilder;
-import com.github.appreciated.apexcharts.config.Responsive;
-import com.github.appreciated.apexcharts.config.builder.*;
-import com.github.appreciated.apexcharts.config.chart.Type;
-import com.github.appreciated.apexcharts.config.chart.builder.ToolbarBuilder;
-import com.github.appreciated.apexcharts.config.plotoptions.builder.BarBuilder;
-import com.github.appreciated.apexcharts.config.stroke.Curve;
-import com.github.appreciated.apexcharts.helper.Series;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoUtility;
-import jakarta.annotation.security.PermitAll;
+import com.vaadin.flow.component.charts.Chart;
+import com.vaadin.flow.component.charts.model.*;
 import jakarta.annotation.security.RolesAllowed;
-import lombok.RequiredArgsConstructor;
-import org.example.inventario.service.security.SecurityService;
-import org.example.inventario.ui.component.ViewToolbar;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.example.inventario.model.entity.inventory.Category;
+import org.example.inventario.model.entity.inventory.Product;
+import org.example.inventario.service.inventory.ProductService;
+import org.example.inventario.utils.Utilidades;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
 
 @Route("")
 @PageTitle("Home")
@@ -34,7 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Menu(order = 1, icon = "vaadin:dashboard", title = "Dashboard")
 public final class MainView extends Main {
 
-    public MainView() {
+    private ProductService productService;
+
+    private List<Product> productsLowStock;
+
+    public MainView(ProductService productService) {
+        this.productService = productService;
         setWidthFull();
         getStyle().set("display", "flex");
         getStyle().set("flexDirection", "column");
@@ -45,7 +40,6 @@ public final class MainView extends Main {
 
         add(buildHeader(), buildStatCards(), buildLowStockAlert(), buildAnalysis());
     }
-
 
     private Component buildHeader() {
         Div header = new Div();
@@ -64,6 +58,7 @@ public final class MainView extends Main {
     }
 
     private Component buildStatCards() {
+        productsLowStock = productService.productLowStock();
         HorizontalLayout row = new HorizontalLayout();
         row.setWidthFull();
         row.getStyle().set("display", "grid");
@@ -71,10 +66,10 @@ public final class MainView extends Main {
         row.getStyle().set("gap", "1rem");
 
         row.add(
-                statCard("Total Productos", "4", "productos registrados"),
-                statCard("Valor Total", "$22,429.72", "valor del inventario"),
-                statCard("Stock Bajo", "2", "productos con stock bajo"),
-                statCard("Categorías", "2", "categorías activas")
+                statCard("Total Productos", String.valueOf(productService.countAllProducts()), "productos registrados"),
+                statCard("Valor Total", Utilidades.convertAndFormatBigDecimalToString(productService.getTotalStockValue()), "valor del inventario"),
+                statCard("Stock Bajo", String.valueOf(productsLowStock.size()), "productos con stock bajo"),
+                statCard("Categorías", String.valueOf(Category.values().length), "categorías activas")
         );
         return row;
     }
@@ -106,8 +101,10 @@ public final class MainView extends Main {
         return card;
     }
 
-
     private Component buildLowStockAlert() {
+        if (productsLowStock.isEmpty()) {
+            return new Div();
+        }
         Div wrap = new Div();
         wrap.getStyle().set("padding", "1rem 1.25rem");
         wrap.getStyle().set("border-radius", "12px");
@@ -117,16 +114,14 @@ public final class MainView extends Main {
         wrap.getStyle().set("flexDirection", "column");
         wrap.getStyle().set("gap", "0.75rem");
 
-        H3 title = new H3("Alerta de Stock Bajo");
+        H3 title = new H3("Stock Bajo");
         title.getStyle().set("margin", "0");
 
         Paragraph note = new Paragraph("Los siguientes productos tienen stock por debajo del mínimo:");
         note.getStyle().set("margin", "0");
 
-        wrap.add(title, note,
-                lowStockItem("Mouse Logitech MX Master", "3", "10"),
-                lowStockItem("Teclado Mecánico RGB", "2", "5")
-        );
+        wrap.add(title, note);
+        productsLowStock.stream().map(p -> lowStockItem(p.getName(), String.valueOf(p.getStock()), String.valueOf(p.getMinStock()))).forEach(wrap::add);
         return wrap;
     }
 
@@ -154,22 +149,18 @@ public final class MainView extends Main {
         return item;
     }
 
-
     private Component buildAnalysis() {
-        // contenedor de análisis con grid
         Div section = new Div();
         section.getStyle().set("display", "grid");
         section.getStyle().set("grid-template-columns", "repeat(auto-fit,minmax(320px,1fr))");
         section.getStyle().set("gap", "1rem");
         section.setWidthFull();
 
-
         section.add(
                 chartCard("Productos por Categoría", buildProductsPerCategoryChart()),
                 chartCard("Valor por Categoría", buildValuePerCategoryChart()),
                 chartCard("Participación de Valor (%)", buildValueSharePie())
         );
-
 
         Div fullWidth = chartCard("Ventas por mes", buildMonthlySalesChart());
         fullWidth.getStyle().set("grid-column", "1 / -1");
@@ -179,7 +170,7 @@ public final class MainView extends Main {
         return section;
     }
 
-    private Div chartCard(String title, ApexCharts chart) {
+    private Div chartCard(String title, Chart chart) {
         Div card = new Div();
         card.getStyle().set("padding", "1rem 1.25rem");
         card.getStyle().set("border-radius", "12px");
@@ -197,66 +188,84 @@ public final class MainView extends Main {
         return card;
     }
 
-    private ApexCharts buildProductsPerCategoryChart() {
-        String[] categorias = {"Electrónicos", "Accesorios"};
-        Double[] cantidades = {2d, 2d};
+    private Chart buildProductsPerCategoryChart() {
+        Chart chart = new Chart(ChartType.COLUMN);
+        Configuration conf = chart.getConfiguration();
+        Tooltip tooltip = new Tooltip();
+        tooltip.setEnabled(true);
+        tooltip.setPointFormat("Valor: <b>{point.y}</b>");
+        conf.setTooltip(tooltip);
 
-        return ApexChartsBuilder.get()
-                .withChart(ChartBuilder.get().withType(Type.BAR).build())
-                .withPlotOptions(PlotOptionsBuilder.get()
-                        .withBar(BarBuilder.get().withHorizontal(false).build())
-                        .build())
-                .withSeries(new Series<>("Productos", cantidades))
-                .withXaxis(XAxisBuilder.get().withCategories(categorias).build())
-                .withResponsive(new Responsive[] { ResponsiveBuilder.get().build() })
-                .build();
+        List<Category> categories = List.of(Category.values());
+        ListSeries serie = new ListSeries("Productos por categoría");
+        for (Category category : categories) {
+            serie.addData(productService.countProductsByCategory(category));
+        }
+        conf.setSeries(serie);
+        conf.getxAxis().setCategories(
+                categories.stream().map(Category::name).toArray(String[]::new)
+        );
+        conf.getyAxis().setTitle("Cantidad");
+        conf.getxAxis().setTitle("Categoría");
+
+        return chart;
     }
 
-    private ApexCharts buildValuePerCategoryChart() {
-        String[] categorias = {"Electrónicos", "Accesorios"};
-        Double[] valores = {21899.77, 529.95};
+    private Chart buildValuePerCategoryChart() {
+        Chart chart = new Chart(ChartType.BAR);
+        Configuration conf = chart.getConfiguration();
+        Tooltip tooltip = new Tooltip();
+        tooltip.setEnabled(true);
+        tooltip.setPointFormat("Valor: <b>{point.y}</b>");
+        conf.setTooltip(tooltip);
 
-        return ApexChartsBuilder.get()
-                .withChart(ChartBuilder.get().withType(Type.BAR).build())
-                .withPlotOptions(PlotOptionsBuilder.get()
-                        .withBar(BarBuilder.get().withHorizontal(true).build())
-                        .build())
-                .withSeries(new Series<>("Valor (USD)", valores))
-                .withXaxis(XAxisBuilder.get().withCategories(categorias).build())
-                .build();
+        List<Category> categories = List.of(Category.values());
+
+        BigDecimal[] values;
+        values = categories.stream()
+                .map(category -> productService.getTotalStockValueByCategory(category))
+                .toArray(BigDecimal[]::new);
+
+
+        conf.addSeries(new ListSeries("Valor", values));
+        conf.getxAxis().setCategories(
+                categories.stream().map(Category::name).toArray(String[]::new)
+        );
+
+        return chart;
     }
 
-    private ApexCharts buildValueSharePie() {
-        Double[] valores = {21899.77, 529.95};
-        String[] categorias = {"Electrónicos", "Accesorios"};
+    private Chart buildValueSharePie() {
+        Chart chart = new Chart(ChartType.PIE);
+        Configuration conf = chart.getConfiguration();
 
-        return ApexChartsBuilder.get()
-                .withChart(ChartBuilder.get().withType(Type.PIE).build())
-                .withLabels(categorias)
-                .withSeries(valores)
-                .build();
+        Tooltip tooltip = new Tooltip();
+        tooltip.setEnabled(true);
+        tooltip.setPointFormat("{point.name}: <b>{point.y}</b>");
+        conf.setTooltip(tooltip);
+
+        DataSeries series = new DataSeries();
+        for (Category category : Category.values()) {
+            Double percent = productService.getTotalStockValuePercentByCategory(category);
+            Double value = BigDecimal.valueOf(percent != null ? percent : 0.0).setScale(2, RoundingMode.HALF_UP).doubleValue();
+            series.add(new DataSeriesItem(category.name(), value));
+        }
+
+        conf.setSeries(series);
+        return chart;
     }
 
-    private ApexCharts buildMonthlySalesChart() {
-        String[] meses = {"Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"};
-        Double[] ventas = {1200d, 1450d, 1320d, 1580d, 1760d, 1650d, 1890d, 2010d, 1950d, 2100d, 2230d, 2400d};
+    private Chart buildMonthlySalesChart() {
+        Chart chart = new Chart(ChartType.AREA);
+        Configuration conf = chart.getConfiguration();
 
-        ApexCharts chart = ApexChartsBuilder.get()
-                .withChart(ChartBuilder.get()
-                        .withType(Type.AREA)
-                        .withToolbar(ToolbarBuilder.get().withShow(true).build())
-                        .build())
-                .withDataLabels(DataLabelsBuilder.get().withEnabled(false).build())
-                .withStroke(StrokeBuilder.get().withCurve(Curve.SMOOTH).build())
-                .withSeries(new Series<>("Ventas", ventas))
-                .withXaxis(XAxisBuilder.get().withCategories(meses).build())
-                .withYaxis(YAxisBuilder.get().withDecimalsInFloat(0d).build())
-                .withFill(FillBuilder.get()
-                        .withOpacity(0.35)
-                        .build())
-                .build();
+        conf.addSeries(new ListSeries("Ventas",
+                1200, 1450, 1320, 1580, 1760, 1650,
+                1890, 2010, 1950, 2100, 2230, 2400));
 
-        chart.setHeight("300px");
+        conf.getxAxis().setCategories("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic");
+        conf.getyAxis().setTitle("Ventas (USD)");
+
         return chart;
     }
 }

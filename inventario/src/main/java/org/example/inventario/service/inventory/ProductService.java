@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -145,4 +146,30 @@ public class ProductService {
         return productRepository.findAll(spec, pageable);
     }
 
+
+    public int countAllProducts() {
+        return productRepository.countAllByEnabledIsTrue();
+    }
+
+    public BigDecimal getTotalStockValue() {
+        return productRepository.getTotalStockValue();
+    }
+
+    public List<Product> productLowStock() {
+        return productRepository.findAll(ProductSpecification.hasLowStock());
+    }
+
+    public int countProductsByCategory(Category category) {
+        Specification<Product> spec = Specification.not(null);
+        spec = spec.and(ProductSpecification.hasCategory(category));
+        spec = spec.and(ProductSpecification.isEnabled());
+        return (int) productRepository.count(spec);
+    }
+
+    public BigDecimal getTotalStockValueByCategory(Category category) {
+        return productRepository.getTotalStockValueByCategory(category);
+    }
+    public Double getTotalStockValuePercentByCategory(Category category) {
+        return productRepository.getTotalStockValuePercentByCategory(category);
+    }
 }

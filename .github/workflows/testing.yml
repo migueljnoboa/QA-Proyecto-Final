@@ -41,10 +41,10 @@ jobs:
           cache: gradle
 
       # Install playwright dependencies
-      - name: Install system deps (optional, for Playwright headless)
+      - name: Install system deps for headless browser
         run: |
           sudo apt-get update
-          sudo apt-get install -y libnss3 libxss1 libasound2 fonts-liberation > /dev/null
+          sudo apt-get install -y libnss3 libxss1 fonts-liberation libasound2t64
 
       # Bring up MySQL using the compose file under src/test/java
       - name: Start MySQL (docker compose)
@@ -120,7 +120,7 @@ jobs:
         with:
           name: jacoco-html
           path: inventario/build/jacocoHtml
-          if-no-files-found: error
+          if-no-files-found: warn
 
       # Stop compose (nice cleanup)
       - name: Stop MySQL (docker compose)

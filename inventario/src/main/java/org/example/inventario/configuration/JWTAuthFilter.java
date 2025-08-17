@@ -12,7 +12,7 @@ import org.example.inventario.exception.ResponseMessage;
 import org.example.inventario.model.dto.scurity.JWTAuthentication;
 import org.example.inventario.model.entity.security.User;
 import org.example.inventario.service.security.AuthenticationService;
-import org.example.inventario.utils.Utlity;
+import org.example.inventario.utils.Utilidades;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -71,7 +71,7 @@ public class JWTAuthFilter extends OncePerRequestFilter {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
             PrintWriter writer = response.getWriter();
-            writer.print(Utlity.convertToJson(ResponseMessage.errorMyExcepcion(e)));
+            writer.print(Utilidades.convertToJson(ResponseMessage.errorMyExcepcion(e)));
             writer.flush();
             writer.close();
         }

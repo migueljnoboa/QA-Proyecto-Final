@@ -5,11 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.inventario.model.dto.inventory.ReturnList;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.Supplier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
@@ -26,21 +31,41 @@ public class ProductApi{
     private String image;
     private SupplierApi supplier;
 
-    public static ProductApi from(Product productApi){
-        if (productApi == null) {
+    public static ProductApi from(Product product){
+        if (product == null) {
             return null;
         }
-        ProductApi product = new ProductApi();
-        product.setId(productApi.getId());
-        product.setName(productApi.getName());
-        product.setDescription(productApi.getDescription());
-        product.setCategory(productApi.getCategory());
-        product.setPrice(productApi.getPrice());
-        product.setStock(productApi.getStock());
-        product.setMinStock(productApi.getMinStock());
-        product.setImage(productApi.getImage());
-        product.setSupplier(SupplierApi.from(productApi.getSupplier()));
-        return product;
+        ProductApi productApi = new ProductApi();
+        productApi.setId(product.getId());
+        productApi.setName(product.getName());
+        productApi.setDescription(product.getDescription());
+        productApi.setCategory(product.getCategory());
+        productApi.setPrice(product.getPrice());
+        productApi.setStock(product.getStock());
+        productApi.setMinStock(product.getMinStock());
+        productApi.setImage(product.getImage());
+        productApi.setSupplier(SupplierApi.from(product.getSupplier()));
+        return productApi;
     }
+
+    public static List<ProductApi> from(List<Product> productList){
+        List<ProductApi> productApis = new ArrayList<>();
+        for (Product product : productList) {
+            productApis.add(from(product));
+        }
+        return productApis;
+    }
+
+    public static ReturnList<ProductApi> from(ReturnList<Product> returnList){
+        ReturnList<ProductApi> result = new ReturnList<>();
+        result.setPage(returnList.getPage());
+        result.setPageSize(returnList.getPageSize());
+        result.setTotalElements(returnList.getTotalElements());
+        result.setTotalPages(returnList.getTotalPages());
+        result.setData(from(returnList.getData()));
+        return result;
+    }
+
+
 
 }

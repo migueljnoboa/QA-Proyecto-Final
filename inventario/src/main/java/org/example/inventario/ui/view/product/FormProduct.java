@@ -27,6 +27,7 @@ import com.vaadin.flow.server.streams.InMemoryUploadHandler;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import org.apache.commons.lang3.StringUtils;
+import org.example.inventario.model.dto.inventory.ReturnList;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.Supplier;
@@ -202,9 +203,8 @@ public class FormProduct extends Dialog {
                             query.getLimit()
                     );
 
-                    Page<Supplier> page = supplierService.getAllSuppliers(pageable);
-
-                    return page.getContent().stream();
+                    ReturnList<Supplier> page = supplierService.getAllSuppliers(pageable);
+                    return page.getData().stream();
                 },
                 query -> {
                     Pageable pageable = PageRequest.of(0, 1);

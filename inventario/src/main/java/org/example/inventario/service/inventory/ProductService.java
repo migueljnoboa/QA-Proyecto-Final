@@ -48,12 +48,11 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public ReturnList<Product> getAllProducts(int page, int size) {
-        PageRequest pageable = PageRequest.of(page, size);
-        Page<Product> list = productRepository.findAll(pageable);
+    public ReturnList<Product> getAllProducts(Pageable pageable) {
+        Page<Product> list = productRepository.findAllByEnabledIsTrue(pageable);
         ReturnList<Product> result = new ReturnList<>();
-        result.setPage(page);
-        result.setPageSize(size);
+        result.setPage(pageable.getPageNumber());
+        result.setPageSize(pageable.getPageSize());
         result.setTotalElements((int) list.getTotalElements());
         result.setTotalPages(list.getTotalPages());
         result.setData(list.getContent());

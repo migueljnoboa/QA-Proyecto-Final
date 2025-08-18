@@ -1,13 +1,16 @@
 package org.example.inventario.services.inventario;
 
+import com.vaadin.hilla.mappedtypes.Pageable;
 import org.example.inventario.exception.MyException;
 import org.example.inventario.model.dto.inventory.ReturnList;
 import org.example.inventario.model.entity.inventory.Supplier;
+import org.example.inventario.repository.inventory.SupplierRepository;
 import org.example.inventario.service.inventory.SupplierService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -16,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -181,16 +186,16 @@ public class SupplierServiceTest {
     }
 
     @Test
-    public void findAllSupplier() {
+    public void findAllSupplierTest() {
+
         supplierService.createSupplier(supplier1);
         supplierService.createSupplier(supplier2);
         supplierService.createSupplier(supplier3);
 
-        ReturnList<Supplier> supplierReturnList = supplierService.getAllSuppliers(0, 20);
+        ReturnList<Supplier> supplierReturnList = supplierService.getAllSuppliers(PageRequest.of(0, 20));
 
-        assertTrue(supplierReturnList.getData().contains(supplier1));
-        assertTrue(supplierReturnList.getData().contains(supplier2));
-        assertTrue(supplierReturnList.getData().contains(supplier3));
+        var ids = supplierReturnList.getData().stream().map(Supplier::getId).toList();
+        assertTrue(ids.containsAll(List.of(supplier1.getId(), supplier2.getId(), supplier3.getId())));
     }
 
     @Test

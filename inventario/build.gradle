@@ -93,8 +93,8 @@ dependencies {
     implementation('com.vaadin:vaadin-spring-boot-starter')
 
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation 'org.testcontainers:junit-jupiter:1.19.0'
-    testImplementation 'org.testcontainers:mysql:1.19.0'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:mysql'
 
     testImplementation 'com.microsoft.playwright:playwright:1.52.0'
     implementation 'com.microsoft.playwright:playwright:1.52.0'

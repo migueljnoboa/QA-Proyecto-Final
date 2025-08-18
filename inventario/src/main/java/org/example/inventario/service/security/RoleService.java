@@ -4,22 +4,20 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.example.inventario.exception.MyException;
 import org.example.inventario.model.dto.inventory.ReturnList;
-import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.security.Permit;
 import org.example.inventario.model.entity.security.Role;
 import org.example.inventario.model.entity.security.User;
-import org.example.inventario.model.specification.product.ProductSpecification;
 import org.example.inventario.model.specification.role.RoleSpecification;
 import org.example.inventario.repository.security.RoleRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -27,12 +25,11 @@ public class RoleService {
     private final PermitService permitService;
     private final RoleRepository roleRepository;
 
-    public ReturnList<Role> listAllRole( int page , int size) {
-        PageRequest pageable = PageRequest.of(page, size);
+    public ReturnList<Role> listAllRole(Pageable pageable) {
         Page<Role> list = roleRepository.findAllByEnabledIsTrue(pageable);
         ReturnList<Role> result = new ReturnList<>();
-        result.setPage(page);
-        result.setPageSize(size);
+        result.setPage(pageable.getPageNumber());
+        result.setPageSize(pageable.getPageSize());
         result.setTotalElements((int) list.getTotalElements());
         result.setTotalPages(list.getTotalPages());
         result.setData(list.getContent());
@@ -58,14 +55,14 @@ public class RoleService {
             Role adminRole = new Role();
             adminRole.setName(Role.ADMIN_ROLE);
             adminRole.setDescription("Administrator role with all permissions");
-            adminRole.setPermits(permitService.findAll());
+            adminRole.setPermits(new LinkedHashSet<>(permitService.findAll()));
             roleRepository.save(adminRole);
         }
 
         if (!roleRepository.existsByName(Role.USER_ROLE)) {
             Role userRole = new Role();
             userRole.setName(Role.USER_ROLE);
-            userRole.setPermits(List.of(permitService.findByName(Permit.DASHBOARD_MENU),
+            userRole.setPermits(Set.of(permitService.findByName(Permit.DASHBOARD_MENU),
                     permitService.findByName(Permit.PRODUCTS_MENU),
                     permitService.findByName(Permit.PRODUCT_VIEW)));
             userRole.setDescription("Regular user role with limited permissions");
@@ -91,7 +88,7 @@ public class RoleService {
             throw new MyException(MyException.ERROR_VALIDATION, "Role must have at least one permit.");
         }
         List<Permit> permits = extractPermits(role);
-        role.setPermits(permits);
+        role.setPermits(new LinkedHashSet<>(permits));
         return roleRepository.save(role);
     }
 
@@ -109,7 +106,7 @@ public class RoleService {
         List<Permit> permits = extractPermits(role);
         existingRole.setName(role.getName());
         existingRole.setDescription(role.getDescription());
-        existingRole.setPermits(permits);
+        existingRole.setPermits(new LinkedHashSet<>(permits));
         existingRole.setEnabled(role.isEnabled());
         return roleRepository.save(existingRole);
     }

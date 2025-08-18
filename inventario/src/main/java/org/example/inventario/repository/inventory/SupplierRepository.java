@@ -14,6 +14,4 @@ import org.springframework.stereotype.Repository;
 public interface SupplierRepository extends JpaRepository<Supplier, Long>, JpaSpecificationExecutor<Supplier> {
 
     Page<Supplier> findAllByEnabledIsTrue(Pageable pageable);
-
-    Page<Supplier> findAll(Specification<Supplier> spec, Pageable pageable);
 }

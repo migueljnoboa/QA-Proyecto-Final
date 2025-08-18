@@ -1,5 +1,6 @@
 package org.example.inventario.services.inventario;
 
+import com.vaadin.hilla.mappedtypes.Pageable;
 import org.example.inventario.exception.MyException;
 import org.example.inventario.model.dto.inventory.ReturnList;
 import org.example.inventario.model.entity.Base;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -230,10 +232,7 @@ public class ProductServiceTest {
         productService.createProduct(product2);
         productService.createProduct(product3);
 
-        ReturnList<Product> productReturnList = productService.getAllProducts(0, 20);
-
-        System.out.println("TESTING");
-        productReturnList.getData().iterator().forEachRemaining(product -> System.out.println("ID: " + product.getId()));
+        ReturnList<Product> productReturnList = productService.getAllProducts(PageRequest.of(0, 20));
 
         assertTrue(productReturnList.getData().contains(product1));
         assertTrue(productReturnList.getData().contains(product2));

@@ -1,7 +1,7 @@
-package org.example.inventario.controller;
+package org.example.inventario.controller.externalApi;
 
 import lombok.RequiredArgsConstructor;
-import org.example.inventario.model.entity.security.Permit;
+import org.example.inventario.model.dto.api.permit.PermitApi;
 import org.example.inventario.service.security.PermitService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,8 +15,8 @@ import java.util.List;
 public class PermitController {
     private final PermitService permitService;
     @GetMapping("")
-    public List<Permit> listPermit() {
-        return permitService.findAll();
+    public List<PermitApi> listPermit() {
+        return PermitApi.from(permitService.findAll());
     }
 
 }

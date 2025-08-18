@@ -21,7 +21,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @Query("SELECT SUM(p.stock * p.price) FROM Product p WHERE p.enabled = true")
     BigDecimal getTotalStockValue();
 
-    @Query("SELECT SUM(p.price) FROM Product p WHERE p.category = ?1")
+    @Query("SELECT SUM(p.price * p.stock) FROM Product p WHERE p.category = ?1")
     BigDecimal getTotalStockValueByCategory(Category category);
 
     @Query("SELECT (SUM(p.stock * p.price) * 100.0) / (SELECT SUM(p2.stock * p2.price) FROM Product p2 WHERE p2.enabled = true) FROM Product p WHERE p.category = :category AND p.enabled = true")

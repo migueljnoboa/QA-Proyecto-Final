@@ -4,13 +4,18 @@ import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.example.inventario.configuration.PasswordEncodingConfig;
 import org.example.inventario.exception.MyException;
+import org.example.inventario.model.dto.inventory.ReturnList;
 import org.example.inventario.model.entity.security.Role;
 import org.example.inventario.model.entity.security.User;
 import org.example.inventario.repository.security.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +25,7 @@ public class UserService {
     private final PasswordEncodingConfig passwordEncoder;
     private final RoleService roleService;
 
-
+    @Transactional
     public User createUser(User user) {
         if(user == null) {
             throw new MyException(MyException.ERROR_NOT_FOUND,"User cannot be null");
@@ -38,6 +43,25 @@ public class UserService {
 
         return userRepository.save(user);
     }
+
+    @Transactional
+    public ReturnList<User> findAllUsers(Pageable pageable) {
+        Page<User> page = userRepository.findByEnabledIsTrue(pageable);
+
+        page.getContent().forEach(u -> {
+            u.getRoles().size();
+        });
+
+        ReturnList<User> result = new ReturnList<>();
+        result.setPage(pageable.getPageNumber());
+        result.setPageSize(pageable.getPageSize());
+        result.setTotalElements((int) page.getTotalElements());
+        result.setTotalPages(page.getTotalPages());
+        result.setData(page.getContent());
+        return result;
+    }
+
+    @Transactional(readOnly = true)
     public User findById(Long id) {
         if(id == null) {
             throw new MyException(MyException.ERROR_VALIDATION, "User ID cannot be null");
@@ -45,6 +69,8 @@ public class UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new MyException(MyException.ERROR_NOT_FOUND, "User not found with ID: " + id));
     }
+
+    @Transactional(readOnly = true)
     public User findByUsername(String username) {
         if(StringUtils.isBlank(username)) {
             throw new MyException(MyException.ERROR_VALIDATION, "Username cannot be empty");
@@ -56,6 +82,7 @@ public class UserService {
         return user;
     }
 
+    @Transactional
     public User updateUser(Long id, User user) {
         if(user == null) {
             throw new MyException(MyException.ERROR_NOT_FOUND,"User cannot be null");
@@ -78,6 +105,8 @@ public class UserService {
         actualUser.setRoles(user.getRoles());
         return userRepository.save(actualUser);
     }
+
+    @Transactional
     public void deleteUser(Long id) {
         if(id == null) {
             throw new MyException(MyException.ERROR_VALIDATION, "User ID cannot be null");
@@ -88,6 +117,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void enableUser(Long id) {
         if(id == null) {
             throw new MyException(MyException.ERROR_VALIDATION, "User ID cannot be null");
@@ -98,6 +128,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void createDefaultUserIfNotExists() {
         User user = userRepository.findByUsernameAndEnabledIsTrue("admin");
         if(user == null) {
@@ -105,12 +136,12 @@ public class UserService {
             user.setUsername("admin");
             user.setPassword(passwordEncoder.passwordEncoder().encode("admin"));
             user.setEmail("admin@gmail.com");
-            user.setRoles(List.of( roleService.findByName(Role.ADMIN_ROLE)));
+            user.setRoles(Set.of( roleService.findByName(Role.ADMIN_ROLE)));
             userRepository.save(user);
         }
     }
 
-
+    @Transactional
     public void createTestUser(){
         User user = userRepository.findByUsernameAndEnabledIsTrue("miguel");
         if(user == null) {
@@ -118,7 +149,7 @@ public class UserService {
             user.setUsername("miguel");
             user.setPassword(passwordEncoder.passwordEncoder().encode("admin"));
             user.setEmail("miguel@gmail.com");
-            user.setRoles(List.of(roleService.findByName(Role.USER_ROLE)));
+            user.setRoles(Set.of(roleService.findByName(Role.USER_ROLE)));
             userRepository.save(user);
         }
 
@@ -128,7 +159,7 @@ public class UserService {
             user.setUsername("carlos");
             user.setPassword(passwordEncoder.passwordEncoder().encode("admin"));
             user.setEmail("carlos@gmail.com");
-            user.setRoles(List.of(roleService.findByName(Role.USER_ROLE)));
+            user.setRoles(Set.of(roleService.findByName(Role.USER_ROLE)));
             userRepository.save(user);
         }
     }

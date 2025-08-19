@@ -65,7 +65,4 @@ public class ProductApi{
         result.setData(from(returnList.getData()));
         return result;
     }
-
-
-
 }

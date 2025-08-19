@@ -17,9 +17,9 @@ public class ProductApiController {
     private final ProductService productService;
 
     @GetMapping("")
-    public ReturnList<Product> getProducts(Pageable pageable) {
+    public ReturnList<ProductApi> getProducts(Pageable pageable) {
 
-        return productService.getAllProducts(pageable);
+        return ProductApi.from(productService.getAllProducts(pageable));
     }
 
     @GetMapping("{id}")

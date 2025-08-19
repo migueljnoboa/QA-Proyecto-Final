@@ -21,6 +21,7 @@ public class SupplierApi {
     private String address;
     private String email;
     private String phoneNumber;
+    private boolean enabled;
 
     public static SupplierApi from(Supplier supplier){
         if (supplier == null) {
@@ -33,6 +34,7 @@ public class SupplierApi {
         supplierApi.setAddress(supplier.getAddress());
         supplierApi.setEmail(supplier.getEmail());
         supplierApi.setPhoneNumber(supplier.getPhoneNumber());
+        supplierApi.setEnabled(supplierApi.isEnabled());
         return supplierApi;
     }
 
@@ -53,7 +55,4 @@ public class SupplierApi {
         result.setData(from(returnList.getData()));
         return result;
     }
-
-
-
 }

@@ -43,7 +43,6 @@ public class RoleServiceTest {
             .withUsername("testuser")
             .withPassword("testpass");
 
-    // Override Spring properties to use the container's JDBC URL and credentials
     @DynamicPropertySource
     static void overrideDatasourceProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
@@ -62,10 +61,9 @@ public class RoleServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Ensure permits exist before using findByName
         permitService.createDefaultPermitsIfNotExists();
 
-        var p = permitService; // short alias
+        var p = permitService;
         var set1 = new LinkedHashSet<>(List.of(
                 p.findByName(Permit.SUPPLIERS_MENU),
                 p.findByName(Permit.SUPPLIER_CREATE),
@@ -214,16 +212,13 @@ public class RoleServiceTest {
         var saved2 = roleService.createRole(role2);
         roleService.createRole(role3);
 
-        // by name (like/equals depends on RoleSpecification; we just expect >=1 when exact)
         Page<Role> byName = roleService.searchRole(saved1.getName(), null, PageRequest.of(0, 10));
         assertTrue(byName.getContent().stream().anyMatch(r -> r.getId().equals(saved1.getId())));
 
-        // by permit
         var onePermitFromRole2 = role2.getPermits().iterator().next();
         Page<Role> byPermit = roleService.searchRole(null, onePermitFromRole2, PageRequest.of(0, 10));
         assertTrue(byPermit.getContent().stream().anyMatch(r -> r.getId().equals(saved2.getId())));
 
-        // disabled should be excluded
         roleService.deleteRole(saved2.getId());
         Page<Role> afterDelete = roleService.searchRole(null, onePermitFromRole2, PageRequest.of(0, 10));
         assertFalse(afterDelete.getContent().stream().anyMatch(r -> r.getId().equals(saved2.getId())));

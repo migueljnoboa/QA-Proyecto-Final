@@ -72,7 +72,7 @@ public class SupplierService {
         oldSupplier.setEmail(supplier.getEmail());
         oldSupplier.setPhoneNumber(supplier.getPhoneNumber());
 
-        return supplierRepository.save(supplier);
+        return supplierRepository.save(oldSupplier);
     }
 
     @Transactional

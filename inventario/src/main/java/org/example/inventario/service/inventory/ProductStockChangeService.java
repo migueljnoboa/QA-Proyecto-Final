@@ -8,6 +8,7 @@ import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.ProductStockChange;
 import org.example.inventario.model.specification.product.ProductSpecification;
+import org.example.inventario.model.specification.product.ProductStockChangeSpecification;
 import org.example.inventario.repository.inventory.ProductRepository;
 import org.example.inventario.repository.inventory.ProductStockChangeRepository;
 import org.jetbrains.annotations.NotNull;
@@ -55,6 +56,31 @@ public class ProductStockChangeService {
         result.setTotalPages(list.getTotalPages());
         result.setData(list.getContent());
         return result;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductStockChange> searchProductStockChanges(
+            Pageable pageable,
+            Long productId,
+            Boolean increased,
+            Integer minAmount,
+            Integer maxAmount,
+            LocalDateTime fromDate,
+            LocalDateTime toDate,
+            String createdBy
+    ) {
+        Specification<ProductStockChange> spec  =
+                ProductStockChangeSpecification.build(
+                productId,
+                increased,
+                minAmount,
+                maxAmount,
+                fromDate,
+                toDate,
+                createdBy
+        );
+
+        return productStockChangeRepository.findAll(spec, pageable);
     }
 
 }

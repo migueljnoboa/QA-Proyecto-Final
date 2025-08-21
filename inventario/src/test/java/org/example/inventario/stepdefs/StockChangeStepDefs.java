@@ -1,5 +1,6 @@
 package org.example.inventario.stepdefs;
 
+import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
 import org.example.inventario.model.dto.api.ProductStockChangeApi;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.*;
 
 import java.math.BigDecimal;
@@ -35,7 +37,6 @@ public class StockChangeStepDefs {
     @Autowired private SupplierService supplierService;
     @Autowired private ProductService productService;
     @Autowired private ProductStockChangeRepository stockChangeRepository;
-    @Autowired private ProductStockChangeService stockChangeService;
 
     private String jwtToken;
 
@@ -47,26 +48,21 @@ public class StockChangeStepDefs {
 
     private ResponseEntity<ProductStockChangeApi> lastChangeByIdResponse;
     private ResponseEntity<ReturnList<ProductStockChangeApi>> lastListResponse;
+    private ResponseEntity<ReturnList<ProductStockChangeApi>> lastSearchResponse;
+
+    private LocalDateTime windowStart;
+    private LocalDateTime windowEnd;
 
     @Before
     public void authenticate() {
         UserAuthentication credentials = new UserAuthentication("admin", "admin");
-
         ResponseEntity<ReturnAuthentication> loginResponse = restTemplate.postForEntity(
                 "/api/security/authenticate", credentials, ReturnAuthentication.class
         );
-
         Assertions.assertEquals(HttpStatus.OK, loginResponse.getStatusCode(), "Login failed");
         Assertions.assertNotNull(loginResponse.getBody(), "Login response body is null");
         jwtToken = loginResponse.getBody().token();
         Assertions.assertNotNull(jwtToken, "JWT token must not be null");
-    }
-
-    private HttpHeaders authHeadersJson() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(jwtToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        return headers;
     }
 
     private HttpHeaders authHeaders() {
@@ -74,6 +70,8 @@ public class StockChangeStepDefs {
         headers.setBearerAuth(jwtToken);
         return headers;
     }
+
+    private static String iso(LocalDateTime dt) { return dt == null ? null : dt.toString(); }
 
     @Given("a test supplier exists")
     public void a_test_supplier_exists() {
@@ -84,7 +82,6 @@ public class StockChangeStepDefs {
         s.setEmail("qa@example.com");
         s.setPhoneNumber("555-0000");
         s.setEnabled(true);
-        s.setLastModifiedBy("test");
         lastSupplier = supplierService.createSupplier(s);
         Assertions.assertNotNull(lastSupplier.getId(), "Supplier ID is null");
     }
@@ -101,7 +98,6 @@ public class StockChangeStepDefs {
         p.setImage(null);
         p.setSupplier(lastSupplier);
         p.setEnabled(true);
-        p.setLastModifiedBy("test");
 
         Product created = productService.createProduct(p);
         Assertions.assertNotNull(created, "createProduct returned null");
@@ -121,7 +117,6 @@ public class StockChangeStepDefs {
         update.setImage(null);
         update.setSupplier(lastSupplier);
         update.setEnabled(true);
-        update.setLastModifiedBy("test-update");
 
         Product updated = productService.updateProduct(lastProductId, update);
         Assertions.assertNotNull(updated, "updateProduct returned null");
@@ -161,6 +156,109 @@ public class StockChangeStepDefs {
         Assertions.assertNotNull(lastListResponse.getBody(), "List response body is null");
     }
 
+    @When("I start a time window")
+    public void i_start_a_time_window() {
+        windowStart = LocalDateTime.now();
+    }
+
+    @When("I end the time window")
+    public void i_end_the_time_window() {
+        windowEnd = LocalDateTime.now();
+    }
+
+    private String buildSearchUrl(PageRequest page, Long productId, Boolean increased,
+                                  Integer minAmount, Integer maxAmount,
+                                  LocalDateTime from, LocalDateTime to,
+                                  String createdBy) {
+        StringBuilder sb = new StringBuilder("/api/stockchange/search");
+        sb.append("?page=").append(page.getPageNumber()).append("&size=").append(page.getPageSize());
+        if (productId != null) sb.append("&productId=").append(productId);
+        if (increased != null) sb.append("&increased=").append(increased);
+        if (minAmount != null) sb.append("&minAmount=").append(minAmount);
+        if (maxAmount != null) sb.append("&maxAmount=").append(maxAmount);
+        if (from != null) sb.append("&fromDate=").append(iso(from));
+        if (to != null) sb.append("&toDate=").append(iso(to));
+        if (createdBy != null && !createdBy.isBlank()) sb.append("&createdBy=").append(createdBy);
+        return sb.toString();
+    }
+
+    @When("I SEARCH stock changes page {int} size {int} with increased true and minAmount {int} and maxAmount {int} for the last product")
+    public void i_search_changes_basic_bounds_no_window(int page, int size, int minAmount, int maxAmount) {
+        String url = buildSearchUrl(PageRequest.of(page, size),
+                lastProductId, true, minAmount, maxAmount, null, null, null);
+
+        lastSearchResponse = restTemplate.exchange(
+                url, HttpMethod.GET, new HttpEntity<>(authHeaders()),
+                new ParameterizedTypeReference<ReturnList<ProductStockChangeApi>>() {}
+        );
+        Assertions.assertEquals(HttpStatus.OK, lastSearchResponse.getStatusCode(), "GET /api/stockchange/search failed");
+        Assertions.assertNotNull(lastSearchResponse.getBody(), "Search response body is null");
+    }
+
+    @When("I SEARCH stock changes page {int} size {int} for the last product within the captured window")
+    public void i_search_changes_window_only(int page, int size) {
+        LocalDateTime from = windowStart == null ? null : windowStart.minusSeconds(2);
+        LocalDateTime to   = windowEnd   == null ? null : windowEnd.plusSeconds(2);
+
+        String url = buildSearchUrl(PageRequest.of(page, size),
+                lastProductId, null, null, null, from, to, null);
+
+        lastSearchResponse = restTemplate.exchange(
+                url, HttpMethod.GET, new HttpEntity<>(authHeaders()),
+                new ParameterizedTypeReference<ReturnList<ProductStockChangeApi>>() {}
+        );
+        Assertions.assertEquals(HttpStatus.OK, lastSearchResponse.getStatusCode(), "GET /api/stockchange/search failed");
+        Assertions.assertNotNull(lastSearchResponse.getBody(), "Search response body is null");
+    }
+
+    @When("I SEARCH stock changes page {int} size {int} with increased true and minAmount {int} and maxAmount {int} for the last product within the captured window")
+    public void i_search_changes_bounds_with_window(int page, int size, int minAmount, int maxAmount) {
+        LocalDateTime from = windowStart == null ? null : windowStart.minusSeconds(2);
+        LocalDateTime to   = windowEnd   == null ? null : windowEnd.plusSeconds(2);
+
+        String url = buildSearchUrl(PageRequest.of(page, size),
+                lastProductId, true, minAmount, maxAmount, from, to, null);
+
+        lastSearchResponse = restTemplate.exchange(
+                url, HttpMethod.GET, new HttpEntity<>(authHeaders()),
+                new ParameterizedTypeReference<ReturnList<ProductStockChangeApi>>() {}
+        );
+        Assertions.assertEquals(HttpStatus.OK, lastSearchResponse.getStatusCode(), "GET /api/stockchange/search failed");
+        Assertions.assertNotNull(lastSearchResponse.getBody(), "Search response body is null");
+    }
+
+    @When("I SEARCH stock changes page {int} size {int} with increased true and minAmount null and maxAmount {int} for the last product within the captured window")
+    public void i_search_changes_max_only_with_window(int page, int size, int maxAmount) {
+        LocalDateTime from = windowStart == null ? null : windowStart.minusSeconds(2);
+        LocalDateTime to   = windowEnd   == null ? null : windowEnd.plusSeconds(2);
+
+        String url = buildSearchUrl(PageRequest.of(page, size),
+                lastProductId, true, null, maxAmount, from, to, null);
+
+        lastSearchResponse = restTemplate.exchange(
+                url, HttpMethod.GET, new HttpEntity<>(authHeaders()),
+                new ParameterizedTypeReference<ReturnList<ProductStockChangeApi>>() {}
+        );
+        Assertions.assertEquals(HttpStatus.OK, lastSearchResponse.getStatusCode(), "GET /api/stockchange/search failed");
+        Assertions.assertNotNull(lastSearchResponse.getBody(), "Search response body is null");
+    }
+
+    @When("I SEARCH stock changes page {int} size {int} with increased true and minAmount {int} and maxAmount null for the last product within the captured window")
+    public void i_search_changes_min_only_with_window(int page, int size, int minAmount) {
+        LocalDateTime from = windowStart == null ? null : windowStart.minusSeconds(2);
+        LocalDateTime to   = windowEnd   == null ? null : windowEnd.plusSeconds(2);
+
+        String url = buildSearchUrl(PageRequest.of(page, size),
+                lastProductId, true, minAmount, null, from, to, null);
+
+        lastSearchResponse = restTemplate.exchange(
+                url, HttpMethod.GET, new HttpEntity<>(authHeaders()),
+                new ParameterizedTypeReference<ReturnList<ProductStockChangeApi>>() {}
+        );
+        Assertions.assertEquals(HttpStatus.OK, lastSearchResponse.getStatusCode(), "GET /api/stockchange/search failed");
+        Assertions.assertNotNull(lastSearchResponse.getBody(), "Search response body is null");
+    }
+
     @Then("the response stock change should have increased {word} and amount {int}")
     public void the_response_stock_change_should_have(String increasedStr, int expectedAmount) {
         boolean expectedIncreased = Boolean.parseBoolean(increasedStr);
@@ -188,11 +286,61 @@ public class StockChangeStepDefs {
                         ", increased=" + inc + ", amount=" + amount);
     }
 
+    @Then("the search result should contain exactly {int} changes for the last product")
+    public void search_result_exact_count(int expected) {
+        ReturnList<ProductStockChangeApi> body = lastSearchResponse.getBody();
+        Assertions.assertNotNull(body, "Search body null");
+        long count = body.getData().stream()
+                .filter(x -> x.getProduct() != null && Objects.equals(x.getProduct().getId(), lastProductId))
+                .count();
+        Assertions.assertEquals(expected, count, "Unexpected count for last product in search result");
+    }
+
+    @Then("the search result should contain at least {int} changes for the last product")
+    public void search_result_at_least_count(int minExpected) {
+        ReturnList<ProductStockChangeApi> body = lastSearchResponse.getBody();
+        Assertions.assertNotNull(body, "Search body null");
+        long count = body.getData().stream()
+                .filter(x -> x.getProduct() != null && Objects.equals(x.getProduct().getId(), lastProductId))
+                .count();
+        Assertions.assertTrue(count >= minExpected,
+                "Expected at least " + minExpected + " but got " + count + " for last product");
+    }
+
+    @And("the search result should include amounts {string}")
+    public void search_result_should_include_amounts(String csv) {
+        Set<Integer> expected = Arrays.stream(csv.split(","))
+                .map(String::trim)
+                .map(Integer::valueOf)
+                .collect(Collectors.toSet());
+
+        ReturnList<ProductStockChangeApi> body = lastSearchResponse.getBody();
+        Assertions.assertNotNull(body, "Search body null");
+
+        Set<Integer> actual = body.getData().stream()
+                .filter(x -> x.getProduct() != null && Objects.equals(x.getProduct().getId(), lastProductId))
+                .map(ProductStockChangeApi::getAmount)
+                .collect(Collectors.toSet());
+
+        Assertions.assertTrue(actual.containsAll(expected),
+                "Expected amounts " + expected + " not all present in " + actual);
+    }
+
     private @NotNull Category resolveCategory(String token) {
-        try {
-            return Category.valueOf(token);
-        } catch (Exception e) {
-            return Category.values()[0];
-        }
+        try { return Category.valueOf(token); }
+        catch (Exception e) { return Category.values()[0]; }
+    }
+
+    @After
+    public void afterEachScenario() {
+        lastSupplier = null;
+        lastProductId = null;
+        lastChangeId = null;
+        lastChangeDto = null;
+        lastChangeByIdResponse = null;
+        lastListResponse = null;
+        lastSearchResponse = null;
+        windowStart = null;
+        windowEnd = null;
     }
 }

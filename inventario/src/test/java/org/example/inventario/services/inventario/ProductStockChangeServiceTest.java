@@ -75,9 +75,9 @@ public class ProductStockChangeServiceTest {
         product1.setStock(product1.getStock() + 5);
         product2.setStock(product2.getStock() - 5);
         product3.setStock(product3.getStock() + 5);
-        productService.updateProduct(product1.getId(), product1);
-        productService.updateProduct(product2.getId(), product2);
-        productService.updateProduct(product3.getId(), product3);
+        productService.updateProduct(product1);
+        productService.updateProduct(product2);
+        productService.updateProduct(product3);
 
         var returnListNew = productStockChangeService.getAll(
                 PageRequest.of(0, 1000, Sort.by("id").ascending())
@@ -100,7 +100,8 @@ public class ProductStockChangeServiceTest {
                 p.getName(), p.getDescription(), p.getCategory(), p.getPrice(),
                 p.getStock() + delta, p.getMinStock(), p.getImage(), p.getSupplier()
         );
-        return productService.updateProduct(p.getId(), updated);
+        updated.setId(p.getId());
+        return productService.updateProduct(updated);
     }
 
     @Test

@@ -183,6 +183,32 @@ public class SearchFilter extends Accordion {
         }
     }
 
+    public void addIntegerRange(String idBase, String minLabel, String maxLabel) {
+        IntegerField min = new IntegerField(minLabel);
+        min.setId(idBase + "Min");
+        min.setClearButtonVisible(true);
+        min.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT, TextFieldVariant.LUMO_SMALL);
+        min.setPlaceholder("0");
+        min.addValueChangeListener(e -> refresh());
+
+        IntegerField max = new IntegerField(maxLabel);
+        max.setId(idBase + "Max");
+        max.setClearButtonVisible(true);
+        max.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT, TextFieldVariant.LUMO_SMALL);
+        max.setPlaceholder("0");
+        max.addValueChangeListener(e -> refresh());
+
+        FormLayout range = new FormLayout();
+        range.setSizeFull();
+        range.setResponsiveSteps(new FormLayout.ResponsiveStep("1px", 2));
+        range.add(min, max);
+
+        register(idBase, range, "");
+
+        filtrosMap.put(idBase + "Min", min);
+        filtrosMap.put(idBase + "Max", max);
+    }
+
     private void register(String id, Component component, String label) {
         if (StringUtils.isNotBlank(label)) {
             formFilter.addFormItem(component, label);
@@ -214,13 +240,13 @@ public class SearchFilter extends Accordion {
         if (component instanceof TextField) {
             ((TextField) component).setValue("");
         } else if (component instanceof IntegerField) {
-            ((IntegerField) component).setValue(0);
+            ((IntegerField) component).setValue(null);
         } else if (component instanceof BigDecimalField) {
-            ((BigDecimalField) component).setValue(BigDecimal.ZERO);
+            ((BigDecimalField) component).setValue(null);
         } else if (component instanceof Select) {
-            ((Select) component).setValue(null);
+            ((Select<?>) component).setValue(null);
         } else if (component instanceof ComboBox) {
-            ((ComboBox) component).setValue(null);
+            ((ComboBox<?>) component).setValue(null);
         } else if (component instanceof DatePicker) {
             ((DatePicker) component).clear();
         } else if (component instanceof MultiSelectComboBox) {

@@ -108,6 +108,7 @@ public class StockChangeStepDefs {
     @When("I service-update the last product stock to {int}")
     public void i_service_update_last_product_stock_to(int newStock) {
         Product update = new Product();
+        update.setId(lastProductId);
         update.setName("updated-" + UUID.randomUUID());
         update.setDescription("updated-desc");
         update.setCategory(Category.values()[0]);
@@ -118,7 +119,7 @@ public class StockChangeStepDefs {
         update.setSupplier(lastSupplier);
         update.setEnabled(true);
 
-        Product updated = productService.updateProduct(lastProductId, update);
+        Product updated = productService.updateProduct(update);
         Assertions.assertNotNull(updated, "updateProduct returned null");
         Assertions.assertEquals(newStock, updated.getStock(), "Stock not updated to expected value");
     }

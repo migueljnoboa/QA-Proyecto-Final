@@ -65,17 +65,17 @@ public class ProductService {
     }
 
     @Transactional
-    public Product updateProduct(Long id, Product product) {
+    public Product updateProduct(Product product) {
 
-        if(id == null) {
-            throw new MyException(MyException.ERROR_NOT_FOUND, "Product not found with ID: " + id);
-        }
-
-        Product oldProduct = productRepository.findById(id).orElse(null);
-
-        if(product == null || oldProduct == null) {
+        if(product == null) {
             throw  new MyException(400, "Supplier not found or null");
         }
+
+        if(product.getId() == null) {
+            throw new MyException(MyException.ERROR_NOT_FOUND, "Product Id not found");
+        }
+
+        Product oldProduct = productRepository.findById(product.getId()).orElse(null);
 
         checkVariables(product);
 

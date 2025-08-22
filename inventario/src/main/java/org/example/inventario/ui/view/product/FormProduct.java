@@ -141,8 +141,7 @@ public class FormProduct extends Dialog {
         btnSave.addClickShortcut(Key.F10);
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
         btnSave.addClickListener(event -> {
-            saveChanges();
-
+            saveChanges(saveProduct.getId() != null && saveProduct.getId() > 0L);
         });
 
         btnExit = new Button("Exit (ESC)");
@@ -296,14 +295,18 @@ public class FormProduct extends Dialog {
                 });
         return new Upload(inMemoryHandler);
     }
-    private void saveChanges() {
+    private void saveChanges(boolean update) {
         if (!validate()) {
             return;
         }
         try {
             loadComponents();
 
-            productService.createProduct(saveProduct);
+            if(update) {
+                productService.updateProduct(saveProduct);
+            }else {
+                productService.createProduct(saveProduct);
+            }
 
 
             MySuccessNotification mySuccessNotification = new MySuccessNotification("Product saved successfully: " + saveProduct.getName());

@@ -41,7 +41,8 @@ public class ProductApiController {
         if (product == null) {
             throw new IllegalArgumentException("Product cannot be null");
         }
-        return ProductApi.from(productService.updateProduct(id, product));
+        product.setId(id);
+        return ProductApi.from(productService.updateProduct(product));
     }
 
     @DeleteMapping("{id}")

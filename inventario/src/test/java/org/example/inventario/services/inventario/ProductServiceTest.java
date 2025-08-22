@@ -179,38 +179,42 @@ public class ProductServiceTest {
         productService.createProduct(product1);
         product1.setName("test");
 
-        productService.updateProduct(product1.getId(),product1);
+        productService.updateProduct(product1);
         assertEquals(product1, productService.getProductById(product1.getId()));
 
-        assertThrows(MyException.class, () -> productService.updateProduct(null,product1));
-        assertThrows(MyException.class, () -> productService.updateProduct(0L,null));
+        var oldProduct1Id = product1.getId();
+        product1.setId(null);
+        assertThrows(MyException.class, () -> productService.updateProduct(product1));
+        product1.setId(oldProduct1Id);
+
+        assertThrows(MyException.class, () -> productService.updateProduct(null));
 
         product1.setName("");
-        assertThrows(MyException.class, () -> productService.updateProduct(product1.getId(), product1));
+        assertThrows(MyException.class, () -> productService.updateProduct(product1));
         product1.setName(product2.getName());
 
         product1.setCategory(null);
-        assertThrows(MyException.class, () -> productService.updateProduct(product1.getId(), product1));
+        assertThrows(MyException.class, () -> productService.updateProduct(product1));
         product1.setCategory(product2.getCategory());
 
         product1.setPrice(null);
-        assertThrows(MyException.class, () -> productService.updateProduct(product1.getId(), product1));
+        assertThrows(MyException.class, () -> productService.updateProduct(product1));
         product1.setPrice(product2.getPrice());
 
         product1.setStock(null);
-        assertThrows(MyException.class, () -> productService.updateProduct(product1.getId(), product1));
+        assertThrows(MyException.class, () -> productService.updateProduct(product1));
         product1.setStock(product2.getStock());
 
         product1.setMinStock(null);
-        assertThrows(MyException.class, () -> productService.updateProduct(product1.getId(), product1));
+        assertThrows(MyException.class, () -> productService.updateProduct(product1));
         product1.setMinStock(product2.getStock());
 
         product1.setMinStock(null);
-        assertThrows(MyException.class, () -> productService.updateProduct(product1.getId(), product1));
+        assertThrows(MyException.class, () -> productService.updateProduct(product1));
         product1.setMinStock(product2.getStock());
 
         product1.setSupplier(null);
-        assertThrows(MyException.class, () -> productService.updateProduct(product1.getId(), product1));
+        assertThrows(MyException.class, () -> productService.updateProduct(product1));
     }
 
     @Test

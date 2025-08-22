@@ -1,63 +1,79 @@
 version: '3.8'
 
 services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.110.0
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "8888:8888" # Prometheus metrics endpoint
+    networks:
+      - otel-net
+    depends_on:
+      - jaeger
 
   jaeger:
     container_name: jaeger
-    image: jaegertracing/jaeger
+    image: jaegertracing/all-in-one:1.46
     restart: always
     ports:
       - "16686:16686"
-      - "14268:14268"
-    networks:
-      - springnet
-
-  mysqlTest:
-    image: mysql:8.0
-    container_name: mysqlTest
-    ports:
-      - "3308:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: inventariodb
-      MYSQL_USER: user
-      MYSQL_PASSWORD: 12345678
-      MYSQL_ROOT_HOST: '%'
-    command:
-      - --default-authentication-plugin=mysql_native_password
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-      - --bind-address=0.0.0.0
-    volumes:
-      - mysql_data:/var/lib/mysqlTest
-    restart: unless-stopped
+      - COLLECTOR_OTLP_ENABLED=true
     networks:
-      - springnet
+      - otel-net
 
-  inventario-app:
+  inventario-app-test:
     container_name: inventario-app-test
     build:
       context: ./inventario
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    # env_file:
-    #   - stack.env
     environment:
-      MYSQL_HOST: "mysqlTest"
-      MYSQL_PORT: "3308"
+      MYSQL_HOST: "172.17.0.1"
+      MYSQL_PORT: "3306"
       MYSQL_DB: "inventariodb"
+      OTEL_SERVICE_NAME: "inventario-app-test"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+      OTEL_METRICS_EXPORTER: "prometheus"
+      OTEL_EXPORTER_PROMETHEUS_HOST: "0.0.0.0"
+      OTEL_EXPORTER_PROMETHEUS_PORT: "9464"
+      OTEL_LOGS_EXPORTER: "logging"
     restart: unless-stopped
     networks:
-      - springnet
+      - otel-net
     depends_on:
+      - otel-collector
       - jaeger
-      - mysqlTest
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - otel-net
+    depends_on:
+      - otel-collector
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - otel-net
+    depends_on:
+      - prometheus
 
 networks:
-  springnet:
+  otel-net:
     driver: bridge
-
-volumes:
-  mysql_data:

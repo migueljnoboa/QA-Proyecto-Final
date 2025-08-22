@@ -1,0 +1,18 @@
+{
+  "frontendFolder": "/home/eleazar/Desktop/QA-Proyecto-Final/inventario/./src/main/frontend",
+  "themeFolder": "themes",
+  "themeResourceFolder": "/home/eleazar/Desktop/QA-Proyecto-Final/inventario/./src/main/frontend/generated/jar-resources",
+  "staticOutput": "/home/eleazar/Desktop/QA-Proyecto-Final/inventario/target/classes/META-INF/VAADIN/webapp/VAADIN/static",
+  "generatedFolder": "generated",
+  "statsOutput": "/home/eleazar/Desktop/QA-Proyecto-Final/inventario/target/classes/META-INF/VAADIN/config",
+  "frontendBundleOutput": "/home/eleazar/Desktop/QA-Proyecto-Final/inventario/target/classes/META-INF/VAADIN/webapp",
+  "devBundleOutput": "/home/eleazar/Desktop/QA-Proyecto-Final/inventario/target/dev-bundle/webapp",
+  "devBundleStatsOutput": "/home/eleazar/Desktop/QA-Proyecto-Final/inventario/target/dev-bundle/config",
+  "i18nOutput": "target/classes/vaadin-i18n",
+  "jarResourcesFolder": "/home/eleazar/Desktop/QA-Proyecto-Final/inventario/./src/main/frontend/generated/jar-resources",
+  "themeName": "",
+  "clientServiceWorkerSource": "/home/eleazar/Desktop/QA-Proyecto-Final/inventario/target/sw.ts",
+  "pwaEnabled": false,
+  "offlineEnabled": false,
+  "offlinePath": "'offline.html'"
+}

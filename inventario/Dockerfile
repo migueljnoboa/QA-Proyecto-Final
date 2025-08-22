@@ -14,4 +14,4 @@ COPY --from=build /home/gradle/src/build/libs/*.jar /app/main.jar
 
 COPY --from=build /home/gradle/src/src/main/resources /app/resources
 
-ENTRYPOINT ["java", "-javaagent:/opentelemetry-javaagent.jar", "-Dotel.traces.exporter=logging", "-Dotel.metrics.exporter=logging", "-Dotel.logs.exporter=logging", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/main.jar"]
+ENTRYPOINT ["java", "-javaagent:/opentelemetry-javaagent.jar","-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/main.jar"]

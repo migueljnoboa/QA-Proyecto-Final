@@ -3,6 +3,7 @@ package org.example.inventario.ui.view.product;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
@@ -43,12 +44,26 @@ public class ProductStockChangePage extends ControlPanel<ProductStockChange> {
         this.applicationContext = applicationContext;
         this.productStockChangeService = productStockChangeService;
         this.productService = productService;
+
+        // Page-level IDs (override ControlPanel default)
+        setId("psc-page");
+        searchFilter.setId("psc-filter");
+        grid.setId("psc-grid");
+
         setConfig();
+
+        // Button ids (useful even if hidden on this page)
+        btnRefresh.setId("psc-btn-refresh");
+        btnNew.setId("psc-btn-new");
+        btnEdit.setId("psc-btn-edit");
+        btnView.setId("psc-btn-view");
+        btnCancel.setId("psc-btn-cancel");
+        btnPrint.setId("psc-btn-print");
     }
 
     @Override
     protected void configurateFilter(SearchFilter filter) {
-        // Product (ComboBox with paging; label generator set in the field itself below)
+        // Product (ComboBox with paging; label generator set after retrieval)
         filter.addFilter(
                 Product.class, "product", "Product",
                 null,
@@ -63,27 +78,42 @@ public class ProductStockChangePage extends ControlPanel<ProductStockChange> {
                 null,
                 false
         );
-        // optional: set item label generator on the created ComboBox
         @SuppressWarnings("unchecked")
         ComboBox<Product> productCb = (ComboBox<Product>) filter.getFilter("product");
         if (productCb != null) {
             productCb.setItemLabelGenerator(Product::getName);
             productCb.setClearButtonVisible(true);
             productCb.setWidth("280px");
+            productCb.setId("psc-filter-product");
         }
 
         // Increased? (tri-state; null = ANY)
         filter.addFilter(Boolean.class, "increased", "Increased?",
                 java.util.List.of(Boolean.TRUE, Boolean.FALSE), null, null, false);
+        @SuppressWarnings("unchecked")
+        ComboBox<Boolean> increasedCb = (ComboBox<Boolean>) filter.getFilter("increased");
+        if (increasedCb != null) {
+            increasedCb.setId("psc-filter-increased");
+        }
 
         // Amount range
         filter.addIntegerRange("amount", "Min amount", "Max amount");
+        IntegerField minAmountField = (IntegerField) filter.getFilter("amountMin");
+        IntegerField maxAmountField = (IntegerField) filter.getFilter("amountMax");
+        if (minAmountField != null) minAmountField.setId("psc-filter-amount-min");
+        if (maxAmountField != null) maxAmountField.setId("psc-filter-amount-max");
 
         // Date range (LocalDate) => creates "datestart" and "dateend"
         filter.addFilter(java.time.LocalDate.class, "date", "From date", null, null, null, false);
+        DatePicker fromDp = (DatePicker) filter.getFilter("datestart");
+        DatePicker toDp   = (DatePicker) filter.getFilter("dateend");
+        if (fromDp != null) fromDp.setId("psc-filter-date-from");
+        if (toDp != null)   toDp.setId("psc-filter-date-to");
 
         // Created by
         filter.addFilter(String.class, "createdBy", "Created by", null, null, "", false);
+        TextField createdByTf = (TextField) filter.getFilter("createdBy");
+        if (createdByTf != null) createdByTf.setId("psc-filter-created-by");
     }
 
     @Override
@@ -97,16 +127,32 @@ public class ProductStockChangePage extends ControlPanel<ProductStockChange> {
 
     @Override
     protected void configGrid(Grid<ProductStockChange> grid) {
+        // Give headers component wrappers so they have their own IDs
+        Span hProduct   = new Span("Product");   hProduct.setId("psc-colhdr-product");
+        Span hIncreased = new Span("Increased"); hIncreased.setId("psc-colhdr-increased");
+        Span hAmount    = new Span("Amount");    hAmount.setId("psc-colhdr-amount");
+        Span hDate      = new Span("Date");      hDate.setId("psc-colhdr-date");
+        Span hUser      = new Span("User");      hUser.setId("psc-colhdr-user");
+
         grid.addColumn(sc -> sc.getProduct() != null ? sc.getProduct().getName() : "No Product")
-                .setHeader("Product");
+                .setHeader(hProduct)
+                .setKey("product");
+
         grid.addColumn(ProductStockChange::isIncreased)
-                .setHeader("Increased");
+                .setHeader(hIncreased)
+                .setKey("increased");
+
         grid.addColumn(ProductStockChange::getAmount)
-                .setHeader("Amount");
+                .setHeader(hAmount)
+                .setKey("amount");
+
         grid.addColumn(ProductStockChange::getDate)
-                .setHeader("Date");
+                .setHeader(hDate)
+                .setKey("date");
+
         grid.addColumn(ProductStockChange::getCreatedBy)
-                .setHeader("User");
+                .setHeader(hUser)
+                .setKey("user");
     }
 
     @Override

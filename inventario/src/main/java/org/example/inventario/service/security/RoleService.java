@@ -63,7 +63,7 @@ public class RoleService {
         if(user == null){
             throw new MyException(MyException.ERROR_USER_NOT_FOUND, "The user cannot be null.");
         }
-        return roleRepository.findAllByUsersAndEnabledIsTrue(List.of(user));
+        return roleRepository.findAllByUsersAndEnabledIsTrue(Set.of(user));
     }
 
     @Transactional
@@ -79,7 +79,8 @@ public class RoleService {
         if (!roleRepository.existsByName(Role.USER_ROLE)) {
             Role userRole = new Role();
             userRole.setName(Role.USER_ROLE);
-            userRole.setPermits(Set.of(permitService.findByName(Permit.DASHBOARD_MENU),
+            userRole.setPermits(Set.of(
+                    permitService.findByName(Permit.DASHBOARD_MENU),
                     permitService.findByName(Permit.PRODUCTS_MENU),
                     permitService.findByName(Permit.PRODUCT_VIEW)));
             userRole.setDescription("Regular user role with limited permissions");
@@ -92,7 +93,7 @@ public class RoleService {
         if(StringUtils.isBlank(name)){
             throw new MyException(MyException.ERROR_VALIDATION, "Role name cannot be null or empty.");
         }
-        return roleRepository.findByName(name);
+        return roleRepository.findByNameAndEnabledIsTrue(name);
     }
 
     @Transactional
@@ -100,14 +101,17 @@ public class RoleService {
         if (role == null || StringUtils.isBlank(role.getName())) {
             throw new MyException(MyException.ERROR_VALIDATION, "Role and its name cannot be null or empty.");
         }
-        if (roleRepository.existsByName(role.getName())) {
+        String normalized = role.getName().trim();
+        if (roleRepository.existsByNameAndEnabledIsTrue(normalized)) {
             throw new MyException(MyException.ERROR_VALIDATION, "Role with this name already exists.");
         }
         if (role.getPermits() == null || role.getPermits().isEmpty()) {
             throw new MyException(MyException.ERROR_VALIDATION, "Role must have at least one permit.");
         }
+        role.setName(normalized);
         List<Permit> permits = extractPermits(role);
         role.setPermits(new LinkedHashSet<>(permits));
+
         Role saved = roleRepository.save(role);
         saved.getPermits().size();
         saved.getUsers().size();
@@ -123,7 +127,8 @@ public class RoleService {
         if (existingRole == null) {
             throw new MyException(MyException.ERROR_NOT_FOUND, "Role not found with ID: " + id);
         }
-        if (!existingRole.getName().equals(role.getName()) && roleRepository.existsByName(role.getName())) {
+        if (!existingRole.getName().equals(role.getName())
+                && roleRepository.existsByNameAndEnabledIsTrue(role.getName())) {
             throw new MyException(MyException.ERROR_VALIDATION, "Role with this name already exists.");
         }
         List<Permit> permits = extractPermits(role);
@@ -131,6 +136,7 @@ public class RoleService {
         existingRole.setDescription(role.getDescription());
         existingRole.setPermits(new LinkedHashSet<>(permits));
         existingRole.setEnabled(role.isEnabled());
+
         Role updated = roleRepository.save(existingRole);
         updated.getPermits().size();
         updated.getUsers().size();
@@ -167,13 +173,8 @@ public class RoleService {
     public Page<Role> searchRole(String name, Permit permit, Pageable pageable) {
         Specification<Role> spec = Specification.not(null);
         spec = spec.and(RoleSpecification.hasName(name));
-
-
         spec = spec.and(RoleSpecification.hasPermit(permit));
-
-
         spec = spec.and(RoleSpecification.isEnabled());
-
         return roleRepository.findAll(spec, pageable);
     }
 }

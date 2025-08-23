@@ -34,9 +34,12 @@ public class PermitPage extends ControlPanel<Permit> {
         filter.addFilter(String.class, "name", "Name", null, null, "", false);
     }
 
-    @Override
     protected void addSecurity() {
-
+        btnNew.setVisible(false);
+        btnEdit.setVisible(false);
+        btnView.setVisible(false);
+        btnCancel.setVisible(false);
+        btnPrint.setVisible(false);
     }
 
     @Override
@@ -56,11 +59,11 @@ public class PermitPage extends ControlPanel<Permit> {
 
     @Override
     protected void configButtons() {
-
+        return;
     }
 
     @Override
     protected void deleteRow() {
-
+        return;
     }
 }

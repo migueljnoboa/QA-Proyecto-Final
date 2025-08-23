@@ -119,9 +119,6 @@ public class SupplierService {
         spec = spec.and(SupplierSpecification.hasEmail(mail));
         spec = spec.and(SupplierSpecification.hasPhoneNumber(phone));
         spec = spec.and(SupplierSpecification.isEnabled());
-
-
-
         return supplierRepository.findAll(spec, pageable);
 
     }

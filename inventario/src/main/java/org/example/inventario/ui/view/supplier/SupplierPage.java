@@ -16,104 +16,128 @@ import org.example.inventario.ui.view.MainLayout;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 
-@Route(value ="/supplier", layout = MainLayout.class)
+@Route(value = "/supplier", layout = MainLayout.class)
 @PageTitle("Supplier")
 @RolesAllowed({"SUPPLIERS_MENU"})
 @Menu(order = 2, icon = "vaadin:user-card", title = "Supplier")
 public class SupplierPage extends ControlPanel<Supplier> {
 
-    private SupplierService supplierService;
+    private final SupplierService supplierService;
+    private final SecurityService securityService;
+    private final ApplicationContext applicationContext;
 
-    private SecurityService securityService;
-    private ApplicationContext applicationContext;
-
-    public SupplierPage(SupplierService supplierService,  SecurityService securityService, ApplicationContext applicationContext) {
+    public SupplierPage(SupplierService supplierService,
+                        SecurityService securityService,
+                        ApplicationContext applicationContext) {
         super();
         this.supplierService = supplierService;
         this.securityService = securityService;
         this.applicationContext = applicationContext;
+
+        setId("sup-page");
+        searchFilter.setId("sup-filter");
+        grid.setId("sup-grid");
+
         setConfig();
+
+        btnRefresh.setId("sup-btn-refresh");
+        btnNew.setId("sup-btn-new");
+        btnEdit.setId("sup-btn-edit");
+        btnView.setId("sup-btn-view");
+        btnCancel.setId("sup-btn-cancel");
+        btnPrint.setId("sup-btn-print");
     }
+
     @Override
     protected void configurateFilter(SearchFilter filter) {
-        filter.addFilter(String.class, "name", "Name", null,null, "", false);
-        filter.addFilter(String.class, "contactInfo", "Contact Info", null,null, "", false);
-        filter.addFilter(String.class, "address", "Address", null,null, "", false);
-        filter.addFilter(String.class, "email", "Email", null,null, "", false);
-        filter.addFilter(String.class, "phoneNumber", "Phone Number", null,null, "", false);
+        filter.addFilter(String.class, "name", "Name", null, null, "", false);
+        filter.addFilter(String.class, "contactInfo", "Contact Info", null, null, "", false);
+        filter.addFilter(String.class, "address", "Address", null, null, "", false);
+        filter.addFilter(String.class, "email", "Email", null, null, "", false);
+        filter.addFilter(String.class, "phoneNumber", "Phone Number", null, null, "", false);
+
+        ((TextField) filter.getFilter("name")).setId("sup-filter-name");
+        ((TextField) filter.getFilter("contactInfo")).setId("sup-filter-contact");
+        ((TextField) filter.getFilter("address")).setId("sup-filter-address");
+        ((TextField) filter.getFilter("email")).setId("sup-filter-email");
+        ((TextField) filter.getFilter("phoneNumber")).setId("sup-filter-phone");
     }
 
     @Override
     protected void addSecurity() {
-        btnNew.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+ Permit.SUPPLIER_CREATE)));
-        btnEdit.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.SUPPLIER_EDIT)));
-        btnView.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.SUPPLIER_VIEW)));
-        btnCancel.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.SUPPLIER_DELETE)));
+        btnNew.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_" + Permit.SUPPLIER_CREATE)));
+        btnEdit.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_" + Permit.SUPPLIER_EDIT)));
+        btnView.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_" + Permit.SUPPLIER_VIEW)));
+        btnCancel.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_" + Permit.SUPPLIER_DELETE)));
     }
 
     @Override
     protected void configGrid(Grid<Supplier> grid) {
-        grid.addColumn(Supplier::getName).setHeader("Name").setSortable(true);
-        grid.addColumn(Supplier::getContactInfo).setHeader("Contact Info").setSortable(true);
-        grid.addColumn(Supplier::getAddress).setHeader("Address").setSortable(true);
-        grid.addColumn(Supplier::getEmail).setHeader("Email").setSortable(true);
-        grid.addColumn(Supplier::getPhoneNumber).setHeader("Phone Number").setSortable(true);
+        grid.addColumn(Supplier::getName).setHeader("Name").setKey("name").setSortable(true);
+        grid.addColumn(Supplier::getContactInfo).setHeader("Contact Info").setKey("contact").setSortable(true);
+        grid.addColumn(Supplier::getAddress).setHeader("Address").setKey("address").setSortable(true);
+        grid.addColumn(Supplier::getEmail).setHeader("Email").setKey("email").setSortable(true);
+        grid.addColumn(Supplier::getPhoneNumber).setHeader("Phone Number").setKey("phone").setSortable(true);
         grid.setSizeFull();
-
     }
 
     @Override
     protected CallbackDataProvider.FetchCallback<Supplier, Void> configDataSource() {
         return query -> {
-            TextField name = (TextField) searchFilter.getFilter("name");
-            TextField contactInfo = (TextField) searchFilter.getFilter("contactInfo");
-            TextField address = (TextField) searchFilter.getFilter("address");
-            TextField email = (TextField) searchFilter.getFilter("email");
-            TextField phoneNumber = (TextField) searchFilter.getFilter("phoneNumber");
+            String name = ((TextField) searchFilter.getFilter("name")).getValue();
+            String contactInfo = ((TextField) searchFilter.getFilter("contactInfo")).getValue();
+            String address = ((TextField) searchFilter.getFilter("address")).getValue();
+            String email = ((TextField) searchFilter.getFilter("email")).getValue();
+            String phoneNumber = ((TextField) searchFilter.getFilter("phoneNumber")).getValue();
 
-            return supplierService.searchSuppliers(name.getValue(), contactInfo.getValue(), address.getValue(), email.getValue(), phoneNumber.getValue(), PageRequest.of(query.getPage(), query.getLimit())).stream();
-
+            return supplierService.searchSuppliers(
+                    name, contactInfo, address, email, phoneNumber,
+                    PageRequest.of(query.getPage(), query.getLimit())
+            ).stream();
         };
     }
 
     @Override
     protected void configButtons() {
-        btnNew.addClickListener(event -> {
+        btnNew.addClickListener(e -> {
             FormSupplier form = applicationContext.getBean(FormSupplier.class);
-            form.addDetachListener(event1 -> fillGrid());
+            form.addDetachListener(e2 -> fillGrid());
             form.open();
         });
-        btnView.addClickListener(event -> {
+        btnView.addClickListener(e -> {
             FormSupplier form = applicationContext.getBean(FormSupplier.class, selectedItem, true);
-            form.addDetachListener(event1 -> fillGrid());
+            form.addDetachListener(e2 -> fillGrid());
             form.open();
         });
-        btnEdit.addClickListener(event -> {
+        btnEdit.addClickListener(e -> {
             FormSupplier form = applicationContext.getBean(FormSupplier.class, selectedItem, false);
-            form.addDetachListener(event1 -> fillGrid());
+            form.addDetachListener(e2 -> fillGrid());
             form.open();
         });
-        btnCancel.addClickListener(event -> {
-            deleteRow();
-        });
+        btnCancel.addClickListener(e -> deleteRow());
     }
 
     @Override
     protected void deleteRow() {
-        ConfirmWindow ventanaConfirmacion = new ConfirmWindow("Confirm Action", "Are you sure you want to delete this supplier: " + selectedItem.getName() + "?", () -> {
-            try {
-                supplierService.deleteSupplier(selectedItem.getId());
-                String mensaje = "Supplier " + selectedItem.getName() + " deleted successfully.";
-                MySuccessNotification miSuccessNotification = new MySuccessNotification(mensaje);
-                miSuccessNotification.open();
-
-                fillGrid();
-            } catch (Exception e) {
-                MyErrorNotification miErrorNotification = new MyErrorNotification(e.getMessage());
-                miErrorNotification.open();
-            }
-        });
-        ventanaConfirmacion.open();
-
+        ConfirmWindow cw = new ConfirmWindow(
+                "Confirm Action",
+                "Are you sure you want to delete this supplier: " + selectedItem.getName() + "?",
+                () -> {
+                    try {
+                        supplierService.deleteSupplier(selectedItem.getId());
+                        new MySuccessNotification(
+                                "Supplier " + selectedItem.getName() + " deleted successfully."
+                        ).open();
+                        fillGrid();
+                    } catch (Exception ex) {
+                        new MyErrorNotification(ex.getMessage()).open();
+                    }
+                }
+        );
+        cw.open();
     }
 }

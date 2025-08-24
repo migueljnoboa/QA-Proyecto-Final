@@ -44,7 +44,7 @@ public class ConfirmWindow extends ConfirmDialog {
         setCloseOnEsc(true);
         setCancelable(true);
         setHeader(titulo);
-        add(vlContenido);
+        setText(vlContenido);
 
         setConfirmText("Confirm");
         addConfirmListener(event -> {

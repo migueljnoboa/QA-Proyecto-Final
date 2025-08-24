@@ -42,7 +42,6 @@ public class UserServiceTest {
             .withUsername("testuser")
             .withPassword("testpass");
 
-    // Override Spring properties to use the container's JDBC URL and credentials
     @DynamicPropertySource
     static void overrideDatasourceProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
@@ -175,11 +174,12 @@ public class UserServiceTest {
         badUsername.setRoles(Set.of(userRole));
         assertThrows(MyException.class, () -> userService.updateUser(saved.getId(), badUsername));
 
-        var badPassword = new User();
-        badPassword.setUsername("ok");
-        badPassword.setPassword(" ");
-        badPassword.setRoles(Set.of(userRole));
-        assertThrows(MyException.class, () -> userService.updateUser(saved.getId(), badPassword));
+        var oldPassword = saved.getPassword();
+        var emptyPassword = new User();
+        emptyPassword.setUsername(saved.getUsername());
+        emptyPassword.setPassword("");
+        emptyPassword.setRoles(Set.of(userRole));
+        assertEquals(oldPassword, userService.updateUser(saved.getId(), emptyPassword).getPassword());
 
         var ok = new User();
         ok.setUsername("ok2");
@@ -205,7 +205,6 @@ public class UserServiceTest {
 
         assertThrows(MyException.class, () -> userService.findByUsername("alice"));
 
-        // errors
         assertThrows(MyException.class, () -> userService.deleteUser(null));
         assertThrows(MyException.class, () -> userService.deleteUser(-1L));
     }

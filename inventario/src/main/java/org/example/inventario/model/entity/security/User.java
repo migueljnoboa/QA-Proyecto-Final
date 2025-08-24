@@ -29,13 +29,11 @@ public class User extends Base {
     @Setter(AccessLevel.NONE)
     private Set<Role> roles = new java.util.LinkedHashSet<>();
 
-    // Custom setter: copy into our mutable set
     public void setRoles(Collection<Role> roles) {
         this.roles.clear();
         if (roles != null) this.roles.addAll(roles);
     }
 
-    // Optional: expose an unmodifiable view
     public Set<Role> getRoles() {
         return Collections.unmodifiableSet(roles);
     }

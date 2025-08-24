@@ -1,9 +1,6 @@
 package org.example.inventario.playwright;
 
-import com.microsoft.playwright.Browser;
-import com.microsoft.playwright.BrowserContext;
-import com.microsoft.playwright.Page;
-import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.*;
 import com.microsoft.playwright.junit.UsePlaywright;
 import com.microsoft.playwright.options.AriaRole;
 import org.junit.jupiter.api.*;
@@ -68,10 +65,25 @@ public class RolePlaywrightTests {
         page.getByText("ADMIN", new Page.GetByTextOptions().setExact(true)).click();
         page.getByText("USER", new Page.GetByTextOptions().setExact(true)).click();
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Refresh")).click();
-        page.getByRole(AriaRole.COMBOBOX, new Page.GetByRoleOptions().setName("Permits")).click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("DASHBOARD_MENU")).locator("slot").click();
+
+        page.locator("#role-filter-permit").click();
+        page.waitForSelector("vaadin-combo-box-overlay[opened]");
+
+        page.locator("vaadin-combo-box-overlay[opened] vaadin-combo-box-item")
+                .filter(new Locator.FilterOptions().setHasText("DASHBOARD_MENU"))
+                .first()
+                .click();
+
+        page.waitForSelector(
+                "vaadin-combo-box-overlay[opened]",
+                new Page.WaitForSelectorOptions()
+                        .setState(com.microsoft.playwright.options.WaitForSelectorState.DETACHED)
+        );
+
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Clean Filter")).click();
     }
+
+
 
     private void login(Page page){
         page.navigate("http://localhost:" + port + "/login");

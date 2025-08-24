@@ -7,6 +7,8 @@ import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.junit.UsePlaywright;
 import com.microsoft.playwright.options.AriaRole;
 import org.junit.jupiter.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Profile;
@@ -16,8 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
 @UsePlaywright
-public class PermitPlaywrightTests {
+public class RolePlaywrightTests {
 
+    private static final Logger log = LoggerFactory.getLogger(RolePlaywrightTests.class);
     static Playwright playwright;
     static Browser browser;
 
@@ -52,45 +55,22 @@ public class PermitPlaywrightTests {
     }
 
     @Test
-    void permitPagetest(Page page) {
+    void roleFilterSearchTest(Page page) {
 
         login(page);
 
-        page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Permit")).click();
-        page.getByText("DASHBOARD_MENU").click();
-        page.getByText("SUPPLIERS_MENU").click();
-        page.getByText("SUPPLIER_CREATE").click();
-        page.getByText("SUPPLIER_EDIT").click();
-        page.getByText("SUPPLIER_DELETE").click();
-        page.getByText("SUPPLIER_VIEW").click();
-        page.getByText("PRODUCTS_MENU").click();
-        page.getByText("PRODUCT_CREATE").click();
-        page.getByText("PRODUCT_EDIT").click();
-        page.getByText("PRODUCT_DELETE").click();
-        page.getByText("PRODUCT_VIEW").click();
-        page.getByText("USERS_MENU").click();
-        page.getByText("USER_CREATE").click();
-        page.getByText("USER_EDIT").click();
-        page.getByText("USER_DELETE").click();
-        page.getByText("ROLES_MENU").click();
-        page.getByText("ROLE_CREATE").click();
-        page.getByText("ROLE_EDIT").click();
-        page.getByText("ROLE_DELETE").click();
+        page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Role")).click();
         page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Name")).click();
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Name")).fill("Dash");
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Name")).fill("Use");
         page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Name")).press("Enter");
-        page.getByText("DASHBOARD_MENU").click();
-        page.locator("#clearButton").click();
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Name")).fill("suppl");
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Name")).press("Enter");
-        page.getByText("SUPPLIERS_MENU").click();
-        page.getByText("SUPPLIER_CREATE").click();
-        page.getByText("SUPPLIER_EDIT").click();
-        page.getByText("SUPPLIER_DELETE").click();
-        page.getByText("SUPPLIER_VIEW").first().click();
+        page.getByText("USER").nth(1).click();
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Clean Filter")).click();
-        page.getByText("ROLE_DELETE").click();
-        page.getByText("DASHBOARD_MENU").click();
+        page.getByText("ADMIN", new Page.GetByTextOptions().setExact(true)).click();
+        page.getByText("USER", new Page.GetByTextOptions().setExact(true)).click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Refresh")).click();
+        page.getByRole(AriaRole.COMBOBOX, new Page.GetByRoleOptions().setName("Permits")).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("DASHBOARD_MENU")).locator("slot").click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Clean Filter")).click();
     }
 
     private void login(Page page){
@@ -101,4 +81,5 @@ public class PermitPlaywrightTests {
         page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Password")).fill("admin");
         page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Password")).press("Enter");
     }
+
 }

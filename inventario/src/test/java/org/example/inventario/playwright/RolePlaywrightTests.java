@@ -52,7 +52,7 @@ public class RolePlaywrightTests {
     }
 
     @Test
-    void roleFilterSearchTest(Page page) {
+    public void roleFilterSearchTest(Page page) {
 
         login(page);
 
@@ -83,7 +83,44 @@ public class RolePlaywrightTests {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Clean Filter")).click();
     }
 
+    @Test
+    public void roleEditTest(Page page){
 
+        login(page);
+
+        page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Role")).click();
+        page.getByText("USER", new Page.GetByTextOptions().setExact(true)).click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Edit")).click();
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Role Name")).click();
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Role Name")).fill("USER2");
+        page.getByRole(AriaRole.TABPANEL, new Page.GetByRoleOptions().setName("Role")).locator("#toggleButton").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("USERS_MENU")).locator("div").click();
+        page.getByRole(AriaRole.TABPANEL, new Page.GetByRoleOptions().setName("Role")).locator("#toggleButton").click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save (F10)")).click();
+        page.getByText("USER2", new Page.GetByTextOptions().setExact(true)).click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("View")).click();
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Role Name")).click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Exit (ESC)")).click();
+    }
+
+    @Test
+    public void roleCreateTest(Page page){
+
+        login(page);
+
+        page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Role")).click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("New")).click();
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Role Name")).click();
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Role Name")).fill("Create");
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Description")).click();
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Description")).fill("Create Role Test Description");
+        page.getByRole(AriaRole.TABPANEL, new Page.GetByRoleOptions().setName("New Role")).locator("#toggleButton").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("SUPPLIER_CREATE")).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("SUPPLIER_MENU")).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("SUPPLIER_EDIT")).click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save (F10)")).click();
+        page.getByText("Create", new Page.GetByTextOptions().setExact(true)).click();
+    }
 
     private void login(Page page){
         page.navigate("http://localhost:" + port + "/login");

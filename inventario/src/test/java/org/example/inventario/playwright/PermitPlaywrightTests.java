@@ -53,7 +53,7 @@ public class PermitPlaywrightTests {
 
     @Test
     void permitPagetest(Page page) {
-        page.navigate("http://localhost:8080/login");
+        page.navigate("http://localhost:" + port + "/login");
         page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Username")).click();
         page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Username")).fill("admin");
         page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Password")).click();

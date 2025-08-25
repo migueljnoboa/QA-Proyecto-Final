@@ -6,6 +6,7 @@ import org.example.inventario.exception.MyException;
 import org.example.inventario.model.dto.inventory.ReturnList;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
+import org.example.inventario.model.entity.inventory.ProductStockChange;
 import org.example.inventario.model.specification.product.ProductSpecification;
 import org.example.inventario.repository.inventory.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +18,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
 
+    @Autowired
     private final ProductRepository productRepository;
 
     @Autowired
     private SupplierService supplierService;
+    @Autowired
+    private ProductStockChangeService productStockChangeService;
 
 
     @Transactional
@@ -48,12 +53,11 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public ReturnList<Product> getAllProducts(int page, int size) {
-        PageRequest pageable = PageRequest.of(page, size);
-        Page<Product> list = productRepository.findAll(pageable);
+    public ReturnList<Product> getAllProducts(Pageable pageable) {
+        Page<Product> list = productRepository.findAllByEnabledIsTrue(pageable);
         ReturnList<Product> result = new ReturnList<>();
-        result.setPage(page);
-        result.setPageSize(size);
+        result.setPage(pageable.getPageNumber());
+        result.setPageSize(pageable.getPageSize());
         result.setTotalElements((int) list.getTotalElements());
         result.setTotalPages(list.getTotalPages());
         result.setData(list.getContent());
@@ -61,19 +65,21 @@ public class ProductService {
     }
 
     @Transactional
-    public Product updateProduct(Long id, Product product) {
+    public Product updateProduct(Product product) {
 
-        if(id == null) {
-            throw new MyException(MyException.ERROR_NOT_FOUND, "Product not found with ID: " + id);
-        }
-
-        Product oldProduct = productRepository.findById(id).orElse(null);
-
-        if(product == null || oldProduct == null) {
+        if(product == null) {
             throw  new MyException(400, "Supplier not found or null");
         }
 
+        if(product.getId() == null) {
+            throw new MyException(MyException.ERROR_NOT_FOUND, "Product Id not found");
+        }
+
+        Product oldProduct = productRepository.findById(product.getId()).orElse(null);
+
         checkVariables(product);
+
+        int delta = product.getStock() - oldProduct.getStock();
 
         oldProduct.setName(product.getName());
         oldProduct.setDescription(product.getDescription());
@@ -84,7 +90,13 @@ public class ProductService {
         oldProduct.setImage(product.getImage());
         oldProduct.setSupplier(product.getSupplier());
 
-        return productRepository.save(oldProduct);
+        oldProduct = productRepository.save(oldProduct);
+
+        if(delta != 0) {
+            productStockChangeService.create(oldProduct, delta > 0, Math.abs(delta));
+        }
+
+        return oldProduct;
     }
 
     @Transactional

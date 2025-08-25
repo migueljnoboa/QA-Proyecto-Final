@@ -27,6 +27,7 @@ import com.vaadin.flow.server.streams.InMemoryUploadHandler;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import org.apache.commons.lang3.StringUtils;
+import org.example.inventario.model.dto.inventory.ReturnList;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.Supplier;
@@ -140,8 +141,7 @@ public class FormProduct extends Dialog {
         btnSave.addClickShortcut(Key.F10);
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
         btnSave.addClickListener(event -> {
-            saveChanges();
-
+            saveChanges(saveProduct.getId() != null && saveProduct.getId() > 0L);
         });
 
         btnExit = new Button("Exit (ESC)");
@@ -202,9 +202,8 @@ public class FormProduct extends Dialog {
                             query.getLimit()
                     );
 
-                    Page<Supplier> page = supplierService.getAllSuppliers(pageable);
-
-                    return page.getContent().stream();
+                    ReturnList<Supplier> page = supplierService.getAllSuppliers(pageable);
+                    return page.getData().stream();
                 },
                 query -> {
                     Pageable pageable = PageRequest.of(0, 1);
@@ -296,14 +295,18 @@ public class FormProduct extends Dialog {
                 });
         return new Upload(inMemoryHandler);
     }
-    private void saveChanges() {
+    private void saveChanges(boolean update) {
         if (!validate()) {
             return;
         }
         try {
             loadComponents();
 
-            productService.createProduct(saveProduct);
+            if(update) {
+                productService.updateProduct(saveProduct);
+            }else {
+                productService.createProduct(saveProduct);
+            }
 
 
             MySuccessNotification mySuccessNotification = new MySuccessNotification("Product saved successfully: " + saveProduct.getName());

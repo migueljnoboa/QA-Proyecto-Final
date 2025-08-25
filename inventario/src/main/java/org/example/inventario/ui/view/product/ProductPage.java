@@ -37,7 +37,7 @@ public class ProductPage extends ControlPanel<Product> {
     private SupplierService supplierService;
 
     private SecurityService securityService;
-    ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
 
 
     public ProductPage(ApplicationContext applicationContext,ProductService productService, SecurityService securityService, SupplierService supplierService) {
@@ -57,7 +57,6 @@ public class ProductPage extends ControlPanel<Product> {
         filter.addFilter(Integer.class, "stock", "Stock", null, null, 0, false);
         filter.addFilter(Integer.class, "minStock", "Min Stock", null, null, 0, false);
 //        filter.addFilter(Supplier.class, "supplier", "Supplier", supplierService., null, null, false);
-
     }
 
     @Override

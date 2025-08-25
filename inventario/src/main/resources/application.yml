@@ -71,7 +71,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
+    #show-sql: true
 
   data:
     redis:
@@ -84,11 +84,11 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     # URL, username, password will be overridden by Testcontainers
 
-  logging:
-    level:
-      org.hibernate.SQL: DEBUG
-      org.hibernate.orm.jdbc.bind: TRACE
-      org.springframework.transaction: DEBUG
+#  logging:
+#    level:
+#      org.hibernate.SQL: DEBUG
+#      org.hibernate.orm.jdbc.bind: TRACE
+#      org.springframework.transaction: DEBUG
 
   # avoid session deserialization headaches in dev
   server:

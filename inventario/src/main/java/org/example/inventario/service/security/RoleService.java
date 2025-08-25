@@ -4,22 +4,21 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.example.inventario.exception.MyException;
 import org.example.inventario.model.dto.inventory.ReturnList;
-import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.security.Permit;
 import org.example.inventario.model.entity.security.Role;
 import org.example.inventario.model.entity.security.User;
-import org.example.inventario.model.specification.product.ProductSpecification;
 import org.example.inventario.model.specification.role.RoleSpecification;
 import org.example.inventario.repository.security.RoleRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -27,45 +26,61 @@ public class RoleService {
     private final PermitService permitService;
     private final RoleRepository roleRepository;
 
-    public ReturnList<Role> listAllRole( int page , int size) {
-        PageRequest pageable = PageRequest.of(page, size);
-        Page<Role> list = roleRepository.findAllByEnabledIsTrue(pageable);
+    @Transactional(readOnly = true)
+    public ReturnList<Role> listAllRole(Pageable pageable) {
+        Page<Role> page = roleRepository.findAllByEnabledIsTrue(pageable);
+
+        page.getContent().forEach(r -> {
+            r.getPermits().size();
+            r.getUsers().size();
+        });
+
         ReturnList<Role> result = new ReturnList<>();
-        result.setPage(page);
-        result.setPageSize(size);
-        result.setTotalElements((int) list.getTotalElements());
-        result.setTotalPages(list.getTotalPages());
-        result.setData(list.getContent());
+        result.setPage(pageable.getPageNumber());
+        result.setPageSize(pageable.getPageSize());
+        result.setTotalElements((int) page.getTotalElements());
+        result.setTotalPages(page.getTotalPages());
+        result.setData(page.getContent());
         return result;
     }
+
+    @Transactional(readOnly = true)
     public Role findById(Long id) {
         if(id == null) {
             throw new MyException(MyException.ERROR_VALIDATION, "Role ID cannot be null");
         }
-        return roleRepository.findById(id)
+        Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new MyException(MyException.ERROR_NOT_FOUND, "Role not found with ID: " + id));
+        // initialize collections needed by RoleApi
+        role.getPermits().size();
+        role.getUsers().size();
+        return role;
 
     }
 
+    @Transactional(readOnly = true)
     public List<Role> listAllRoleByUser(User user){
         if(user == null){
             throw new MyException(MyException.ERROR_USER_NOT_FOUND, "The user cannot be null.");
         }
-        return roleRepository.findAllByUsersAndEnabledIsTrue(List.of(user));
+        return roleRepository.findAllByUsersAndEnabledIsTrue(Set.of(user));
     }
+
+    @Transactional
     public void createDefaultRolesIfNotExists(){
         if (!roleRepository.existsByName(Role.ADMIN_ROLE)) {
             Role adminRole = new Role();
             adminRole.setName(Role.ADMIN_ROLE);
             adminRole.setDescription("Administrator role with all permissions");
-            adminRole.setPermits(permitService.findAll());
+            adminRole.setPermits(new LinkedHashSet<>(permitService.findAll()));
             roleRepository.save(adminRole);
         }
 
         if (!roleRepository.existsByName(Role.USER_ROLE)) {
             Role userRole = new Role();
             userRole.setName(Role.USER_ROLE);
-            userRole.setPermits(List.of(permitService.findByName(Permit.DASHBOARD_MENU),
+            userRole.setPermits(Set.of(
+                    permitService.findByName(Permit.DASHBOARD_MENU),
                     permitService.findByName(Permit.PRODUCTS_MENU),
                     permitService.findByName(Permit.PRODUCT_VIEW)));
             userRole.setDescription("Regular user role with limited permissions");
@@ -73,28 +88,37 @@ public class RoleService {
         }
     }
 
+    @Transactional(readOnly = true)
     public Role findByName(String name) {
         if(StringUtils.isBlank(name)){
             throw new MyException(MyException.ERROR_VALIDATION, "Role name cannot be null or empty.");
         }
-        return roleRepository.findByName(name);
+        return roleRepository.findByNameAndEnabledIsTrue(name);
     }
 
+    @Transactional
     public Role createRole(Role role) {
         if (role == null || StringUtils.isBlank(role.getName())) {
             throw new MyException(MyException.ERROR_VALIDATION, "Role and its name cannot be null or empty.");
         }
-        if (roleRepository.existsByName(role.getName())) {
+        String normalized = role.getName().trim();
+        if (roleRepository.existsByNameAndEnabledIsTrue(normalized)) {
             throw new MyException(MyException.ERROR_VALIDATION, "Role with this name already exists.");
         }
         if (role.getPermits() == null || role.getPermits().isEmpty()) {
             throw new MyException(MyException.ERROR_VALIDATION, "Role must have at least one permit.");
         }
+        role.setName(normalized);
         List<Permit> permits = extractPermits(role);
-        role.setPermits(permits);
-        return roleRepository.save(role);
+        role.setPermits(new LinkedHashSet<>(permits));
+
+        Role saved = roleRepository.save(role);
+        saved.getPermits().size();
+        saved.getUsers().size();
+        return saved;
     }
 
+    @Transactional
     public Role updateRole(Long id, Role role) {
         if (role == null || StringUtils.isBlank(role.getName())) {
             throw new MyException(MyException.ERROR_VALIDATION, "Role and its name cannot be null or empty.");
@@ -103,17 +127,23 @@ public class RoleService {
         if (existingRole == null) {
             throw new MyException(MyException.ERROR_NOT_FOUND, "Role not found with ID: " + id);
         }
-        if (!existingRole.getName().equals(role.getName()) && roleRepository.existsByName(role.getName())) {
+        if (!existingRole.getName().equals(role.getName())
+                && roleRepository.existsByNameAndEnabledIsTrue(role.getName())) {
             throw new MyException(MyException.ERROR_VALIDATION, "Role with this name already exists.");
         }
         List<Permit> permits = extractPermits(role);
         existingRole.setName(role.getName());
         existingRole.setDescription(role.getDescription());
-        existingRole.setPermits(permits);
+        existingRole.setPermits(new LinkedHashSet<>(permits));
         existingRole.setEnabled(role.isEnabled());
-        return roleRepository.save(existingRole);
+
+        Role updated = roleRepository.save(existingRole);
+        updated.getPermits().size();
+        updated.getUsers().size();
+        return updated;
     }
 
+    @Transactional(readOnly = true)
     public List<Permit> extractPermits(Role role){
         List<Permit> permits = new ArrayList<>();
         for (Permit permit : role.getPermits()) {
@@ -126,25 +156,25 @@ public class RoleService {
         return permits;
     }
 
+    @Transactional
     public Role deleteRole(Long id) {
         Role role = findById(id);
         if (role == null) {
             throw new MyException(MyException.ERROR_NOT_FOUND, "Role not found with ID: " + id);
         }
         role.setEnabled(false);
-        return roleRepository.save(role);
+        Role saved = roleRepository.save(role);
+        saved.getPermits().size();
+        saved.getUsers().size();
+        return saved;
     }
 
+    @Transactional(readOnly = true)
     public Page<Role> searchRole(String name, Permit permit, Pageable pageable) {
         Specification<Role> spec = Specification.not(null);
         spec = spec.and(RoleSpecification.hasName(name));
-
-
         spec = spec.and(RoleSpecification.hasPermit(permit));
-
-
         spec = spec.and(RoleSpecification.isEnabled());
-
         return roleRepository.findAll(spec, pageable);
     }
 }

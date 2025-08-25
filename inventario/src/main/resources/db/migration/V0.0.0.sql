@@ -92,8 +92,8 @@ CREATE TABLE `roles_permits`
 (
     `roles_id`   bigint NOT NULL,
     `permits_id` bigint NOT NULL,
-    KEY `FKbr5xd3omh6bkhyxcn2j6wbcdc` (`permits_id`),
-    KEY `FK362qj8xl57wes9pocllv1q7v8` (`roles_id`),
+    KEY          `FKbr5xd3omh6bkhyxcn2j6wbcdc` (`permits_id`),
+    KEY          `FK362qj8xl57wes9pocllv1q7v8` (`roles_id`),
     CONSTRAINT `FK362qj8xl57wes9pocllv1q7v8` FOREIGN KEY (`roles_id`) REFERENCES `roles` (`id`),
     CONSTRAINT `FKbr5xd3omh6bkhyxcn2j6wbcdc` FOREIGN KEY (`permits_id`) REFERENCES `permits` (`id`)
 ) ENGINE = InnoDB
@@ -130,7 +130,7 @@ CREATE TABLE `users`
     `password`           varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `username`           varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `idx_user_username` (`username`)
+    KEY                  `idx_user_username` (`username`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 4
   DEFAULT CHARSET = utf8mb4
@@ -163,8 +163,8 @@ CREATE TABLE `users_roles`
 (
     `users_id` bigint NOT NULL,
     `roles_id` bigint NOT NULL,
-    KEY `FKa62j07k5mhgifpp955h37ponj` (`roles_id`),
-    KEY `FKml90kef4w2jy7oxyqv742tsfc` (`users_id`),
+    KEY        `FKa62j07k5mhgifpp955h37ponj` (`roles_id`),
+    KEY        `FKml90kef4w2jy7oxyqv742tsfc` (`users_id`),
     CONSTRAINT `FKa62j07k5mhgifpp955h37ponj` FOREIGN KEY (`roles_id`) REFERENCES `roles` (`id`),
     CONSTRAINT `FKml90kef4w2jy7oxyqv742tsfc` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`)
 ) ENGINE = InnoDB
@@ -236,22 +236,22 @@ CREATE TABLE `supplier_aud`
 CREATE TABLE `product`
 (
     `id`                 bigint NOT NULL AUTO_INCREMENT,
-    `created_by`         varchar(255) COLLATE utf8mb4_unicode_ci                                                                                                                                                                                                           DEFAULT NULL,
+    `created_by`         varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `created_date`       datetime(6)                                                                                                                                                                                                                                       DEFAULT NULL,
     `enabled`            bit(1) NOT NULL,
-    `last_modified_by`   varchar(255) COLLATE utf8mb4_unicode_ci                                                                                                                                                                                                           DEFAULT NULL,
+    `last_modified_by`   varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `last_modified_date` datetime(6)                                                                                                                                                                                                                                       DEFAULT NULL,
-    `version`            bigint                                                                                                                                                                                                                                            DEFAULT NULL,
+    `version`            bigint                                  DEFAULT NULL,
     `category`           enum ('AUTOMOTIVE','BEAUTY_PRODUCTS','BOOKS','CLOTHING','ELECTRONICS','FOOD','FURNITURE','GARDENING_SUPPLIES','HEALTHCARE','JEWELRY','MUSICAL_INSTRUMENTS','OFFICE_SUPPLIES','PET_SUPPLIES','SPORTS_EQUIPMENT','TOYS') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `description`        longtext COLLATE utf8mb4_unicode_ci,
     `image`              longtext COLLATE utf8mb4_unicode_ci,
-    `min_stock`          int                                                                                                                                                                                                                                               DEFAULT NULL,
-    `name`               varchar(255) COLLATE utf8mb4_unicode_ci                                                                                                                                                                                                           DEFAULT NULL,
-    `price`              decimal(38, 2)                                                                                                                                                                                                                                    DEFAULT NULL,
-    `stock`              int                                                                                                                                                                                                                                               DEFAULT NULL,
-    `supplier_id`        bigint                                                                                                                                                                                                                                            DEFAULT NULL,
+    `min_stock`          int                                     DEFAULT NULL,
+    `name`               varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `price`              decimal(38, 2)                          DEFAULT NULL,
+    `stock`              int                                     DEFAULT NULL,
+    `supplier_id`        bigint                                  DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `FK2kxvbr72tmtscjvyp9yqb12by` (`supplier_id`),
+    KEY                  `FK2kxvbr72tmtscjvyp9yqb12by` (`supplier_id`),
     CONSTRAINT `FK2kxvbr72tmtscjvyp9yqb12by` FOREIGN KEY (`supplier_id`) REFERENCES `supplier` (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
@@ -263,26 +263,40 @@ CREATE TABLE `product_aud`
 (
     `id`              bigint NOT NULL,
     `rev`             int    NOT NULL,
-    `revtype`         tinyint                                                                                                                                                                                                                                           DEFAULT NULL,
+    `revtype`         tinyint                                 DEFAULT NULL,
     `category`        enum ('AUTOMOTIVE','BEAUTY_PRODUCTS','BOOKS','CLOTHING','ELECTRONICS','FOOD','FURNITURE','GARDENING_SUPPLIES','HEALTHCARE','JEWELRY','MUSICAL_INSTRUMENTS','OFFICE_SUPPLIES','PET_SUPPLIES','SPORTS_EQUIPMENT','TOYS') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `category_mod`    bit(1)                                                                                                                                                                                                                                            DEFAULT NULL,
-    `description`     longtext COLLATE utf8mb4_unicode_ci                                                                                                                                                                                                           DEFAULT NULL,
-    `description_mod` bit(1)                                                                                                                                                                                                                                            DEFAULT NULL,
-    `image`           longtext COLLATE utf8mb4_unicode_ci                                                                                                                                                                                                           DEFAULT NULL,
-    `image_mod`       bit(1)                                                                                                                                                                                                                                            DEFAULT NULL,
-    `min_stock`       int                                                                                                                                                                                                                                               DEFAULT NULL,
-    `min_stock_mod`   bit(1)                                                                                                                                                                                                                                            DEFAULT NULL,
-    `name`            varchar(255) COLLATE utf8mb4_unicode_ci                                                                                                                                                                                                           DEFAULT NULL,
-    `name_mod`        bit(1)                                                                                                                                                                                                                                            DEFAULT NULL,
-    `price`           decimal(38, 2)                                                                                                                                                                                                                                    DEFAULT NULL,
-    `price_mod`       bit(1)                                                                                                                                                                                                                                            DEFAULT NULL,
-    `stock`           int                                                                                                                                                                                                                                               DEFAULT NULL,
-    `stock_mod`       bit(1)                                                                                                                                                                                                                                            DEFAULT NULL,
-    `supplier_id`     bigint                                                                                                                                                                                                                                            DEFAULT NULL,
-    `supplier_mod`    bit(1)                                                                                                                                                                                                                                            DEFAULT NULL,
+    `category_mod`    bit(1)                                  DEFAULT NULL,
+    `description`     longtext COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+    `description_mod` bit(1)                                  DEFAULT NULL,
+    `image`           longtext COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+    `image_mod`       bit(1)                                  DEFAULT NULL,
+    `min_stock`       int                                     DEFAULT NULL,
+    `min_stock_mod`   bit(1)                                  DEFAULT NULL,
+    `name`            varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `name_mod`        bit(1)                                  DEFAULT NULL,
+    `price`           decimal(38, 2)                          DEFAULT NULL,
+    `price_mod`       bit(1)                                  DEFAULT NULL,
+    `stock`           int                                     DEFAULT NULL,
+    `stock_mod`       bit(1)                                  DEFAULT NULL,
+    `supplier_id`     bigint                                  DEFAULT NULL,
+    `supplier_mod`    bit(1)                                  DEFAULT NULL,
     PRIMARY KEY (`rev`, `id`),
     CONSTRAINT `FK9vwllld6jlw5xys1ay911oh1x` FOREIGN KEY (`rev`) REFERENCES `revinfo` (`rev`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
+
+
+CREATE TABLE `product_stock_change`
+(
+    `id`         bigint NOT NULL AUTO_INCREMENT,
+    `amount`     int    NOT NULL,
+    `created_by` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `date`       datetime(6) DEFAULT NULL,
+    `increased`  bit(1) NOT NULL,
+    `product_id` bigint                                  DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY          `FKfr7yw1f3sheemv3864v70ygjx` (`product_id`),
+    CONSTRAINT `FKfr7yw1f3sheemv3864v70ygjx` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

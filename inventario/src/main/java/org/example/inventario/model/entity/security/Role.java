@@ -9,7 +9,9 @@ import lombok.Setter;
 import org.example.inventario.model.entity.Base;
 import org.hibernate.envers.Audited;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -25,9 +27,9 @@ public class Role extends Base {
     private String description;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Permit> permits;
+    private Set<Permit> permits = new LinkedHashSet<>();
 
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
-    private List<User> users;
+    private Set<User> users = new LinkedHashSet<>();
 }

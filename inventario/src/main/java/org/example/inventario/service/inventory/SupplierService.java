@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.example.inventario.exception.MyException;
 import org.example.inventario.model.dto.inventory.ReturnList;
+import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.Supplier;
 import org.example.inventario.model.specification.supplier.SupplierSpecification;
 import org.example.inventario.repository.inventory.SupplierRepository;
@@ -38,17 +39,11 @@ public class SupplierService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Supplier> getAllSuppliers(Pageable pageable) {
-        return supplierRepository.findAllByEnabledIsTrue(pageable);
-    }
-
-    @Transactional(readOnly = true)
-    public ReturnList<Supplier> getAllSuppliers(int page, int size) {
-        PageRequest pageable = PageRequest.of(page, size);
+    public ReturnList<Supplier> getAllSuppliers(Pageable pageable) {
         Page<Supplier> list =  supplierRepository.findAllByEnabledIsTrue(pageable);
         ReturnList<Supplier> result = new ReturnList<>();
-        result.setPage(page);
-        result.setPageSize(size);
+        result.setPage(pageable.getPageNumber());
+        result.setPageSize(pageable.getPageSize());
         result.setTotalElements((int) list.getTotalElements());
         result.setTotalPages(list.getTotalPages());
         result.setData(list.getContent());
@@ -77,7 +72,7 @@ public class SupplierService {
         oldSupplier.setEmail(supplier.getEmail());
         oldSupplier.setPhoneNumber(supplier.getPhoneNumber());
 
-        return supplierRepository.save(supplier);
+        return supplierRepository.save(oldSupplier);
     }
 
     @Transactional
@@ -124,9 +119,6 @@ public class SupplierService {
         spec = spec.and(SupplierSpecification.hasEmail(mail));
         spec = spec.and(SupplierSpecification.hasPhoneNumber(phone));
         spec = spec.and(SupplierSpecification.isEnabled());
-
-
-
         return supplierRepository.findAll(spec, pageable);
 
     }

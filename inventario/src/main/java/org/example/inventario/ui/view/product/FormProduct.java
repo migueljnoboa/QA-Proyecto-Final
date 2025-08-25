@@ -73,6 +73,8 @@ public class FormProduct extends Dialog {
     private ComboBox<Supplier> cbSupplier;
 
     private String image;
+
+    private Upload upload;
     
     private Button btnSave, btnExit;
 
@@ -218,7 +220,7 @@ public class FormProduct extends Dialog {
         taDescription.setMaxLength(500);
         taDescription.setValueChangeMode(ValueChangeMode.EAGER);
 
-        Upload upload = getUpload();
+        upload = getUpload();
         upload.setDropAllowed(true);
 
         // Crear layout para mostrar la imagen preview
@@ -406,6 +408,7 @@ public class FormProduct extends Dialog {
         ifStock.setReadOnly(true);
         ifminStock.setReadOnly(true);
         cbSupplier.setReadOnly(true);
+        upload.setVisible(false);
         btnSave.setVisible(false);
     }
 

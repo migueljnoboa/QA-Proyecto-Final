@@ -89,7 +89,6 @@ public class PermitPlaywrightTests {
         page.getByText("SUPPLIER_VIEW").first().click();
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Clean Filter")).click();
         page.getByText("ROLE_DELETE").click();
-        page.getByText("DASHBOARD_MENU").click();
     }
 
     private void login(Page page){

@@ -82,6 +82,9 @@ public class FormProduct extends Dialog {
 
 
     public FormProduct() {
+
+        setId("prod-form");
+
         this.saveProduct = new Product();
         setHeaderTitle("New Product");
         setId("FORM-PRODUCT");
@@ -139,6 +142,7 @@ public class FormProduct extends Dialog {
     }
 
     private void construirLayoutBotones() {
+
         btnSave = new Button("Save (F10)");
         btnSave.addClickShortcut(Key.F10);
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
@@ -158,11 +162,15 @@ public class FormProduct extends Dialog {
             }
         });
 
+        btnSave.setId("prod-form-btn-save");
+        btnExit.setId("prod-form-btn-exit");
+
         getFooter().add(btnExit);
         getFooter().add(btnSave);
     }
 
     private Component buildTabNewProduct() {
+
         tfName = new TextField("Product Name");
         tfName.setRequired(true);
         tfName.setRequiredIndicatorVisible(true);
@@ -280,6 +288,16 @@ public class FormProduct extends Dialog {
         if(!view ) {
             mainLayout.add(imageSection);
         }
+
+        tfName.setId("prod-form-name");
+        cbCategory.setId("prod-form-category");
+        bdFPrice.setId("prod-form-price");
+        ifStock.setId("prod-form-stock");
+        ifminStock.setId("prod-form-minstock");
+        cbSupplier.setId("prod-form-supplier");
+        taDescription.setId("prod-form-description");
+        upload.setId("prod-form-upload");
+
         mainLayout.add(row1, row2, row3, taDescription);
 
         return mainLayout;

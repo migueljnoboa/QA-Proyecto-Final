@@ -66,10 +66,15 @@ public class ProductPage extends ControlPanel<Product> {
         btnView.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.PRODUCT_VIEW)));
         btnCancel.setVisible(securityService.getAuthenticatedUser().getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_"+Permit.PRODUCT_DELETE)));
 
+        btnNew.setId("prod-btn-new");
+        btnEdit.setId("prod-btn-edit");
+        btnView.setId("prod-btn-view");
+        btnCancel.setId("prod-btn-delete");
     }
 
     @Override
     protected void configGrid(Grid<Product> grid) {
+        grid.setId("prod-grid");
         grid.addColumn(Product::getName).setHeader("Name").setSortable(true);
         grid.addColumn(Product::getDescription).setHeader("Description").setSortable(true);
         grid.addColumn(product -> product.getCategory().name()).setHeader("Category").setSortable(true);

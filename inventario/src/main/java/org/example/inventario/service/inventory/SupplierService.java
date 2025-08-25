@@ -111,7 +111,7 @@ public class SupplierService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Supplier>searchSuppliers(String name, String contactInfo, String address, String mail, String phone, PageRequest pageable) {
+    public Page<Supplier>searchSuppliers(String name, String contactInfo, String address, String mail, String phone, Pageable pageable) {
         Specification<Supplier> spec = Specification.not(null);
         spec = spec.and(SupplierSpecification.hasName(name));
         spec = spec.and(SupplierSpecification.hasContactInfo(contactInfo));

@@ -1,16 +1,19 @@
 package org.example.inventario.ui.view.product;
 
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
+import org.example.inventario.model.dto.inventory.ReturnList;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.Supplier;
@@ -35,7 +38,6 @@ public class ProductPage extends ControlPanel<Product> {
 
     private ProductService productService;
     private SupplierService supplierService;
-
     private SecurityService securityService;
     private ApplicationContext applicationContext;
 
@@ -46,6 +48,11 @@ public class ProductPage extends ControlPanel<Product> {
         this.productService = productService;
         this.securityService = securityService;
         this.supplierService = supplierService;
+
+        setId("prod-page");
+        searchFilter.setId("prod-filter");
+        grid.setId("prod-grid");
+
         setConfig();
     }
 
@@ -56,7 +63,27 @@ public class ProductPage extends ControlPanel<Product> {
         filter.addFilter(BigDecimal.class, "price", "Price", null, null, BigDecimal.ZERO, false);
         filter.addFilter(Integer.class, "stock", "Stock", null, null, 0, false);
         filter.addFilter(Integer.class, "minStock", "Min Stock", null, null, 0, false);
-//        filter.addFilter(Supplier.class, "supplier", "Supplier", supplierService., null, null, false);
+
+        DataProvider<Supplier, String> supplierProvider = DataProvider.fromFilteringCallbacks(
+                q -> {
+                    PageRequest pr = PageRequest.of(q.getOffset() / q.getLimit(), q.getLimit());
+                    ReturnList<Supplier> rl = supplierService.getAllSuppliers(pr);
+                    return rl.getData().stream();
+                },
+                q -> {
+                    PageRequest pr = PageRequest.of(0, 1);
+                    return (int) supplierService.getAllSuppliers(pr).getTotalElements();
+                }
+        );
+        filter.addFilter(Supplier.class, "supplier", "Supplier", null, supplierProvider::fetch, null, false);
+
+        @SuppressWarnings("unchecked")
+        ComboBox<Supplier> suppliersBox = (ComboBox<Supplier>) filter.getFilter("supplier");
+        if (suppliersBox != null) {
+            suppliersBox.setItemLabelGenerator(Supplier::getName);
+            suppliersBox.setClearButtonVisible(true);
+            suppliersBox.setWidth("280px");
+        }
     }
 
     @Override
@@ -74,7 +101,6 @@ public class ProductPage extends ControlPanel<Product> {
 
     @Override
     protected void configGrid(Grid<Product> grid) {
-        grid.setId("prod-grid");
         grid.addColumn(Product::getName).setHeader("Name").setSortable(true);
         grid.addColumn(Product::getDescription).setHeader("Description").setSortable(true);
         grid.addColumn(product -> product.getCategory().name()).setHeader("Category").setSortable(true);
@@ -94,8 +120,9 @@ public class ProductPage extends ControlPanel<Product> {
             IntegerField minStock = (IntegerField) searchFilter.getFilter("minStock");
             IntegerField stock = (IntegerField) searchFilter.getFilter("stock");
             ComboBox<Category> category = (ComboBox<Category>) searchFilter.getFilter("category");
+            ComboBox<Supplier> supplier = (ComboBox<Supplier>) searchFilter.getFilter("supplier");
 
-            return productService.searchProducts(name.getValue(), category.getValue(), price.getValue(), minStock.getValue(), stock.getValue(), PageRequest.of(query.getPage(), query.getLimit())).stream();
+            return productService.searchProducts(name.getValue(), category.getValue(), price.getValue(), minStock.getValue(), stock.getValue(), supplier.getValue(), PageRequest.of(query.getPage(), query.getLimit())).stream();
         };
 
     }

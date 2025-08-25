@@ -269,19 +269,19 @@ public class ProductServiceTest {
         productService.createProduct(product2);
         productService.createProduct(product3);
 
-        List<Product> productList = productService.searchProducts(product1.getName(), null, null, null, null, PageRequest.of(0, 10)).stream().toList();
+        List<Product> productList = productService.searchProducts(product1.getName(), null, null, null, null, null, PageRequest.of(0, 10)).stream().toList();
         assertEquals(1, productList.size());
 
-        productList = productService.searchProducts(null, product1.getCategory(), null, null, null, PageRequest.of(0, 10)).stream().toList();
+        productList = productService.searchProducts(null, product1.getCategory(), null, null, null, null, PageRequest.of(0, 10)).stream().toList();
         assertEquals(3, productList.size());
 
-        productList = productService.searchProducts(null, null, product1.getPrice(), null, null, PageRequest.of(0, 10)).stream().toList();
+        productList = productService.searchProducts(null, null, product1.getPrice(), null, null, null, PageRequest.of(0, 10)).stream().toList();
         assertEquals(3, productList.size());
 
-        productList = productService.searchProducts(null, null, null, product1.getMinStock(), null, PageRequest.of(0, 10)).stream().toList();
+        productList = productService.searchProducts(null, null, null, product1.getMinStock(), null, null, PageRequest.of(0, 10)).stream().toList();
         assertEquals(3, productList.size());
 
-        productList = productService.searchProducts(null, null, null, null, product1.getStock(), PageRequest.of(0, 10)).stream().toList();
+        productList = productService.searchProducts(null, null, null, null, product1.getStock(), null, PageRequest.of(0, 10)).stream().toList();
         assertEquals(3, productList.size());
 
     }

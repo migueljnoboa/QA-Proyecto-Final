@@ -2,11 +2,29 @@ package org.example.inventario.model.specification.product;
 
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
+import org.example.inventario.model.entity.inventory.Supplier;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 
 public class ProductSpecification {
+
+    public static Specification<Product> hasSupplier(Supplier supplier) {
+        return (root, query, cb) -> {
+            if (supplier == null || supplier.getId() == null) {
+                return cb.conjunction();
+            }
+            return cb.equal(root.get("supplier").get("id"), supplier.getId());
+        };
+    }
+
+    // (Optional: name-based search if you ever need it)
+    public static Specification<Product> hasSupplierNameLike(String name) {
+        return (root, query, cb) -> {
+            if (name == null || name.trim().isEmpty()) return cb.conjunction();
+            return cb.like(cb.lower(root.get("supplier").get("name")), "%" + name.toLowerCase() + "%");
+        };
+    }
 
     public static Specification<Product> hasName(String name) {
         return (root, query, criteriaBuilder) -> {

@@ -74,6 +74,7 @@ public class ProductStockChangePage extends ControlPanel<ProductStockChange> {
                         null,
                         null,
                         null,
+                        null,
                         PageRequest.of(q.getPage(), q.getPageSize())
                 ).stream(),
                 null,

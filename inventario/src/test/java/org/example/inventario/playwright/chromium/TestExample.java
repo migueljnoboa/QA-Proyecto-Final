@@ -1,4 +1,4 @@
-package org.example.inventario.playwright;
+package org.example.inventario.playwright.chromium;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;

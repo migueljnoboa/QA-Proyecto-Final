@@ -1,4 +1,4 @@
-package org.example.inventario.playwright;
+package org.example.inventario.playwright.chromium;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
@@ -13,8 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.microsoft.playwright.Locator;
 
 @Profile("dev")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -106,7 +104,7 @@ public class ProductPlaywrightTests {
 
         page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Stock Changes")).click();
 
-        page.locator("#psc-grid").getByText("EditProductTest").click();
+        page.locator("#psc-grid").getByText("EditProductTest").first().click();
     }
 
     private void login(Page page){

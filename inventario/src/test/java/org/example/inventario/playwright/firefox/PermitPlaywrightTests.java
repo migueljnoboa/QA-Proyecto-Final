@@ -1,4 +1,4 @@
-package org.example.inventario.playwright;
+package org.example.inventario.playwright.firefox;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
@@ -30,7 +30,7 @@ public class PermitPlaywrightTests {
     @BeforeAll
     static void launchBrowser() {
         playwright = Playwright.create();
-        browser = playwright.chromium().launch();
+        browser = playwright.firefox().launch();
     }
 
     @AfterAll

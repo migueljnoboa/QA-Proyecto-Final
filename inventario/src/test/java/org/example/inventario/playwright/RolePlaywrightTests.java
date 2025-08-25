@@ -104,7 +104,7 @@ public class RolePlaywrightTests {
     }
 
     @Test
-    public void roleCreateTest(Page page){
+    public void roleCreateAndDeleteTest(Page page){
 
         login(page);
 
@@ -114,12 +114,17 @@ public class RolePlaywrightTests {
         page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Role Name")).fill("Create");
         page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Description")).click();
         page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Description")).fill("Create Role Test Description");
-        page.getByRole(AriaRole.TABPANEL, new Page.GetByRoleOptions().setName("New Role")).locator("#toggleButton").click();
+        page.getByRole(AriaRole.COMBOBOX, new Page.GetByRoleOptions().setName("Permits")).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("DASHBOARD_MENU")).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("SUPPLIERS_MENU")).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("SUPPLIER_CREATE")).click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("SUPPLIER_MENU")).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("SUPPLIER_EDIT")).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("SUPPLIER_DELETE")).click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("SUPPLIER_VIEW")).click();
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save (F10)")).click();
         page.getByText("Create", new Page.GetByTextOptions().setExact(true)).click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Cancel")).click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Confirm")).click();
     }
 
     private void login(Page page){

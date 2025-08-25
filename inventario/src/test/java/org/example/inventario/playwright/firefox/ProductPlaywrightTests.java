@@ -53,6 +53,20 @@ public class ProductPlaywrightTests {
     }
 
     @Test
+    void productSeachTest(Page page) {
+
+        login(page);
+
+        page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Product")).click();
+        page.locator("#name").click();
+        page.locator("#name").locator ("input").fill("NVI");
+        page.locator("#name").locator ("input").press("Enter");
+        page.getByText("NVIDIA RTX").click();
+
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Clean Filter")).click();
+    }
+
+    @Test
     void productCreateEditDeleteTest(Page page) {
 
         login(page);

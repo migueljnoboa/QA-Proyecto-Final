@@ -30,7 +30,7 @@ import java.util.List;
 @Menu(order = 1, icon = "vaadin:dashboard", title = "Dashboard")
 public final class MainView extends Main {
 
-    private final ProductService productService;
+    private ProductService productService;
     private List<Product> productsLowStock;
 
     public MainView(ProductService productService) {

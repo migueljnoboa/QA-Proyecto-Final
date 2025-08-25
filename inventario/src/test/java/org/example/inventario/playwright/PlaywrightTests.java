@@ -19,11 +19,9 @@ import com.microsoft.playwright.Locator;
 @Transactional
 @UsePlaywright
 public class PlaywrightTests {
-  // Shared between all tests in this class.
   static Playwright playwright;
   static Browser browser;
 
-  // New instance for each test method.
   BrowserContext context;
   Page page;
 
@@ -154,12 +152,10 @@ public class PlaywrightTests {
     page.getByRole(AriaRole.SPINBUTTON, new Page.GetByRoleOptions().setName("Min Stock")).fill("3");
     page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save (F10)")).click();
 
-    // Verify changes were saved
     page.waitForSelector("text=Product saved successfully");
   }
 
   private void viewProduct() {
-    // Select the edited product
     page.locator("vaadin-grid-cell-content")
             .filter(new Locator.FilterOptions().setHasText("New Product Name Test"))
             .click();
@@ -170,7 +166,6 @@ public class PlaywrightTests {
   }
 
   private void deleteProduct() {
-    // Select the product to delete
     page.locator("vaadin-grid-cell-content")
             .filter(new Locator.FilterOptions().setHasText("New Product Name Test"))
             .click();

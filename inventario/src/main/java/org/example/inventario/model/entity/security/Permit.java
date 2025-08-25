@@ -34,15 +34,22 @@ public class Permit extends Base implements Serializable {
     public static final String PRODUCT_DELETE = "PRODUCT_DELETE";
     public static final String PRODUCT_VIEW = "PRODUCT_VIEW";
 
+    public static final String PRODUCT_STOCK_CHANGE = "PRODUCT_STOCK_CHANGE";
+
     public static final String USERS_MENU = "USERS_MENU";
     public static final String USER_CREATE = "USER_CREATE";
     public static final String USER_EDIT = "USER_EDIT";
     public static final String USER_DELETE = "USER_DELETE";
+    public static final String USER_VIEW = "USER_VIEW";
 
     public static final String ROLES_MENU = "ROLES_MENU";
     public static final String ROLE_CREATE = "ROLE_CREATE";
     public static final String ROLE_EDIT = "ROLE_EDIT";
     public static final String ROLE_DELETE = "ROLE_DELETE";
+    public static final String ROLE_VIEW = "ROLE_VIEW";
+
+    public static final String PERMIT_MENU = "PERMIT_MENU";
+    public static final String PERMIT_VIEW = "PERMIT_VIEW";
 
     @Column(unique = true)
     String name;

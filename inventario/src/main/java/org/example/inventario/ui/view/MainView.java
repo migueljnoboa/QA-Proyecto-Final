@@ -11,6 +11,7 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
+import org.example.inventario.model.entity.security.Permit;
 import org.example.inventario.service.inventory.ProductService;
 import org.example.inventario.utils.Utilidades;
 import com.github.appreciated.apexcharts.ApexCharts;
@@ -25,11 +26,11 @@ import java.util.List;
 
 @Route("")
 @PageTitle("Home")
-@RolesAllowed({"DASHBOARD_MENU"})
+@RolesAllowed({Permit.DASHBOARD_MENU})
 @Menu(order = 1, icon = "vaadin:dashboard", title = "Dashboard")
 public final class MainView extends Main {
 
-    private ProductService productService;
+    private final ProductService productService;
     private List<Product> productsLowStock;
 
     public MainView(ProductService productService) {

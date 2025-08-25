@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 @Route(value = "/role", layout = MainLayout.class)
 @PageTitle("Role")
-@RolesAllowed({"ROLES_MENU"})
+@RolesAllowed({Permit.ROLES_MENU})
 @Menu(order = 3, icon = "vaadin:users", title = "Role")
 public class RolePage extends ControlPanel<Role> {
 

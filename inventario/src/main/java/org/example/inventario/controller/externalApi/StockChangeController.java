@@ -5,12 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.example.inventario.model.dto.api.ProductStockChangeApi;
 import org.example.inventario.model.dto.inventory.ReturnList;
 import org.example.inventario.model.entity.inventory.ProductStockChange;
+import org.example.inventario.model.entity.security.Permit;
 import org.example.inventario.service.inventory.ProductStockChangeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,9 +22,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/stockchange")
 @RequiredArgsConstructor
+@Secured({Permit.PRODUCT_STOCK_CHANGE})
 public class StockChangeController {
     private final ProductStockChangeService stockChangeService;
 
+    @Secured({Permit.PRODUCT_STOCK_CHANGE})
     @GetMapping("{id}")
     public ProductStockChangeApi getById(@PathVariable(name = "id") @Parameter(description = "Stock Change ID.", example = "1") Long id) {
         ProductStockChange entity = stockChangeService.getById(id);
@@ -32,11 +36,13 @@ public class StockChangeController {
         return ProductStockChangeApi.from(entity);
     }
 
+    @Secured({Permit.PRODUCT_STOCK_CHANGE})
     @GetMapping
     public ReturnList<ProductStockChangeApi> getAll(Pageable pageable) {
         return ProductStockChangeApi.from(stockChangeService.getAll(pageable));
     }
 
+    @Secured({Permit.PRODUCT_STOCK_CHANGE})
     @GetMapping("/search")
     public ReturnList<ProductStockChangeApi> search(
             Pageable pageable,

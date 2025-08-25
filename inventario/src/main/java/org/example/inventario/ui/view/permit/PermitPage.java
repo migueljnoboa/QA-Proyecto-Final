@@ -17,7 +17,7 @@ import org.springframework.data.domain.PageRequest;
 
 @Route(value ="/permit", layout = MainLayout.class)
 @PageTitle("Permit")
-@RolesAllowed({"ROLES_MENU"})
+@RolesAllowed({Permit.PERMIT_MENU})
 @Menu(order = 4, icon = "vaadin:ticket", title = "Permit")
 public class PermitPage extends ControlPanel<Permit> {
 

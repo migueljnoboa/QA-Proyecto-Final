@@ -13,6 +13,7 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.inventory.ProductStockChange;
+import org.example.inventario.model.entity.security.Permit;
 import org.example.inventario.service.inventory.ProductService;
 import org.example.inventario.service.inventory.ProductStockChangeService;
 import org.example.inventario.ui.component.ControlPanel;
@@ -26,7 +27,7 @@ import java.time.LocalDateTime;
 
 @Route(value = "/productStockChange", layout = MainLayout.class)
 @PageTitle("Product Stock Changes")
-@RolesAllowed({"PRODUCTS_MENU"})
+@RolesAllowed({Permit.PRODUCT_STOCK_CHANGE})
 @Menu(order = 1, icon = "vaadin:history", title = "Stock Changes")
 public class ProductStockChangePage extends ControlPanel<ProductStockChange> {
 

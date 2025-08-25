@@ -36,15 +36,23 @@ public class PermitService {
                 Permit.PRODUCT_DELETE,
                 Permit.PRODUCT_VIEW,
 
+                Permit.PRODUCT_STOCK_CHANGE,
+
                 Permit.USERS_MENU,
                 Permit.USER_CREATE,
                 Permit.USER_EDIT,
                 Permit.USER_DELETE,
+                Permit.USER_VIEW,
 
                 Permit.ROLES_MENU,
                 Permit.ROLE_CREATE,
                 Permit.ROLE_EDIT,
-                Permit.ROLE_DELETE
+                Permit.ROLE_DELETE,
+                Permit.ROLE_VIEW,
+
+                Permit.PERMIT_MENU,
+                Permit.PERMIT_VIEW,
+
         };
 
         for (String permitName : defaultPermits) {

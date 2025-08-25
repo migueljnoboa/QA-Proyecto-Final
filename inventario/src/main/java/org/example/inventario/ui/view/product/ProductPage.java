@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 @Route(value ="/product", layout = MainLayout.class)
 @PageTitle("Product")
-@RolesAllowed({"PRODUCTS_MENU"})
+@RolesAllowed({Permit.PRODUCTS_MENU})
 @Menu(order = 1, icon = "vaadin:package", title = "Product")
 public class ProductPage extends ControlPanel<Product> {
 

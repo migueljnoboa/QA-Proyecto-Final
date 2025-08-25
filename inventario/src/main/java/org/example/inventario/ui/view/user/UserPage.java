@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 @Route(value = "/user", layout = MainLayout.class)
 @PageTitle("Users")
-@RolesAllowed({"USERS_MENU"})
+@RolesAllowed({Permit.USERS_MENU})
 @Menu(order = 4, icon = "vaadin:user", title = "Users")
 public class UserPage extends ControlPanel<User> {
 

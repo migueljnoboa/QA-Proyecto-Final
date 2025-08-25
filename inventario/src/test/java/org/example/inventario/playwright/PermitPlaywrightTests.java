@@ -21,7 +21,6 @@ public class PermitPlaywrightTests {
     static Playwright playwright;
     static Browser browser;
 
-    // New instance for each test method.
     BrowserContext context;
     Page page;
 

@@ -18,7 +18,7 @@ import org.springframework.data.domain.PageRequest;
 
 @Route(value = "/supplier", layout = MainLayout.class)
 @PageTitle("Supplier")
-@RolesAllowed({"SUPPLIERS_MENU"})
+@RolesAllowed({Permit.SUPPLIERS_MENU})
 @Menu(order = 2, icon = "vaadin:user-card", title = "Supplier")
 public class SupplierPage extends ControlPanel<Supplier> {
 

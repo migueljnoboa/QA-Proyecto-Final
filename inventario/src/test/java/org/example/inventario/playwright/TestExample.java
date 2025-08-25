@@ -10,11 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestExample {
-  // Shared between all tests in this class.
   static Playwright playwright;
   static Browser browser;
 
-  // New instance for each test method.
   BrowserContext context;
   Page page;
 

@@ -36,7 +36,7 @@ public class PermitServiceTest {
     public void findAllTest() {
 
         permitService.createDefaultPermitsIfNotExists();
-        assertEquals(19, permitService.findAll().size());
+        assertEquals(24, permitService.findAll().size());
     }
 
     @Test

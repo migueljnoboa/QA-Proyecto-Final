@@ -2,9 +2,11 @@ package org.example.inventario.controller;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.example.inventario.model.dto.api.SupplierApi;
 import org.example.inventario.model.dto.inventory.ReturnList;
 import org.example.inventario.model.entity.inventory.Supplier;
 import org.example.inventario.service.inventory.SupplierService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,41 +16,40 @@ public class SupplierController {
     private final SupplierService supplierService;
 
     @GetMapping("")
-    public ReturnList<Supplier> getAllSuppliers(@RequestParam(name = "page", defaultValue = "0") @Parameter(description = "Page Number.", example = "0") int page,
-                                                @RequestParam(name = "size", defaultValue = "50") @Parameter(description = "Page Size.", example = "50") int size ){
-        return supplierService.getAllSuppliers(page, size);
+    public ReturnList<SupplierApi> getAllSuppliers(Pageable pageable) {
+        return SupplierApi.from(supplierService.getAllSuppliers(pageable));
 
     }
 
     @GetMapping("/{id}")
-    public Supplier getSupplierById(@PathVariable(name = "id") @Parameter(description = "Supplier ID.", example = "1") Long id) {
-        return supplierService.getSupplierById(id);
+    public SupplierApi getSupplierById(@PathVariable(name = "id") @Parameter(description = "Supplier ID.", example = "1") Long id) {
+        return SupplierApi.from(supplierService.getSupplierById(id));
     }
 
     @PostMapping("/")
-    public Supplier createSupplier(@RequestBody Supplier supplier) {
+    public SupplierApi createSupplier(@RequestBody Supplier supplier) {
         if (supplier == null) {
             throw new IllegalArgumentException("Supplier cannot be null");
         }
-        return supplierService.createSupplier(supplier);
+        return SupplierApi.from(supplierService.createSupplier(supplier));
     }
 
     @PutMapping("/{id}")
-    public Supplier updateSupplier(
+    public SupplierApi updateSupplier(
             @PathVariable(name = "id")
             @Parameter(description = "Supplier ID.", example = "1") Long id,
             @RequestBody Supplier supplier) {
         if (supplier == null) {
             throw new IllegalArgumentException("Supplier cannot be null");
         }
-        return supplierService.updateSupplier(id, supplier);
+        return SupplierApi.from(supplierService.updateSupplier(id, supplier));
     }
 
     @DeleteMapping("/{id}")
-    public Supplier deleteSupplier(
+    public SupplierApi deleteSupplier(
             @PathVariable(name = "id")
             @Parameter(description = "Supplier ID.", example = "1") Long id) {
-       return supplierService.deleteSupplier(id);
+       return SupplierApi.from(supplierService.deleteSupplier(id));
     }
 
 

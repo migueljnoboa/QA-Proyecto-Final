@@ -9,7 +9,8 @@ import com.vaadin.flow.component.dialog.DialogVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
-import com.vaadin.flow.component.textfield.*;
+import com.vaadin.flow.component.textfield.EmailField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.example.inventario.model.entity.inventory.Supplier;
@@ -28,188 +29,173 @@ public class FormSupplier extends Dialog {
     private SupplierService supplierService;
 
     private Supplier saveSupplier;
+    private boolean view;
+    private boolean isEdit;
 
     private TextField name;
-
     private TextField contactInfo;
-
     private TextField address;
-
     private EmailField email;
-
     private TextField phoneNumber;
 
     private Button btnSave, btnExit;
 
-    private boolean view = false;
-
-
     public FormSupplier() {
-        this.saveSupplier = new Supplier();
-        setHeaderTitle("Nuevo Suplidor");
-        setId("FORM-SUPPLIER");
+        this(new Supplier(), false);
+    }
+
+    // Constructor used by SupplierPage via applicationContext.getBean(FormSupplier.class, selectedItem, view)
+    public FormSupplier(Supplier supplier, boolean view) {
+        this.saveSupplier = supplier != null ? supplier : new Supplier();
+        this.view = view;
+        this.isEdit = this.saveSupplier.getId() != null;
+
+        setCommonProps(view ? "View Supplier" : (isEdit ? "Edit Supplier" : "New Supplier"),
+                view ? "sup-form-view" : (isEdit ? "sup-form-edit" : "sup-form-new"));
+
+        add(buildWindow());
+        if (view) disableFields();
+    }
+
+    private void setCommonProps(String title, String id) {
+        setHeaderTitle(title);
+        setId(id);
         setModal(false);
         setDraggable(true);
         addThemeVariants(DialogVariant.LUMO_NO_PADDING);
-
-        add(buildWindow());
     }
 
     @Autowired
     public void setServices(SupplierService supplierService) {
         this.supplierService = supplierService;
+        if (isEdit) fillFields();
     }
 
     private Component buildWindow() {
-        TabSheet tabSheet = new TabSheet();
-        tabSheet.setSizeUndefined();
-        tabSheet.add("New Supplier", buildTabNewSupplier());
-        if (saveSupplier.getId() != null && saveSupplier.getId() > 0) {
-//            tabSheet.add("Security", construirTabSeguridad());
-        }
+        TabSheet tabs = new TabSheet();
+        tabs.setSizeUndefined();
+        tabs.add(isEdit ? "Supplier" : "New Supplier", buildForm());
 
-        VerticalLayout layoutVentana = new VerticalLayout();
-        layoutVentana.setMargin(false);
-        layoutVentana.setPadding(true);
-        layoutVentana.setSpacing(false);
-        layoutVentana.setSizeUndefined();
-        layoutVentana.add(tabSheet);
+        VerticalLayout root = new VerticalLayout();
+        root.setMargin(false);
+        root.setPadding(true);
+        root.setSpacing(false);
+        root.setSizeUndefined();
+        root.add(tabs);
 
-        construirLayoutBotones();
-
-        return layoutVentana;
+        buildFooterButtons();
+        return root;
     }
 
-    private void construirLayoutBotones() {
+    private void buildFooterButtons() {
         btnSave = new Button("Save (F10)");
+        btnSave.setId("sup-form-btn-save");
         btnSave.addClickShortcut(Key.F10);
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
-        btnSave.addClickListener(event -> {
-            saveChanges();
-        });
+        btnSave.addClickListener(e -> saveChanges());
 
         btnExit = new Button("Exit (ESC)");
+        btnExit.setId("sup-form-btn-exit");
         btnExit.addClickShortcut(Key.ESCAPE);
         btnExit.addThemeVariants(ButtonVariant.LUMO_SMALL);
-        btnExit.addClickListener(event -> {
+        btnExit.addClickListener(e -> {
             if (!view) {
-                ConfirmWindow confirmWindow = new ConfirmWindow("Action Confirmation", "Are you sure to continue?", this::close);
-                confirmWindow.open();
+                ConfirmWindow cw = new ConfirmWindow("Action Confirmation", "Are you sure to continue?", this::close);
+                cw.open();
             } else {
                 close();
             }
         });
 
-        getFooter().add(btnExit);
-        getFooter().add(btnSave);
+        if (view) btnSave.setVisible(false);
+
+        getFooter().add(btnExit, btnSave);
     }
 
-    private Component buildTabNewSupplier() {
-        name = new TextField("Nombre del Suplidor");
+    private Component buildForm() {
+        name = new TextField("Supplier Name");
+        name.setId("sup-form-name");
         name.setRequired(true);
         name.setRequiredIndicatorVisible(true);
         name.setWidthFull();
 
-        contactInfo = new TextField("Info de Contacto");
+        contactInfo = new TextField("Contact Info");
+        contactInfo.setId("sup-form-contact");
         contactInfo.setRequired(true);
         contactInfo.setRequiredIndicatorVisible(true);
         contactInfo.setWidthFull();
 
-        address = new TextField("Dirección del Suplidor");
-        address.setRequired(true);
-        address.setRequiredIndicatorVisible(true);
-        address.setWidthFull();
-
-        email = new EmailField("Correo de Suplidor");
+        email = new EmailField("Supplier Email");
+        email.setId("sup-form-email");
         email.setRequired(true);
         email.setRequiredIndicatorVisible(true);
         email.setWidthFull();
 
-        phoneNumber = new TextField("Numero de Suplidor");
+        address = new TextField("Supplier Address");
+        address.setId("sup-form-address");
+        address.setRequired(true);
+        address.setRequiredIndicatorVisible(true);
+        address.setWidthFull();
+
+        phoneNumber = new TextField("Supplier Phone");
+        phoneNumber.setId("sup-form-phone");
         phoneNumber.setRequired(true);
         phoneNumber.setRequiredIndicatorVisible(true);
         phoneNumber.setWidthFull();
 
-        // Crear los layouts para organizar los campos
-        HorizontalLayout row1 = new HorizontalLayout();
+        // Row 1: name, contact, email
+        HorizontalLayout row1 = new HorizontalLayout(name, contactInfo, email);
         row1.setWidthFull();
-        row1.add(name, contactInfo, address, email, phoneNumber);
         row1.setFlexGrow(1, name);
         row1.setFlexGrow(1, contactInfo);
         row1.setFlexGrow(1, email);
 
-        HorizontalLayout row2 = new HorizontalLayout();
+        // Row 2: address, phone
+        HorizontalLayout row2 = new HorizontalLayout(address, phoneNumber);
         row2.setWidthFull();
-        row2.add(address, phoneNumber);
         row2.setFlexGrow(2, address);
         row2.setFlexGrow(1, phoneNumber);
 
-        // Layout principal del tab
-        VerticalLayout mainLayout = new VerticalLayout();
-        mainLayout.setSpacing(true);
-        mainLayout.setPadding(true);
-        mainLayout.setWidthFull();
-        mainLayout.add(row1, row2);
+        VerticalLayout main = new VerticalLayout(row1, row2);
+        main.setSpacing(true);
+        main.setPadding(true);
+        main.setWidthFull();
+        main.setId("sup-form-body");
 
-        return mainLayout;
+        return main;
     }
 
     private void saveChanges() {
-        if (!validate()) {
-            return;
-        }
+        if (!validate()) return;
+
         try {
             loadComponents();
 
-            supplierService.createSupplier(saveSupplier);
+            boolean update = (saveSupplier.getId() != null);
+            if (update) {
+                supplierService.updateSupplier(saveSupplier.getId(), saveSupplier);
+            } else {
+                supplierService.createSupplier(saveSupplier);
+            }
 
-            MySuccessNotification mySuccessNotification = new MySuccessNotification("Supplier saved successfully: " + saveSupplier.getName());
-            mySuccessNotification.open();
+            new MySuccessNotification(
+                    "Supplier " + (update ? "updated" : "created") + " successfully: " + saveSupplier.getName()
+            ).open();
 
             close();
         } catch (Exception e) {
-            MyErrorNotification miErrorNotification = new MyErrorNotification(e.getMessage());
-            miErrorNotification.open();
+            new MyErrorNotification(e.getMessage()).open();
         }
     }
 
     private boolean validate() {
         boolean ok = true;
 
-        if (name.isRequired() && StringUtils.isBlank(name.getValue())) {
-            ok = false;
-            name.setInvalid(true);
-        } else {
-            name.setInvalid(false);
-        }
-
-        if (contactInfo.isRequired() && StringUtils.isBlank(contactInfo.getValue())) {
-            ok = false;
-            contactInfo.setInvalid(true);
-        } else {
-            contactInfo.setInvalid(false);
-        }
-
-        if (address.isRequired() && StringUtils.isBlank(address.getValue())) {
-            ok = false;
-            address.setInvalid(true);
-        } else {
-            address.setInvalid(false);
-        }
-
-        if (email.isRequired() && StringUtils.isBlank(email.getValue())) {
-            ok = false;
-            email.setInvalid(true);
-        } else {
-            email.setInvalid(false);
-        }
-
-        if (phoneNumber.isRequired() && StringUtils.isBlank(phoneNumber.getValue())) {
-            ok = false;
-            phoneNumber.setInvalid(true);
-        } else {
-            phoneNumber.setInvalid(false);
-        }
+        if (name.isRequired() && StringUtils.isBlank(name.getValue())) { ok = false; name.setInvalid(true); } else name.setInvalid(false);
+        if (contactInfo.isRequired() && StringUtils.isBlank(contactInfo.getValue())) { ok = false; contactInfo.setInvalid(true); } else contactInfo.setInvalid(false);
+        if (address.isRequired() && StringUtils.isBlank(address.getValue())) { ok = false; address.setInvalid(true); } else address.setInvalid(false);
+        if (email.isRequired() && StringUtils.isBlank(email.getValue())) { ok = false; email.setInvalid(true); } else email.setInvalid(false);
+        if (phoneNumber.isRequired() && StringUtils.isBlank(phoneNumber.getValue())) { ok = false; phoneNumber.setInvalid(true); } else phoneNumber.setInvalid(false);
 
         return ok;
     }
@@ -222,5 +208,20 @@ public class FormSupplier extends Dialog {
         saveSupplier.setPhoneNumber(phoneNumber.getValue());
     }
 
+    private void fillFields() {
+        name.setValue(StringUtils.defaultString(saveSupplier.getName(), ""));
+        contactInfo.setValue(StringUtils.defaultString(saveSupplier.getContactInfo(), ""));
+        address.setValue(StringUtils.defaultString(saveSupplier.getAddress(), ""));
+        email.setValue(StringUtils.defaultString(saveSupplier.getEmail(), ""));
+        phoneNumber.setValue(StringUtils.defaultString(saveSupplier.getPhoneNumber(), ""));
+    }
 
+    private void disableFields() {
+        name.setReadOnly(true);
+        contactInfo.setReadOnly(true);
+        address.setReadOnly(true);
+        email.setReadOnly(true);
+        phoneNumber.setReadOnly(true);
+        btnSave.setVisible(false);
+    }
 }

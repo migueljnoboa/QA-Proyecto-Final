@@ -1,4 +1,4 @@
-package org.example.inventario.controller;
+package org.example.inventario.controller.externalApi;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

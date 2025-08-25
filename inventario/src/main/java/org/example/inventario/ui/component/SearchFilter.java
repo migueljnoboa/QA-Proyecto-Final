@@ -51,6 +51,7 @@ public class SearchFilter extends Accordion {
 
     private Component buildWindow() {
         Button btnClearFilter = new Button("Clean Filter");
+        btnClearFilter.setId("filter-btn-clean");
         btnClearFilter.setIcon(new Icon(VaadinIcon.CROP));
         btnClearFilter.addThemeVariants(ButtonVariant.LUMO_SMALL);
         btnClearFilter.addClickListener(buttonClickEvent -> cleanFilter());

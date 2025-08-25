@@ -11,6 +11,8 @@ processors:
 exporters:
   debug:
     verbosity: detailed
+  loki:
+    endpoint: "http://loki:3100/loki/api/v1/push"
   otlp/jaeger:
     endpoint: "jaeger:4317"
     tls:
@@ -22,3 +24,7 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [debug, otlp/jaeger]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [loki]

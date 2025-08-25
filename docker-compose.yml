@@ -1,19 +1,63 @@
 version: '3.8'
 
 services:
+
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/jaeger
+    restart: always
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+    networks:
+      - springnet
+
+  mysqlTest:
+    image: mysql:8.0
+    container_name: mysqlTest
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: inventariodb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 12345678
+      MYSQL_ROOT_HOST: '%'
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --bind-address=0.0.0.0
+    volumes:
+      - mysql_data:/var/lib/mysqlTest
+    restart: unless-stopped
+    networks:
+      - springnet
+
   inventario-app:
-    container_name: inventario-app
+    container_name: inventario-app-test
     build:
       context: ./inventario
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    env_file:
-      - stack.env
+    # env_file:
+    #   - stack.env
+    environment:
+      MYSQL_HOST: "mysqlTest"
+      MYSQL_PORT: "3308"
+      MYSQL_DB: "inventariodb"
     restart: unless-stopped
     networks:
       - springnet
+    depends_on:
+      - jaeger
+      - mysqlTest
+
 
 networks:
   springnet:
     driver: bridge
+
+volumes:
+  mysql_data:

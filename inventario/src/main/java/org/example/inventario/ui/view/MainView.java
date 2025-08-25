@@ -1,18 +1,23 @@
 package org.example.inventario.ui.view;
 
+import com.github.appreciated.apexcharts.config.PlotOptions;
+import com.github.appreciated.apexcharts.config.plotoptions.Bar;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.component.charts.Chart;
-import com.vaadin.flow.component.charts.model.*;
 import jakarta.annotation.security.RolesAllowed;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.service.inventory.ProductService;
 import org.example.inventario.utils.Utilidades;
+import com.github.appreciated.apexcharts.ApexCharts;
+import com.github.appreciated.apexcharts.ApexChartsBuilder;
+import com.github.appreciated.apexcharts.config.builder.*;
+import com.github.appreciated.apexcharts.config.chart.Type;
+import com.github.appreciated.apexcharts.helper.Series;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,7 +30,6 @@ import java.util.List;
 public final class MainView extends Main {
 
     private ProductService productService;
-
     private List<Product> productsLowStock;
 
     public MainView(ProductService productService) {
@@ -170,7 +174,7 @@ public final class MainView extends Main {
         return section;
     }
 
-    private Div chartCard(String title, Chart chart) {
+    private Div chartCard(String title, ApexCharts chart) {
         Div card = new Div();
         card.getStyle().set("padding", "1rem 1.25rem");
         card.getStyle().set("border-radius", "12px");
@@ -184,88 +188,83 @@ public final class MainView extends Main {
         H4 t = new H4(title);
         t.getStyle().set("margin", "0");
 
+        chart.setHeight("280px");
         card.add(t, chart);
         return card;
     }
 
-    private Chart buildProductsPerCategoryChart() {
-        Chart chart = new Chart(ChartType.COLUMN);
-        Configuration conf = chart.getConfiguration();
-        Tooltip tooltip = new Tooltip();
-        tooltip.setEnabled(true);
-        tooltip.setPointFormat("Valor: <b>{point.y}</b>");
-        conf.setTooltip(tooltip);
-
+    private ApexCharts buildProductsPerCategoryChart() {
         List<Category> categories = List.of(Category.values());
-        ListSeries serie = new ListSeries("Productos por categoría");
-        for (Category category : categories) {
-            serie.addData(productService.countProductsByCategory(category));
-        }
-        conf.setSeries(serie);
-        conf.getxAxis().setCategories(
-                categories.stream().map(Category::name).toArray(String[]::new)
-        );
-        conf.getyAxis().setTitle("Cantidad");
-        conf.getxAxis().setTitle("Categoría");
 
-        return chart;
+        String[] categoryNames = categories.stream().map(Category::name).toArray(String[]::new);
+        Number[] productCounts = categories.stream()
+                .map(category -> productService.countProductsByCategory(category))
+                .toArray(Number[]::new);
+
+        return ApexChartsBuilder.get()
+                .withChart(ChartBuilder.get().withType(Type.BAR).build())
+                .withXaxis(XAxisBuilder.get().withCategories(categoryNames).build())
+                .withSeries(new Series<>("Productos por categoría", productCounts))
+                .build();
     }
 
-    private Chart buildValuePerCategoryChart() {
-        Chart chart = new Chart(ChartType.BAR);
-        Configuration conf = chart.getConfiguration();
-        Tooltip tooltip = new Tooltip();
-        tooltip.setEnabled(true);
-        tooltip.setPointFormat("Valor: <b>{point.y}</b>");
-        conf.setTooltip(tooltip);
-
+    private ApexCharts buildValuePerCategoryChart() {
         List<Category> categories = List.of(Category.values());
 
-        BigDecimal[] values;
-        values = categories.stream()
+
+        String[] categoryNames = categories.stream().map(Category::name).toArray(String[]::new);
+        Number[] values = categories.stream()
                 .map(category -> productService.getTotalStockValueByCategory(category))
-                .toArray(BigDecimal[]::new);
+                .toArray(Number[]::new);
 
+        PlotOptions plotOptions = new PlotOptions();
+        Bar bar = new Bar();
+        bar.setHorizontal(true);
+        plotOptions.setBar(bar);
 
-        conf.addSeries(new ListSeries("Valor", values));
-        conf.getxAxis().setCategories(
-                categories.stream().map(Category::name).toArray(String[]::new)
-        );
+        return ApexChartsBuilder.get()
+                .withChart(ChartBuilder.get().withType(Type.BAR).build())
+                .withPlotOptions(plotOptions)
+                .withXaxis(XAxisBuilder.get().withCategories(categoryNames).build())
+                .withSeries(new Series<>("Valor", values))
 
-        return chart;
+                .build();
     }
 
-    private Chart buildValueSharePie() {
-        Chart chart = new Chart(ChartType.PIE);
-        Configuration conf = chart.getConfiguration();
+    private ApexCharts buildValueSharePie() {
+        List<Category> categories = List.of(Category.values());
 
-        Tooltip tooltip = new Tooltip();
-        tooltip.setEnabled(true);
-        tooltip.setPointFormat("{point.name}: <b>{point.y}</b>");
-        conf.setTooltip(tooltip);
+        String[] categoryNames = categories.stream()
+                .map(Category::name)
+                .toArray(String[]::new);
 
-        DataSeries series = new DataSeries();
-        for (Category category : Category.values()) {
-            Double percent = productService.getTotalStockValuePercentByCategory(category);
-            Double value = BigDecimal.valueOf(percent != null ? percent : 0.0).setScale(2, RoundingMode.HALF_UP).doubleValue();
-            series.add(new DataSeriesItem(category.name(), value));
-        }
+        Double[] percentages = categories.stream()
+                .map(category -> {
+                    Double percent = productService.getTotalStockValuePercentByCategory(category);
+                    return BigDecimal.valueOf(percent != null ? percent : 0.0)
+                            .setScale(2, RoundingMode.HALF_UP)
+                            .doubleValue();
+                })
+                .toArray(Double[]::new);
 
-        conf.setSeries(series);
-        return chart;
+        return ApexChartsBuilder.get()
+                .withChart(ChartBuilder.get().withType(Type.PIE).build())
+                .withLabels(categoryNames)
+                .withSeries(percentages)
+                .withLegend(LegendBuilder.get().withShow(false).build())
+                .build();
     }
 
-    private Chart buildMonthlySalesChart() {
-        Chart chart = new Chart(ChartType.AREA);
-        Configuration conf = chart.getConfiguration();
+    private ApexCharts buildMonthlySalesChart() {
+        String[] months = {"Ene", "Feb", "Mar", "Abr", "May", "Jun",
+                "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"};
+        Number[] salesData = {1200, 1450, 1320, 1580, 1760, 1650,
+                1890, 2010, 1950, 2100, 2230, 2400};
 
-        conf.addSeries(new ListSeries("Ventas",
-                1200, 1450, 1320, 1580, 1760, 1650,
-                1890, 2010, 1950, 2100, 2230, 2400));
-
-        conf.getxAxis().setCategories("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic");
-        conf.getyAxis().setTitle("Ventas (USD)");
-
-        return chart;
+        return ApexChartsBuilder.get()
+                .withChart(ChartBuilder.get().withType(Type.AREA).build())
+                .withXaxis(XAxisBuilder.get().withCategories(months).build())
+                .withSeries(new Series<>("Ventas", salesData))
+                .build();
     }
 }

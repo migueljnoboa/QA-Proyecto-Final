@@ -83,26 +83,6 @@ public class RolePlaywrightTests {
     }
 
     @Test
-    public void roleEditTest(Page page){
-
-        login(page);
-
-        page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Role")).click();
-        page.getByText("USER", new Page.GetByTextOptions().setExact(true)).click();
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Edit")).click();
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Role Name")).click();
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Role Name")).fill("USER2");
-        page.getByRole(AriaRole.TABPANEL, new Page.GetByRoleOptions().setName("Role")).locator("#toggleButton").click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("USERS_MENU")).locator("div").click();
-        page.getByRole(AriaRole.TABPANEL, new Page.GetByRoleOptions().setName("Role")).locator("#toggleButton").click();
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save (F10)")).click();
-        page.getByText("USER2", new Page.GetByTextOptions().setExact(true)).click();
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("View")).click();
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Role Name")).click();
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Exit (ESC)")).click();
-    }
-
-    @Test
     public void roleCreateAndDeleteTest(Page page){
 
         login(page);
@@ -110,19 +90,46 @@ public class RolePlaywrightTests {
         page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Role")).click();
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("New")).click();
         page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Role Name")).click();
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Role Name")).fill("Create");
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Role Name")).fill("CreateRole");
         page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Description")).click();
-        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Description")).fill("Create Role Test Description");
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Description")).fill("CreateRole Role Test Description");
         page.getByRole(AriaRole.COMBOBOX, new Page.GetByRoleOptions().setName("Permits")).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("DASHBOARD_MENU")).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("SUPPLIERS_MENU")).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("SUPPLIER_CREATE")).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("SUPPLIER_EDIT")).click();
-        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("SUPPLIER_DELETE")).click();
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("SUPPLIER_VIEW")).click();
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save (F10)")).click();
-        page.getByText("Create", new Page.GetByTextOptions().setExact(true)).click();
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Cancel")).click();
+
+        page.locator("#role-form-btn-save").click();
+
+        page.getByText("CreateRole", new Page.GetByTextOptions().setExact(true)).click();
+
+        page.locator("#role-btn-edit").click();
+
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Role Name")).click();
+        page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Role Name")).fill("CreateRole");
+        page.getByRole(AriaRole.TABPANEL, new Page.GetByRoleOptions().setName("Role")).locator("#toggleButton").click();
+        page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("USERS_MENU")).locator("div").click();
+        page.getByRole(AriaRole.TABPANEL, new Page.GetByRoleOptions().setName("Role")).locator("#toggleButton").click();
+
+        page.locator("#role-form-btn-save").click();
+
+        page.waitForSelector(
+                "vaadin-dialog-overlay[opened]",
+                new Page.WaitForSelectorOptions().setState(com.microsoft.playwright.options.WaitForSelectorState.DETACHED)
+        );
+
+        page.getByText("CreateRole", new Page.GetByTextOptions().setExact(true)).click();
+
+
+        page.locator("#role-btn-view:not([disabled])").click();
+
+        page.locator("#role-form-btn-exit").click();
+
+        page.getByText("CreateRole", new Page.GetByTextOptions().setExact(true)).click();
+
+        page.locator("#role-btn-cancel").click();
+
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Confirm")).click();
     }
 

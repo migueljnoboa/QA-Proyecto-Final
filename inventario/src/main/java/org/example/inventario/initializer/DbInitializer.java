@@ -18,18 +18,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public  class DbInitializer implements ApplicationRunner {
     private final UserService userService;
-    private final PermitService permitService;
-    private final RoleService roleService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        permitService.createDefaultPermitsIfNotExists();
-        roleService.createDefaultRolesIfNotExists();
         userService.createDefaultUserIfNotExists();
-
-        //TODO: REMOVE BEFORE DEPLOYMENT
-        userService.createTestUser();
-
     }
 }
 

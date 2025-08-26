@@ -116,8 +116,8 @@ public class RoleServiceTest {
 
     @Test
     void createDefaultRolesIfNotExists_idempotent_and_creates_admin_user_roles() {
-        roleService.createDefaultRolesIfNotExists();
         assertEquals(Role.ADMIN_ROLE, roleService.findByName(Role.ADMIN_ROLE).getName());
+        assertEquals(Role.EMPLOYEE_ROLE, roleService.findByName(Role.EMPLOYEE_ROLE).getName());
         assertEquals(Role.USER_ROLE, roleService.findByName(Role.USER_ROLE).getName());
     }
 

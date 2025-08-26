@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 @Route(value = "/productStockChange", layout = MainLayout.class)
 @PageTitle("Product Stock Changes")
 @RolesAllowed({Permit.PRODUCT_STOCK_CHANGE})
-@Menu(order = 1, icon = "vaadin:history", title = "Stock Changes")
+@Menu(order = 1, icon = "vaadin:archive", title = "Stock Changes")
 public class ProductStockChangePage extends ControlPanel<ProductStockChange> {
 
     private final ProductStockChangeService productStockChangeService;

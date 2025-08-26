@@ -1,4 +1,4 @@
--- inventariodb.revinfo definition
+-- revinfo definition
 
 CREATE TABLE `revinfo`
 (
@@ -11,7 +11,7 @@ CREATE TABLE `revinfo`
   COLLATE = utf8mb4_unicode_ci;
 
 
--- inventariodb.permits definition
+-- permits definition
 
 CREATE TABLE `permits`
 (
@@ -30,7 +30,7 @@ CREATE TABLE `permits`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
--- inventariodb.permits_aud definition
+-- permits_aud definition
 
 CREATE TABLE `permits_aud`
 (
@@ -47,7 +47,7 @@ CREATE TABLE `permits_aud`
   COLLATE = utf8mb4_unicode_ci;
 
 
--- inventariodb.roles definition
+-- roles definition
 
 CREATE TABLE `roles`
 (
@@ -66,7 +66,7 @@ CREATE TABLE `roles`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
--- inventariodb.roles_aud definition
+-- roles_aud definition
 
 CREATE TABLE `roles_aud`
 (
@@ -86,7 +86,7 @@ CREATE TABLE `roles_aud`
   COLLATE = utf8mb4_unicode_ci;
 
 
--- inventariodb.roles_permits definition
+-- roles_permits definition
 
 CREATE TABLE `roles_permits`
 (
@@ -100,7 +100,7 @@ CREATE TABLE `roles_permits`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
--- inventariodb.roles_permits_aud definition
+-- roles_permits_aud definition
 
 CREATE TABLE `roles_permits_aud`
 (
@@ -115,7 +115,7 @@ CREATE TABLE `roles_permits_aud`
   COLLATE = utf8mb4_unicode_ci;
 
 
--- inventariodb.users definition
+-- users definition
 
 CREATE TABLE `users`
 (
@@ -136,7 +136,7 @@ CREATE TABLE `users`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
--- inventariodb.users_aud definition
+-- users_aud definition
 
 CREATE TABLE `users_aud`
 (
@@ -157,7 +157,7 @@ CREATE TABLE `users_aud`
   COLLATE = utf8mb4_unicode_ci;
 
 
--- inventariodb.users_roles definition
+-- users_roles definition
 
 CREATE TABLE `users_roles`
 (
@@ -171,7 +171,7 @@ CREATE TABLE `users_roles`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
--- inventariodb.users_roles_aud definition
+-- users_roles_aud definition
 
 CREATE TABLE `users_roles_aud`
 (
@@ -186,7 +186,7 @@ CREATE TABLE `users_roles_aud`
   COLLATE = utf8mb4_unicode_ci;
 
 
--- inventariodb.supplier definition
+-- supplier definition
 
 CREATE TABLE `supplier`
 (
@@ -207,7 +207,7 @@ CREATE TABLE `supplier`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
--- inventariodb.supplier_aud definition
+-- supplier_aud definition
 
 CREATE TABLE `supplier_aud`
 (
@@ -231,7 +231,7 @@ CREATE TABLE `supplier_aud`
   COLLATE = utf8mb4_unicode_ci;
 
 
--- inventariodb.product definition
+-- product definition
 
 CREATE TABLE `product`
 (
@@ -257,7 +257,7 @@ CREATE TABLE `product`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
--- inventariodb.product_aud definition
+-- product_aud definition
 
 CREATE TABLE `product_aud`
 (
@@ -300,3 +300,215 @@ CREATE TABLE `product_stock_change`
     KEY          `FKfr7yw1f3sheemv3864v70ygjx` (`product_id`),
     CONSTRAINT `FKfr7yw1f3sheemv3864v70ygjx` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+# INSERT PERMITS
+
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(1, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'DASHBOARD_MENU');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(2, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'SUPPLIERS_MENU');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(3, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'SUPPLIER_CREATE');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(4, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'SUPPLIER_EDIT');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(5, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'SUPPLIER_DELETE');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(6, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'SUPPLIER_VIEW');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(7, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'PRODUCTS_MENU');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(8, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'PRODUCT_CREATE');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(9, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'PRODUCT_EDIT');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(10, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'PRODUCT_DELETE');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(11, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'PRODUCT_VIEW');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(12, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'PRODUCT_STOCK_CHANGE');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(13, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'USERS_MENU');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(14, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'USER_CREATE');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(15, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'USER_EDIT');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(16, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'USER_DELETE');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(17, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'USER_VIEW');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(18, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'ROLES_MENU');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(19, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'ROLE_CREATE');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(20, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'ROLE_EDIT');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(21, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'ROLE_DELETE');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(22, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'ROLE_VIEW');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(23, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'PERMIT_MENU');
+INSERT INTO permits
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, name)
+VALUES(24, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'PERMIT_VIEW');
+
+
+
+# INSERT ROLES
+
+INSERT INTO roles
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, description, name)
+VALUES(1, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'Administrator role with all permissions', 'ADMIN');
+INSERT INTO roles
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, description, name)
+VALUES(2, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'Employee, access to Create, Edit and View Products and view Stock Change History', 'EMPLOYEE');
+INSERT INTO roles
+(id, created_by, created_date, enabled, last_modified_by, last_modified_date, version, description, name)
+VALUES(3, 'system', '2025-08-25 00:00:00.000000', 1, 'system', '2025-08-25 00:00:00.000000', 0, 'Invited / User, can View Product Information', 'USER');
+
+
+
+# INSERT ROLES PERMIT
+
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 1);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 3);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 12);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 21);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 6);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 18);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 19);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 2);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 5);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 7);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 11);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 16);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 4);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 24);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 17);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 15);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 14);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 8);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 23);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 9);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 13);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 20);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 22);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(1, 10);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(2, 7);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(2, 11);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(2, 1);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(2, 3);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(2, 12);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(2, 4);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(2, 6);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(2, 8);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(2, 9);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(2, 2);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(3, 7);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(3, 11);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(3, 1);
+INSERT INTO roles_permits
+(roles_id, permits_id)
+VALUES(3, 6);
+
+# INSERT BASIC USERS

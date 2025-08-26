@@ -69,6 +69,7 @@ public class UserPlaywrightTests {
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Clean Filter")).click();
     }
 
+
     @Test
     public void userCreateEditDeleteTest(Page page){
 
@@ -96,11 +97,9 @@ public class UserPlaywrightTests {
 
         page.getByRole(AriaRole.OPTION, new Page.GetByRoleOptions().setName("ADMIN")).click();
 
-        page.locator("html").click();
-
         page.locator("#user-form-btn-save").click();
 
-        page.getByText("TestUsername", new Page.GetByTextOptions().setExact(true)).click();
+        page.locator("#user-grid").getByText("TestUsername").click();
 
         page.locator("#user-btn-edit").click();
 
@@ -109,7 +108,7 @@ public class UserPlaywrightTests {
 
         page.locator("#user-form-btn-save").click();
 
-        page.getByText("TestUsernameEdit", new Page.GetByTextOptions().setExact(true)).click();
+        page.locator("#user-grid").getByText("TestUsernameEdit").click();
 
         page.locator("#user-btn-view").click();
 
@@ -117,7 +116,7 @@ public class UserPlaywrightTests {
 
         page.locator("#user-form-btn-exit").click();
 
-        page.getByText("TestUsernameEdit", new Page.GetByTextOptions().setExact(true)).click();
+        page.locator("#user-grid").getByText("TestUsernameEdit").click();
 
         page.locator("#user-btn-delete").click();
 

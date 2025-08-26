@@ -62,8 +62,6 @@ public class UserServiceTest {
 
     @BeforeEach
     public void init() {
-        permitService.createDefaultPermitsIfNotExists();
-        roleService.createDefaultRolesIfNotExists();
 
         adminRole = roleService.findByName(Role.ADMIN_ROLE);
         userRole  = roleService.findByName(Role.USER_ROLE);

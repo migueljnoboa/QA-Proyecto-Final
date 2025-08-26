@@ -9,22 +9,21 @@ import org.example.inventario.model.entity.security.Role;
 import org.example.inventario.model.entity.security.User;
 import org.example.inventario.model.specification.role.RoleSpecification;
 import org.example.inventario.repository.security.RoleRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class RoleService {
-    private final PermitService permitService;
-    private final RoleRepository roleRepository;
+
+    @Autowired private final PermitService permitService;
+    @Autowired private final RoleRepository roleRepository;
 
     @Transactional(readOnly = true)
     public ReturnList<Role> listAllRole(Pageable pageable) {
@@ -68,22 +67,38 @@ public class RoleService {
 
     @Transactional
     public void createDefaultRolesIfNotExists(){
-        if (!roleRepository.existsByName(Role.ADMIN_ROLE)) {
-            Role adminRole = new Role();
-            adminRole.setName(Role.ADMIN_ROLE);
-            adminRole.setDescription("Administrator role with all permissions");
+
+        Role adminRole = roleRepository.findByName(Role.ADMIN_ROLE);
+        if (adminRole.getPermits().isEmpty()){
             adminRole.setPermits(new LinkedHashSet<>(permitService.findAll()));
             roleRepository.save(adminRole);
         }
 
-        if (!roleRepository.existsByName(Role.USER_ROLE)) {
-            Role userRole = new Role();
-            userRole.setName(Role.USER_ROLE);
-            userRole.setPermits(Set.of(
+        Role employeeRole = roleRepository.findByName(Role.EMPLOYEE_ROLE);
+        if (employeeRole.getPermits().isEmpty()) {
+            employeeRole.setPermits(new LinkedHashSet<>(Arrays.asList(
+                    permitService.findByName(Permit.DASHBOARD_MENU),
+
+                    permitService.findByName(Permit.SUPPLIERS_MENU),
+                    permitService.findByName(Permit.SUPPLIER_VIEW),
+                    permitService.findByName(Permit.SUPPLIER_CREATE),
+                    permitService.findByName(Permit.SUPPLIER_EDIT),
+
+                    permitService.findByName(Permit.PRODUCTS_MENU),
+                    permitService.findByName(Permit.PRODUCT_CREATE),
+                    permitService.findByName(Permit.PRODUCT_EDIT),
+                    permitService.findByName(Permit.PRODUCT_VIEW),
+                    permitService.findByName(Permit.PRODUCT_STOCK_CHANGE))));
+            roleRepository.save(employeeRole);
+        }
+
+        Role userRole = roleRepository.findByName(Role.USER_ROLE);
+        if (userRole.getPermits().isEmpty()){
+            userRole.setPermits(new LinkedHashSet<>(Arrays.asList(
                     permitService.findByName(Permit.DASHBOARD_MENU),
                     permitService.findByName(Permit.PRODUCTS_MENU),
-                    permitService.findByName(Permit.PRODUCT_VIEW)));
-            userRole.setDescription("Regular user role with limited permissions");
+                    permitService.findByName(Permit.PRODUCT_VIEW),
+                    permitService.findByName(Permit.SUPPLIER_VIEW))));
             roleRepository.save(userRole);
         }
     }

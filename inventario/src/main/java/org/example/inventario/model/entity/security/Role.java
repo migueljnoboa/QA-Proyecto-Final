@@ -22,6 +22,7 @@ import java.util.Set;
 @Audited(withModifiedFlag = true)
 public class Role extends Base {
     public static final String ADMIN_ROLE = "ADMIN";
+    public static final String EMPLOYEE_ROLE = "EMPLOYEE";
     public static final String USER_ROLE = "USER";
     private String name;
     private String description;

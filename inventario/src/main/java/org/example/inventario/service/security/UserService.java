@@ -10,6 +10,7 @@ import org.example.inventario.model.entity.security.User;
 import org.example.inventario.model.specification.user.UserSpecification;
 import org.example.inventario.repository.security.UserRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -114,14 +115,28 @@ public class UserService {
 
     @Transactional
     public void createDefaultUserIfNotExists() {
-        User user = userRepository.findByUsernameAndEnabledIsTrue("admin");
-        if (user == null) {
-            user = new User();
-            user.setUsername("admin");
-            user.setPassword(passwordEncoder.passwordEncoder().encode("admin"));
-            user.setEmail("admin@gmail.com");
-            user.setRoles(Set.of(roleService.findByName(Role.ADMIN_ROLE)));
-            userRepository.save(user);
+        if (userRepository.count() == 0) {
+            User adminUser = new User();
+            adminUser.setUsername("admin");
+            adminUser.setPassword(passwordEncoder.passwordEncoder().encode("admin"));
+            adminUser.setEmail("admin@gmail.com");
+            adminUser.setRoles(Set.of(roleService.findByName(Role.ADMIN_ROLE)));
+            userRepository.save(adminUser);
+
+
+            User employeeUser = new User();
+            employeeUser.setUsername("employee");
+            employeeUser.setPassword(passwordEncoder.passwordEncoder().encode("employee"));
+            employeeUser.setEmail("employee@gmail.com");
+            employeeUser.setRoles(Set.of(roleService.findByName(Role.EMPLOYEE_ROLE)));
+            userRepository.save(employeeUser);
+
+            User visitorUser = new User();
+            visitorUser.setUsername("user");
+            visitorUser.setPassword(passwordEncoder.passwordEncoder().encode("user"));
+            visitorUser.setEmail("user@gmail.com");
+            visitorUser.setRoles(Set.of(roleService.findByName(Role.USER_ROLE)));
+            userRepository.save(visitorUser);
         }
     }
 

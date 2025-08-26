@@ -20,6 +20,7 @@ import java.util.List;
 public class PermitService {
     private final PermitRepository permitRepository;
 
+    @Deprecated
     public void createDefaultPermitsIfNotExists() {
         String[] defaultPermits = {
                 Permit.DASHBOARD_MENU,
@@ -57,6 +58,9 @@ public class PermitService {
 
         for (String permitName : defaultPermits) {
             if (!permitRepository.existsByName(permitName)) {
+
+                System.out.println("[ERROR] FLYWAY FAILED TO CREATE PERMIT " + permitName);
+
                 Permit permit = new Permit();
                 permit.setName(permitName);
                 permitRepository.save(permit);

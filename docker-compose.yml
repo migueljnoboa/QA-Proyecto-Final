@@ -35,17 +35,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    environment:
-      MYSQL_HOST: "172.17.0.1"
-      MYSQL_PORT: "3306"
-      MYSQL_DB: "inventariodb"
-      OTEL_SERVICE_NAME: "inventario-app-test"
-      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      OTEL_METRICS_EXPORTER: "prometheus"
-      OTEL_EXPORTER_PROMETHEUS_HOST: "0.0.0.0"
-      OTEL_EXPORTER_PROMETHEUS_PORT: "9464"
-      OTEL_LOGS_EXPORTER: "otlp"
+    env_file:
+      - stack.env
     restart: unless-stopped
     networks:
       - otel-net

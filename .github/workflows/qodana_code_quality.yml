@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: [ main, dev, 'releases/*' ]
+    branches: [dev, 'releases/*' ]
 
 jobs:
   qodana:

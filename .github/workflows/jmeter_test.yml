@@ -27,12 +27,12 @@ jobs:
           outputReportsFolder: other_reports/
           args: "--loglevel INFO"
 
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
           name: jmeter-test-results
           path: reports/
 
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
           name: jmeter-test-results-other
           path: other_reports/

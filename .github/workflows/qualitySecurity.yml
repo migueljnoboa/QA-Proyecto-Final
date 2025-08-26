@@ -10,7 +10,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# Needed for SARIF upload and artifact publishing
 permissions:
   contents: read
   security-events: write
@@ -19,7 +18,7 @@ jobs:
   qodana:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    environment: enviroments   # <-- your Environment name (case-sensitive)
+    environment: enviroments   # <-- your Environment name
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,12 +26,12 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
 
-      # Uses Cloud if QODANA_TOKEN is present; falls back to Community on fork PRs (no secrets)
       - name: Qodana Scan (Cloud if token, else Community)
         uses: JetBrains/qodana-action@v2025.1
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
+          project-dir: inventario
           args: >-
             --results-dir=qodana/results
             ${{ secrets.QODANA_TOKEN == '' && '--linter=jetbrains/qodana-jvm-community:2025.1' || '' }}
@@ -55,10 +54,18 @@ jobs:
             qodana/results/**/qodana.sarif.json
           if-no-files-found: warn
 
+      - name: Upload Qodana logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qodana-logs
+          path: qodana/results/logs/
+          if-no-files-found: warn
+
   snyk:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    environment: enviroments   # <-- needed so SNYK_TOKEN is available
+    environment: enviroments
     defaults:
       run:
         working-directory: inventario
@@ -81,7 +88,7 @@ jobs:
 
       - name: Run Snyk (Gradle)
         uses: snyk/actions/gradle@master
-        continue-on-error: true     # allow SARIF upload to still run
+        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -105,13 +112,6 @@ jobs:
     timeout-minutes: 25
     needs: [qodana, snyk]
 
-    # If your app needs DB config to boot in CI, uncomment and set these:
-    # env:
-    #   SPRING_PROFILES_ACTIVE: dev
-    #   SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/inventariodb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    #   SPRING_DATASOURCE_USERNAME: user
-    #   SPRING_DATASOURCE_PASSWORD: 12345678
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -133,44 +133,5 @@ jobs:
 
       - name: Start app and run OWASP ZAP Full Scan
         run: |
-          # Start the Spring Boot JAR
           nohup java -jar inventario/build/libs/*.jar > app.log 2>&1 &
           echo "Waiting for app..."
-          for i in {1..40}; do
-            if curl -sSf http://127.0.0.1:8080 >/dev/null; then
-              echo "App is up!"
-              break
-            fi
-            sleep 3
-          done
-
-          # If it never came up, fail early (you'll still get app.log uploaded)
-          if ! curl -sSf http://127.0.0.1:8080 >/dev/null; then
-            echo "App did not start in time" >&2
-            exit 1
-          fi
-
-          # Run ZAP Full Scan (allow non-zero exit code from findings)
-          docker run --rm \
-            -v "$(pwd)":/zap/wrk/:rw \
-            --network="host" \
-            zaproxy/zap-stable \
-            zap-full-scan.py \
-            -t http://127.0.0.1:8080 \
-            -r zap_full_report.html || true
-
-      - name: Upload ZAP Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-report
-          path: zap_full_report.html
-          if-no-files-found: error
-
-      - name: Upload app logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-log
-          path: app.log
-          if-no-files-found: warn

@@ -187,4 +187,39 @@ Any new additions to the database will be addressed with a new version of the da
 
 
 Slow rollouts to the more dedicated users as well as sustaining good comunication and feedback with them is essential before full deployment.
+
+
+
+Task	SCRUM-25	
+Document Requierments
+
+MIGUEL JOSÉ NOBOA HURTADO	MIGUEL JOSÉ NOBOA HURTADO	Medium	Done	Done	02/Jul/25	26/Aug/25	 
+Task	SCRUM-24	
+Write the Project Plan
+
+MIGUEL JOSÉ NOBOA HURTADO	MIGUEL JOSÉ NOBOA HURTADO	Medium	Done	Done	02/Jul/25	26/Aug/25	 
+Task	SCRUM-23	
+Test JWT tokens with users
+
+Unassigned	MIGUEL JOSÉ NOBOA HURTADO	Medium	Done	Done	02/Jul/25	26/Aug/25	 
+Task	SCRUM-21	
+Test Product Frontend
+
+MIGUEL JOSÉ NOBOA HURTADO	MIGUEL JOSÉ NOBOA HURTADO	Medium	Done	Done	02/Jul/25	26/Aug/25	 
+Task	SCRUM-20	
+Test Supplier Frontend
+
+MIGUEL JOSÉ NOBOA HURTADO	MIGUEL JOSÉ NOBOA HURTADO	Medium	Done	Done	02/Jul/25	26/Aug/25	 
+Task	SCRUM-15	
+Create Frontend Product
+
+Carlos Eleazar Peterson	MIGUEL JOSÉ NOBOA HURTADO	Medium	Done	Done	02/Jul/25	26/Aug/25	 
+Task	SCRUM-14	
+Create Frontend Supplier
+
+Carlos Eleazar Peterson	MIGUEL JOSÉ NOBOA HURTADO	Medium	Done	Done	02/Jul/25	26/Aug/25	 
+Task	SCRUM-13	
+Test Service User Unit Test
+
+MIGUEL JOSÉ NOBOA HURTADO	MIGUEL JOSÉ NOBOA HURTADO	Medium	Done	Done	02/Jul/25	26/Aug/25	 
    

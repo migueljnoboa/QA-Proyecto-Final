@@ -31,6 +31,24 @@ application.
 
 ## Project Plan
 
+### Objectives
+
+#### General Objective: 
+Implement an inventory management system that meets the functional requirements, applying software quality standards and ensuring maintainability.
+
+#### Specific Objectives:
+
+Implement CRUD functionalities for products and suppliers.
+
+Develop a user and role management module.
+
+Incorporate a history of changes in product stock.
+
+Apply different types of quality testing to ensure reliability and security.
+
+Deliver technical and functional documentation to support the use and maintenance of the system.
+
+
 The project is focused on an inventory management system with high levels of Quality Assurance.
 It must implement methods that let the user add, update, view and delete products from its catalog as well as be notified when the stock is low to know what to products to restock.
 Behind this system there must be users that can access specific parts of the app and are prevented from others. Some examples of posible users are Admins with access to all the system and user data and a product viewer that can see the full catalog but not interact with it.
@@ -78,6 +96,84 @@ The key components / requierments of the program are the following.
   
 8. version management / conflicts between vesions.
    Fix: Using the adequate tools to deal with changes in the database squema are the key to prevent future problems with future databases and posible migrations. The use of graddle is key for this project since we can know exactly what versions of our dependencies we need and work well for our projects, finally using containers to run our applications lets us be able to not just run the projects in any machine or configuration but also have a stable and always working version of the software we can be confident in.
+
+## Requierments:
+
+### Functional Requirements:
+#### Authentification and Authorization:
+- The system must have 3 default roles, user, employee and admin where user/visitor must only be able to see products. Employee must be able to create, edit and view but not delete products and view and interact with other related information. And admin must have full control over the system.
+- The system must include a secure login mechanism.
+- The system must verify permissions before executing any critical action.
+
+#### Product Management:
+- The system must allow authorized users to create, edit, view and delete products, specifying or specified with name, description, price, and stock, minimum stock and supplier.
+- The system must store and display a history of stock changes for each product.
+
+#### Supplier Management:
+- The system must allow authorized users to create, edit, view and delete suppliers, specifying or specified with specifying name, contact, and relevant information.
+- The system must allow users to view the list of registered suppliers.
+
+#### User and Role Management
+- The system must allow administrators to manage users (create, edit, delete).
+- The system must allow administrators to assign roles with different access levels (administrator, employee, visitor).
+- The system must restrict available functionalities according to the authenticated user’s role.
+
+#### History and Reports:
+- The system must record stock changes for each product, including date, time, and responsible user.
+- The system must allow querying the history filtered by product, date, or user.
+
+### Non-Functional Requirements:
+#### Usability:
+- The interface must be intuitive, responsive, and easy to use for non-technical users.
+- The system must be accessible from modern browsers (Chrome, Firefox).
+
+#### Security:
+- Passwords must be stored using a secure hash.
+- The system must implement role-based access control.
+- System must use some kind of Authentification method (JWT)
+- System must not display passwords from other users
+
+#### Maintainability:
+- The system must include unit, integration, and end-to-end tests.
+- The system must allow easy incorporation of new features.
+- System must implemente workflows do ease the testing and incorporation of new features and to prevent deployment issues
+
+  
+## Tecnologies Used:
+- Database: My SQL
+- Backend: Spring Boot
+- Frontend: Vaadin
+- Auditing: Hivernate Envers
+- DB Migration: Flyway
+- Monitoring and Observability: Prometheus, Grafana, Open Telemetry
+- ContainerL Docker
+- Authentification: JWT
+- Unit Tests: Junit
+- Integration Tests: Cucumber
+- End to End Tests: Playwright
+- Security Tests: Qodana, Snyk, OWASP ZAP
+- Stress Test: Jmeter
+- Testing Pipeline: Github Workflow
+- Regresion Testing: Junit + Cucumber + Playwright Tests
+
+
+
+## Documentation:
+
+### Testing Guide:
+
+There are 3 main kinds of tests to be aware of when adding or changing app features, unit, integration and end to end.
+If the feature changes are related to services, then unit tests need to be adjusted.
+If changes to the api are made then cucumber tests must be checked and revised
+If frontend changes then revise playwright.
+Adding tests to all of these is recommended, the general idea is for each service of mayor area to have its own tests, example all tests related to product are in one class, the same is for supplier and user.
+Doing regression testing by running the verification/test command in graddle is very important to do before pushing to your own branch and even more important to dev.
+After pushing to dev, make sure that all tests passed, even if they pass in one machine doesnt mean they will pass in github.
+
+Some extra advise for playwright tests, using codegen is not a bad idea as a helper, but playwright seems to be very brittle when testing with a vaadin application. Its recommend to add ids to all of you vaadin components to make the playwright tests a lot easier later. Using other Forms and Pages as a template is recommend.
+
+If running tests locally, playwright must need the program running locally as well as its testing database. Inside the tests folder you will fine a docker compose file with code for a test database, simply go to this directory and use docker compose up. If any changes are done to flyway its recommmended to run docker compose down --volumes and subsequently docker compose up and restart the application. This will restart the container with a fresh one.
+
 
 ## Migration and Post Deployment Plan 
 

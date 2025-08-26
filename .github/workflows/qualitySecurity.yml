@@ -13,12 +13,13 @@ concurrency:
 permissions:
   contents: read
   security-events: write
+  actions: read   # helpful for some SARIF uploads in private repos
 
 jobs:
   qodana:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    environment: enviroments   # <-- your Environment name
+    environment: enviroments
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,15 +27,22 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
 
+      # Qodana uses CLI args; point it at the subfolder project
       - name: Qodana Scan (Cloud if token, else Community)
         uses: JetBrains/qodana-action@v2025.1
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
-          project-dir: inventario
-          args: >-
-            --results-dir=qodana/results
-            ${{ secrets.QODANA_TOKEN == '' && '--linter=jetbrains/qodana-jvm-community:2025.1' || '' }}
+          # keep it single-line so nothing gets dropped by YAML folding
+          args: "--project-dir=inventario --results-dir=qodana/results ${{ secrets.QODANA_TOKEN == '' && '--linter=jetbrains/qodana-jvm-community:2025.1' || '' }}"
+
+      # Upload Qodana SARIF to GitHub Security tab (code scanning)
+      - name: Upload Qodana SARIF to Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          # Qodana writes SARIF here by default under results dir
+          sarif_file: qodana/results/qodana.sarif.json
 
       - name: Upload Qodana HTML
         if: always()
@@ -42,16 +50,6 @@ jobs:
         with:
           name: qodana-report
           path: qodana/results/report/
-          if-no-files-found: warn
-
-      - name: Upload Qodana SARIF (if present)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: qodana-sarif
-          path: |
-            qodana/results/qodana.sarif.json
-            qodana/results/**/qodana.sarif.json
           if-no-files-found: warn
 
       - name: Upload Qodana logs
@@ -88,7 +86,7 @@ jobs:
 
       - name: Run Snyk (Gradle)
         uses: snyk/actions/gradle@master
-        continue-on-error: true
+        continue-on-error: true   # per Snyk docs, so upload step still runs
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -111,6 +109,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     needs: [qodana, snyk]
+
+    # env:
+    #   SPRING_PROFILES_ACTIVE: dev
+    #   SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/inventariodb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    #   SPRING_DATASOURCE_USERNAME: user
+    #   SPRING_DATASOURCE_PASSWORD: 12345678
 
     steps:
       - name: Checkout
@@ -135,3 +139,39 @@ jobs:
         run: |
           nohup java -jar inventario/build/libs/*.jar > app.log 2>&1 &
           echo "Waiting for app..."
+          for i in {1..40}; do
+            if curl -sSf http://127.0.0.1:8080 >/dev/null; then
+              echo "App is up!"
+              break
+            fi
+            sleep 3
+          done
+
+          if ! curl -sSf http://127.0.0.1:8080 >/dev/null; then
+            echo "App did not start in time" >&2
+            exit 1
+          fi
+
+          docker run --rm \
+            -v "$(pwd)":/zap/wrk/:rw \
+            --network="host" \
+            zaproxy/zap-stable \
+            zap-full-scan.py \
+            -t http://127.0.0.1:8080 \
+            -r zap_full_report.html || true
+
+      - name: Upload ZAP Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report
+          path: zap_full_report.html
+          if-no-files-found: error
+
+      - name: Upload app logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-log
+          path: app.log
+          if-no-files-found: warn

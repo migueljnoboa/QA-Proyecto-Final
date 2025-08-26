@@ -7,6 +7,7 @@ To start the application in development mode, import it into your IDE and run th
 Use the docker compose up file as well as start up the database docker compose in the test folder
 
 ## Getting Started
+<img width="1819" height="1108" alt="appInventario" src="https://github.com/user-attachments/assets/baf11f70-105d-41be-9dc5-d5b88c5351df" />
 
 The [Getting Started](https://vaadin.com/docs/latest/getting-started) guide will quickly familiarize you with your new
 Qa Proyecto Final implementation. You'll learn how to set up your development environment, understand the project 

@@ -6,7 +6,7 @@ services:
     container_name: otel-collector
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
-      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+      - ./static:/etc
     ports:
       - "4317:4317"
       - "4318:4318"
@@ -48,7 +48,7 @@ services:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
-      - ./prometheus.yml:/etc/prometheus.yml:ro
+      - ./static:/etc/prometheus
     ports:
       - "9090:9090"
     networks:

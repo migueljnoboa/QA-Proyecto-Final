@@ -65,44 +65,6 @@ public class RoleService {
         return roleRepository.findAllByUsersAndEnabledIsTrue(Set.of(user));
     }
 
-    @Transactional
-    public void createDefaultRolesIfNotExists(){
-
-        Role adminRole = roleRepository.findByName(Role.ADMIN_ROLE);
-        if (adminRole.getPermits().isEmpty()){
-            adminRole.setPermits(new LinkedHashSet<>(permitService.findAll()));
-            roleRepository.save(adminRole);
-        }
-
-        Role employeeRole = roleRepository.findByName(Role.EMPLOYEE_ROLE);
-        if (employeeRole.getPermits().isEmpty()) {
-            employeeRole.setPermits(new LinkedHashSet<>(Arrays.asList(
-                    permitService.findByName(Permit.DASHBOARD_MENU),
-
-                    permitService.findByName(Permit.SUPPLIERS_MENU),
-                    permitService.findByName(Permit.SUPPLIER_VIEW),
-                    permitService.findByName(Permit.SUPPLIER_CREATE),
-                    permitService.findByName(Permit.SUPPLIER_EDIT),
-
-                    permitService.findByName(Permit.PRODUCTS_MENU),
-                    permitService.findByName(Permit.PRODUCT_CREATE),
-                    permitService.findByName(Permit.PRODUCT_EDIT),
-                    permitService.findByName(Permit.PRODUCT_VIEW),
-                    permitService.findByName(Permit.PRODUCT_STOCK_CHANGE))));
-            roleRepository.save(employeeRole);
-        }
-
-        Role userRole = roleRepository.findByName(Role.USER_ROLE);
-        if (userRole.getPermits().isEmpty()){
-            userRole.setPermits(new LinkedHashSet<>(Arrays.asList(
-                    permitService.findByName(Permit.DASHBOARD_MENU),
-                    permitService.findByName(Permit.PRODUCTS_MENU),
-                    permitService.findByName(Permit.PRODUCT_VIEW),
-                    permitService.findByName(Permit.SUPPLIER_VIEW))));
-            roleRepository.save(userRole);
-        }
-    }
-
     @Transactional(readOnly = true)
     public Role findByName(String name) {
         if(StringUtils.isBlank(name)){

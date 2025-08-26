@@ -6,7 +6,7 @@ services:
     container_name: otel-collector
     command: ["--config=/etc/otelcol-contrib/otel-collector-config.yaml"]
     volumes:
-      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+     - otel-config:/etc:ro
     ports:
       - "4317:4317"
       - "4318:4318"

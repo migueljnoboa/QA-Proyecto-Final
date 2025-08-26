@@ -3,10 +3,10 @@ on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: # Specify your branches here
-      - main # The 'main' branch
-      - dev # The 'main' branch
-      - 'releases/*' # The release branches
+    branches:
+      - main
+      - dev
+      - 'releases/*'
 
 jobs:
   qodana:
@@ -15,16 +15,25 @@ jobs:
       contents: write
       pull-requests: write
       checks: write
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
-          fetch-depth: 0  # a full history is required for pull request analysis
-      - name: 'Qodana Scan'
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Qodana Scan
         uses: JetBrains/qodana-action@v2025.2
         with:
-          working-directory: ./inventario
-          args: --save-report --show-report
+          # Store results in a temp dir and auto-upload as an artifact
+          results-dir: ${{ runner.temp }}/qodana/results
+          upload-result: true
+          artifact-name: qodana-report
+          # Pass CLI flags via args (no working-directory input in 2025.2)
+          args: >
+            --project-dir ./inventario
+            --save-report
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_2110364401 }}
           QODANA_ENDPOINT: 'https://qodana.cloud'

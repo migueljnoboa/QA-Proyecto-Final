@@ -83,7 +83,7 @@ public class ProductServiceTest {
 
         supplierService.createSupplier(supplier);
 
-        assertThrows(MyException.class, () -> productService.createProduct(null));
+        assertThrows(MyException.class, () -> productService.createProduct((Product) null));
 
         // Check if you can create a product
         assertEquals(product1, productService.createProduct(product1));
@@ -95,7 +95,7 @@ public class ProductServiceTest {
 
         // Check if name is null
         product1.setName(null);
-        assertThrows(MyException.class, () -> productService.createProduct(null));
+        assertThrows(MyException.class, () -> productService.createProduct((Product) null));
 
         // Check if name is empty
         product1.setName("");
@@ -108,7 +108,7 @@ public class ProductServiceTest {
 
         // Check if name is null
         product1.setCategory(null);
-        assertThrows(MyException.class, () -> productService.createProduct(null));
+        assertThrows(MyException.class, () -> productService.createProduct((Product) null));
 
         // Check if name is empty
         product1.setName("");
@@ -121,7 +121,7 @@ public class ProductServiceTest {
 
         // Check if name is null
         product1.setPrice(null);
-        assertThrows(MyException.class, () -> productService.createProduct(null));
+        assertThrows(MyException.class, () -> productService.createProduct((Product) null));
 
         // Check if name is empty
         product1.setPrice(new BigDecimal("-1.0"));
@@ -134,7 +134,7 @@ public class ProductServiceTest {
 
         // Check if name is null
         product1.setStock(null);
-        assertThrows(MyException.class, () -> productService.createProduct(null));
+        assertThrows(MyException.class, () -> productService.createProduct((Product) null));
 
         // Check if name is empty
         product1.setStock(-1);
@@ -147,7 +147,7 @@ public class ProductServiceTest {
 
         // Check if name is null
         product1.setMinStock(null);
-        assertThrows(MyException.class, () -> productService.createProduct(null));
+        assertThrows(MyException.class, () -> productService.createProduct((Product) null));
 
         // Check if name is empty
         product1.setMinStock(-1);
@@ -160,7 +160,7 @@ public class ProductServiceTest {
 
         // Check if name is null
         product1.setSupplier(null);
-        assertThrows(MyException.class, () -> productService.createProduct(null));
+        assertThrows(MyException.class, () -> productService.createProduct((Product) null));
 
         // Check if name is empty
 
@@ -187,7 +187,7 @@ public class ProductServiceTest {
         assertThrows(MyException.class, () -> productService.updateProduct(product1));
         product1.setId(oldProduct1Id);
 
-        assertThrows(MyException.class, () -> productService.updateProduct(null));
+        assertThrows(MyException.class, () -> productService.updateProduct((Product) null));
 
         product1.setName("");
         assertThrows(MyException.class, () -> productService.updateProduct(product1));

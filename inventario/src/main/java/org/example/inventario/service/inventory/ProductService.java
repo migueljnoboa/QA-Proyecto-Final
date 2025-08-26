@@ -1,8 +1,11 @@
 package org.example.inventario.service.inventory;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.example.inventario.exception.MyException;
+import org.example.inventario.model.dto.api.ProductApi;
 import org.example.inventario.model.dto.inventory.ReturnList;
 import org.example.inventario.model.entity.inventory.Category;
 import org.example.inventario.model.entity.inventory.Product;
@@ -34,6 +37,9 @@ public class ProductService {
     @Autowired
     private ProductStockChangeService productStockChangeService;
 
+    @PersistenceContext
+    private EntityManager em;
+
 
     @Transactional
     public Product createProduct(Product product) {
@@ -45,6 +51,21 @@ public class ProductService {
         checkVariables(product);
 
         return productRepository.save(product);
+    }
+
+    @Transactional
+    public Product createProduct(ProductApi productApi) {
+
+        if (productApi == null) {
+            throw new MyException(400, "Product is null");
+        }
+
+        Product product = ProductApi.from(productApi);
+        Long supplierId = productApi.getSupplier().getId();
+        Supplier managed = em.getReference(Supplier.class, supplierId);
+        product.setSupplier(managed);
+
+        return createProduct(product);
     }
 
     @Transactional(readOnly = true)
@@ -67,20 +88,17 @@ public class ProductService {
 
     @Transactional
     public Product updateProduct(Product product) {
+        if (product == null) throw new MyException(400, "Product not found or null");
+        if (product.getId() == null) throw new MyException(MyException.ERROR_NOT_FOUND, "Product Id not found");
 
-        if(product == null) {
-            throw  new MyException(400, "Supplier not found or null");
-        }
-
-        if(product.getId() == null) {
-            throw new MyException(MyException.ERROR_NOT_FOUND, "Product Id not found");
-        }
-
-        Product oldProduct = productRepository.findById(product.getId()).orElse(null);
+        Product oldProduct = productRepository.findById(product.getId())
+                .orElseThrow(() -> new MyException(MyException.ERROR_NOT_FOUND, "Product not found with ID: " + product.getId()));
 
         checkVariables(product);
 
-        int delta = product.getStock() - oldProduct.getStock();
+        int oldStock = oldProduct.getStock() == null ? 0 : oldProduct.getStock();
+        int newStock = product.getStock() == null ? 0 : product.getStock();
+        int delta = newStock - oldStock;
 
         oldProduct.setName(product.getName());
         oldProduct.setDescription(product.getDescription());
@@ -93,11 +111,30 @@ public class ProductService {
 
         oldProduct = productRepository.save(oldProduct);
 
-        if(delta != 0) {
+        if (delta != 0) {
             productStockChangeService.create(oldProduct, delta > 0, Math.abs(delta));
         }
 
         return oldProduct;
+    }
+
+    @Transactional
+    public Product updateProduct(ProductApi productApi) {
+
+        if(productApi == null) {
+            throw  new MyException(400, "Product not found or null");
+        }
+
+        if(productApi.getId() == null) {
+            throw new MyException(MyException.ERROR_NOT_FOUND, "Product Id not found");
+        }
+
+        Product product = ProductApi.from(productApi);
+        Long supplierId = productApi.getSupplier().getId();
+        Supplier managed = em.getReference(Supplier.class, supplierId);
+        product.setSupplier(managed);
+
+        return updateProduct(product);
     }
 
     @Transactional
@@ -135,7 +172,7 @@ public class ProductService {
         if(product.getMinStock() == null || product.getMinStock() < 0) {
             throw new MyException(400,"Product min stock cannot be null or less than zero");
         }
-        if(product.getSupplier() == null) {
+        if(product.getSupplier() == null || product.getSupplier().getId() == null) {
             throw new MyException(400,"Product supplier cannot be null");
         }
 

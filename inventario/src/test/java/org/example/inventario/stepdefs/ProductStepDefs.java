@@ -3,6 +3,7 @@ package org.example.inventario.stepdefs;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
 import org.example.inventario.model.dto.api.ProductApi;
+import org.example.inventario.model.dto.api.SupplierApi;
 import org.example.inventario.model.dto.scurity.ReturnAuthentication;
 import org.example.inventario.model.dto.scurity.UserAuthentication;
 import org.example.inventario.model.entity.inventory.Category;
@@ -24,7 +25,6 @@ import java.util.Map;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ProductStepDefs {
 
-    private Product product;
     private ProductApi responseProductApi;
     private Long lastProductId;
     private ResponseEntity<ProductApi> lastDtoResponse;
@@ -87,20 +87,21 @@ public class ProductStepDefs {
 
     @Given("a product exists with name {string}, description {string}, category {string}, price {double}, stock {int}, minStock {int}, supplier Id {int}")
     public void a_product_exists(String name, String description, String category, Double price, Integer stock, Integer minStock, Integer supplierId) {
+        Supplier ensured = ensureSupplierExists(supplierId.longValue());
 
-        Supplier supplier = ensureSupplierExists(supplierId.longValue());
-
-        Product toCreate = new Product();
+        ProductApi toCreate = new ProductApi();
         toCreate.setName(name);
         toCreate.setDescription(description);
-        toCreate.setCategory(Category.valueOf(category));
+        toCreate.setCategory(category);
         toCreate.setPrice(BigDecimal.valueOf(price));
         toCreate.setStock(stock);
         toCreate.setMinStock(minStock);
-        toCreate.setSupplier(supplier);
 
-        // Use API to create (exercise controller + security)
-        HttpEntity<Product> request = new HttpEntity<>(toCreate, authHeadersJson());
+        SupplierApi s = new SupplierApi();
+        s.setId(ensured.getId());
+        toCreate.setSupplier(s);
+
+        HttpEntity<ProductApi> request = new HttpEntity<>(toCreate, authHeadersJson());
         ResponseEntity<ProductApi> postResponse = restTemplate.exchange(
                 "/api/product", HttpMethod.POST, request, ProductApi.class
         );
@@ -110,26 +111,26 @@ public class ProductStepDefs {
 
         responseProductApi = postResponse.getBody();
         lastProductId = responseProductApi.getId();
-
-        // Keep a modifiable copy (entity) for later updates
-        product = toCreate;
-        product.setId(lastProductId);
     }
 
     @When("I create a product with name {string}, description {string}, category {string}, price {double}, stock {int}, minStock {int}, supplier Id {int}")
     public void i_create_a_product(String name, String description, String category, Double price, Integer stock, Integer minStock, Integer supplierId) {
-        Supplier supplier = ensureSupplierExists(supplierId.longValue());
 
-        Product toCreate = new Product();
+        Supplier ensured = ensureSupplierExists(supplierId.longValue());
+
+        ProductApi toCreate = new ProductApi();
         toCreate.setName(name);
         toCreate.setDescription(description);
-        toCreate.setCategory(Category.valueOf(category));
+        toCreate.setCategory(category);
         toCreate.setPrice(BigDecimal.valueOf(price));
         toCreate.setStock(stock);
         toCreate.setMinStock(minStock);
-        toCreate.setSupplier(supplier);
 
-        HttpEntity<Product> request = new HttpEntity<>(toCreate, authHeadersJson());
+        SupplierApi s = new SupplierApi();
+        s.setId(ensured.getId());
+        toCreate.setSupplier(s);
+
+        HttpEntity<ProductApi> request = new HttpEntity<>(toCreate, authHeadersJson());
         lastDtoResponse = restTemplate.exchange("/api/product", HttpMethod.POST, request, ProductApi.class);
 
         Assertions.assertEquals(HttpStatus.OK, lastDtoResponse.getStatusCode());
@@ -137,9 +138,6 @@ public class ProductStepDefs {
 
         responseProductApi = lastDtoResponse.getBody();
         lastProductId = responseProductApi.getId();
-
-        product = toCreate;
-        product.setId(lastProductId);
     }
 
     @When("I get the product by ID")
@@ -154,9 +152,19 @@ public class ProductStepDefs {
 
     @When("I update the product name to {string}")
     public void i_update_the_product_name_to(String newName) {
-        product.setName(newName);
-        HttpEntity<Product> request = new HttpEntity<>(product, authHeadersJson());
+        // Build a full DTO including supplier
+        ProductApi toUpdate = new ProductApi();
+        toUpdate.setId(lastProductId);
+        toUpdate.setName(newName);
+        toUpdate.setDescription(responseProductApi.getDescription());
+        toUpdate.setCategory(responseProductApi.getCategory());
+        toUpdate.setPrice(responseProductApi.getPrice());
+        toUpdate.setStock(responseProductApi.getStock());
+        toUpdate.setMinStock(responseProductApi.getMinStock());
+        toUpdate.setImage(responseProductApi.getImage());
+        toUpdate.setSupplier(responseProductApi.getSupplier());
 
+        HttpEntity<ProductApi> request = new HttpEntity<>(toUpdate, authHeadersJson());
         lastDtoResponse = restTemplate.exchange(
                 "/api/product/" + lastProductId, HttpMethod.PUT, request, ProductApi.class
         );

@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.example.inventario.model.dto.api.ProductApi;
 import org.example.inventario.model.dto.inventory.ReturnList;
-import org.example.inventario.model.entity.inventory.Product;
 import org.example.inventario.model.entity.security.Permit;
 import org.example.inventario.service.inventory.ProductService;
 import org.springframework.data.domain.Page;
@@ -34,7 +33,7 @@ public class ProductApiController {
 
     @Secured({Permit.PRODUCT_CREATE})
     @PostMapping("")
-    public ProductApi createProduct(@RequestBody Product product) {
+    public ProductApi createProduct(@RequestBody ProductApi product) {
         if (product == null) {
             throw new IllegalArgumentException("Product cannot be null");
         }
@@ -43,7 +42,7 @@ public class ProductApiController {
 
     @Secured({Permit.PRODUCT_EDIT})
     @PutMapping("{id}")
-    public ProductApi updateProduct(@PathVariable(name = "id") @Parameter(description = "Product ID.", example = "1") Long id, @RequestBody Product product) {
+    public ProductApi updateProduct(@PathVariable(name = "id") @Parameter(description = "Product ID.", example = "1") Long id, @RequestBody ProductApi product) {
         if (product == null) {
             throw new IllegalArgumentException("Product cannot be null");
         }

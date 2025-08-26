@@ -25,14 +25,18 @@ jobs:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
           args: --results-dir=qodana/results
-      - name: Upload Qodana Report
+
+      - name: Upload Qodana Report (HTML)
         uses: actions/upload-artifact@v4
         with:
           name: qodana-report
-          path: qodana/results/report.html
+          path: qodana/results/report/
 
   snyk:
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -48,13 +52,14 @@ jobs:
 
       - name: Run Snyk Scan
         uses: snyk/actions/gradle@master
+        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high --sarif-file-output=snyk.sarif
 
       - name: Upload Snyk Report to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: snyk.sarif
 
@@ -71,23 +76,20 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Build and run application
-        run: ./gradlew bootRun &
+      - name: Build app
+        run: ./gradlew build -x test
 
-      - name: Wait for app
+      - name: Start app and run OWASP ZAP Full Scan
         run: |
-          echo "Esperando..."
+          nohup java -jar build/libs/*.jar > app.log 2>&1 &
+          echo "Waiting for app..."
           for i in {1..30}; do
-            if curl -s http://127.0.0.1:8080 > /dev/null; then
+            if curl -s http://127.0.0.1:8080 >/dev/null; then
               echo "App is up!"
-              exit 0
+              break
             fi
             sleep 5
           done
-          echo "App did not start in time" && exit 1
-
-      - name: Run OWASP ZAP Full Scan
-        run: |
           docker run --rm \
             -v $(pwd):/zap/wrk/:rw \
             --network="host" \

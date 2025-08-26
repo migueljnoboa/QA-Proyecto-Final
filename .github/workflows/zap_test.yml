@@ -2,26 +2,32 @@ name: OWASP ZAP Baseline Scan
 
 on:
   workflow_dispatch:
+
   push:
     branches: [ dev ]
+
   pull_request:
     branches: [ dev ]
 
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
+
+    permissions:
+      issues: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: ZAP Scan
         uses: zaproxy/action-baseline@v0.11.0
         with:
-          # Replace with websiite
           target: 'https://www.google.com'
-          report_name: 'zap_baseline_report.html'
-          fail_on_risk: 'High'
+
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
           name: zap-baseline-report
-          path: 'zap_baseline_report.html'
+
+          path: 'report_html.html'

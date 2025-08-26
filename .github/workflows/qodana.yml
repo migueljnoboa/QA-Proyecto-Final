@@ -4,9 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - main
-      - cpeterson
-
+      - dev
 jobs:
   qodana:
     runs-on: ubuntu-latest

@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: [ dev, 'releases/*' ]
+    branches: [ main, dev, 'releases/*' ]
 
 jobs:
   qodana:
@@ -21,12 +21,15 @@ jobs:
       - name: Qodana Scan
         uses: JetBrains/qodana-action@v2025.2
         with:
-          # store & upload results without extra flags
+          args: --project-dir=./inventario --image=jetbrains/qodana-jvm-community:2025.2
           results-dir: ${{ runner.temp }}/qodana/results
-          upload-result: true
-          artifact-name: qodana-report
-          # IMPORTANT: single-token arg
-          args: --project-dir=./inventario
+          upload-result: false
         env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_2110364401 }}
-          QODANA_ENDPOINT: 'https://qodana.cloud'
+          #QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_2110364401 }}
+          #QODANA_ENDPOINT: 'https://qodana.cloud'
+
+      - name: Upload Qodana HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: qodana-html
+          path: ${{ runner.temp }}/qodana/results/report/

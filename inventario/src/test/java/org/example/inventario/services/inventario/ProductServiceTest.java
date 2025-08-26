@@ -170,6 +170,9 @@ public class ProductServiceTest {
         product1.setSupplier(badSupplier);
         assertThrows(MyException.class, () -> productService.createProduct(product1));
 
+        product1.setSupplier(null);
+        assertThrows(MyException.class, () -> productService.createProduct(product1));
+
     }
 
     @Test
